@@ -32,7 +32,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def validate_password2(self, attrs, source):
         password2 = attrs.pop(source)
         if password2 != attrs.get('password'):
-            msg = 'Your passwords do not match.'
+            msg = _('Your passwords do not match.')
             raise serializers.ValidationError(msg)
         return attrs
 
@@ -60,13 +60,13 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
     def validate_old_password(self, attrs, source):
         value = attrs[source]
         if not self.object.check_password(value):
-            msg = 'Invalid password.'
+            msg = _('Invalid password.')
             raise serializers.ValidationError(msg)
         return attrs
 
     def validate_new_password2(self, attrs, source):
         if attrs['new_password'] != attrs[source]:
-            msg = 'Your new passwords do not match.'
+            msg = _('Your new passwords do not match.')
             raise serializers.ValidationError(msg)
         return attrs
 
@@ -86,7 +86,7 @@ class PasswordResetSerializer(serializers.ModelSerializer):
 
     def validate_new_password2(self, attrs, source):
         if attrs['new_password'] != attrs[source]:
-            msg = 'Your new passwords do not match.'
+            msg = _('Your new passwords do not match.')
             raise serializers.ValidationError(msg)
         return attrs
 
