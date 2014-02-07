@@ -1,0 +1,10 @@
+{% spaceless %}{% load i18n %}{% autoescape off %}
+You are receiving this email because your email address has been used to
+register an account at {{ site.name }}.
+
+Please click the following link to complete your registration:
+
+http://{{ site.domain }}#/register/verify/{{ uid }}/{{ token }}/
+
+{% endautoescape %}
+{% endspaceless %}

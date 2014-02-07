@@ -1,0 +1,6 @@
+from django.conf.urls import include, patterns, url
+
+
+urlpatterns = patterns('',
+    url(r'', include('user_management.urls')),
+)
