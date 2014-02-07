@@ -20,7 +20,7 @@ class GetToken(ObtainAuthToken):
 
 
 class UserRegister(generics.CreateAPIView):
-    serializer_class = serializers.UserSerializer
+    serializer_class = serializers.RegistrationSerializer
     permission_classes = [permissions.IsNotAuthenticated]
     ok_message = _('Your account has been created and an activation link sent to your email address. Please check your email to continue.')
 

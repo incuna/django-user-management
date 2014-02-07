@@ -6,7 +6,7 @@ from rest_framework import serializers
 User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
+class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8, label=_('Password'))
     password2 = serializers.CharField(write_only=True, min_length=8, label=_('Repeat password'))
 

@@ -130,7 +130,7 @@ class PasswordResetSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
 
 
-class UserSerializerTest(TestCase):
+class RegistrationSerializerTest(TestCase):
     def setUp(self):
         super().setUp()
         self.data = {
@@ -141,7 +141,7 @@ class UserSerializerTest(TestCase):
         }
 
     def test_deserialize(self):
-        serializer = serializers.UserSerializer(data=self.data)
+        serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertTrue(serializer.is_valid())
 
         user = serializer.object
@@ -151,13 +151,13 @@ class UserSerializerTest(TestCase):
     def test_deserialize_invalid_new_password(self):
         self.data['password'] = '2short'
 
-        serializer = serializers.UserSerializer(data=self.data)
+        serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('password', serializer.errors)
         self.assertIs(serializer.object, None)
 
     def test_deserialize_mismatched_passwords(self):
         self.data['password2'] = 'different_password'
-        serializer = serializers.UserSerializer(data=self.data)
+        serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('password2', serializer.errors)
