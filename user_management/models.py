@@ -81,7 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         send(
             to=[self.email],
-            template_name='users/account_validation_email.html',
+            template_name='user_management/account_validation_email.html',
             subject='{} account validate'.format(site.domain),
             extra_context=context,
         )

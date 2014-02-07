@@ -52,7 +52,7 @@ class TestUser(TestCase):
     def test_send_validation_email(self):
         site = Site.objects.get_current()
         subject = '{} account validate'.format(site.domain)
-        template = 'users/account_validation_email.html'
+        template = 'user_management/account_validation_email.html'
         user = UserFactory.create()
 
         uid = urlsafe_base64_encode(force_bytes(user.pk))
