@@ -32,7 +32,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class AbstractUser(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(
         verbose_name=_('Name'),
         max_length=255,
@@ -58,6 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['name']
 
     class Meta:
+        abstract = True
         ordering = ['name']
 
     def __str__(self):

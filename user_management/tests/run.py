@@ -9,7 +9,7 @@ import dj_database_url
 
 settings.configure(
     DATABASES={
-        'default': dj_database_url.config(default='postgres://localhost/epatient_api'),
+        'default': dj_database_url.config(default='postgres://localhost/user_management_api'),
     },
     INSTALLED_APPS=(
         # Put contenttypes before auth to work around test issue.
@@ -21,10 +21,11 @@ settings.configure(
         'django.contrib.admin',
 
         'user_management',
+        'user_management.tests',
     ),
     PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',),
     SITE_ID = 1,
-    AUTH_USER_MODEL = 'user_management.User',
+    AUTH_USER_MODEL = 'tests.User',
     ROOT_URLCONF='user_management.tests.urls',
     REST_FRAMEWORK={
         'DEFAULT_PERMISSION_CLASSES': (
