@@ -44,6 +44,7 @@ class TestUserManager(TestCase):
 
         user = self.manager.create_superuser(email, password)
 
+        self.assertTrue(user.is_active)
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
 
