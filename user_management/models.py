@@ -23,11 +23,12 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
+        extra_fields.update({
+            'is_active': True,
+            'is_staff': True,
+            'is_superuser': True,
+        })
         user = self.create_user(email, password, **extra_fields)
-        user.is_active = True
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
         return user
 
 
@@ -54,6 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
 
     class Meta:
         ordering = ['name']
