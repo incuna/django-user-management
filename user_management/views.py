@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 from incuna_mail import send
 from rest_framework import generics, renderers, response, status, views
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import AllowAny
 
 from . import serializers, permissions
 
@@ -32,7 +31,6 @@ class UserRegister(generics.CreateAPIView):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        serializer.object.send_validation_email()
 
         return response.Response(
             data={'data': self.ok_message},
@@ -109,19 +107,6 @@ class PasswordChangeView(generics.UpdateAPIView):
 
     def get_object(self):
         return self.request.user
-
-
-class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        if self.user.verified_email:
-            return response.Response(status=status.HTTP_403_FORBIDDEN)
-
-        self.user.verified_email = True
-        self.user.is_active = True
-        self.user.save()
-        return response.Response(status=status.HTTP_200_OK)
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
