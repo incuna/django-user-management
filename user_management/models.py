@@ -1,13 +1,11 @@
+from django.conf import settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.models import Site
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
-from incuna_mail import send
+
+IS_ACTIVE_DEFAULT = getattr(settings, 'USER_IS_ACTIVE_DEFAULT', True)
 
 
 class UserManager(BaseUserManager):
@@ -47,10 +45,8 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         default=timezone.now,
         editable=False,
     )
-    is_active = models.BooleanField(_('active'), default=False)
+    is_active = models.BooleanField(_('active'), default=IS_ACTIVE_DEFAULT)
     is_staff = models.BooleanField(_('staff status'), default=False)
-
-    verified_email = models.BooleanField(_('Verified email address'), default=False)
 
     objects = UserManager()
 
@@ -69,20 +65,3 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.name
-
-    def send_validation_email(self):
-        if self.verified_email:
-            raise ValueError('Cannot validate already active user.')
-
-        context = {
-            'uid': urlsafe_base64_encode(force_bytes(self.pk)),
-            'token': default_token_generator.make_token(self),
-        }
-        site = Site.objects.get_current()
-
-        send(
-            to=[self.email],
-            template_name='user_management/account_validation_email.html',
-            subject='{} account validate'.format(site.domain),
-            extra_context=context,
-        )
