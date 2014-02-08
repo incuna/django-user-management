@@ -1,8 +1,11 @@
+from django.conf import settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
+IS_ACTIVE_DEFAULT = getattr(settings, 'USER_IS_ACTIVE_DEFAULT', True)
 
 
 class UserManager(BaseUserManager):
@@ -42,7 +45,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         default=timezone.now,
         editable=False,
     )
-    is_active = models.BooleanField(_('active'), default=True)
+    is_active = models.BooleanField(_('active'), default=IS_ACTIVE_DEFAULT)
     is_staff = models.BooleanField(_('staff status'), default=False)
 
     objects = UserManager()
