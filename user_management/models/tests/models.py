@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from ..mixins import (
-    BaseUserMixin,
-    VerifiedEmailMixin,
+    BasicUserFieldsMixin,
+    VeryifyEmailMixin,
     VerifiedEmailManagerMixin,
     UserManager as BaseUserManager)
 
@@ -10,5 +10,5 @@ class UserManager(VerifiedEmailManagerMixin, BaseUserManager):
     pass
 
 
-class User(BaseUserMixin, VerifiedEmailMixin, PermissionsMixin, AbstractBaseUser):
+class User(BasicUserFieldsMixin, VeryifyEmailMixin, PermissionsMixin, AbstractBaseUser):
     objects = UserManager()

@@ -23,14 +23,14 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.update({
-            'is_staff': True,
-            'is_superuser': True,
+            'is_staff': extra_fields.pop('is_staff', True),
+            'is_superuser': extra_fields.pop('is_superuser', True),
         })
         user = self.create_user(email, password, **extra_fields)
         return user
 
 
-class BaseUserMixin(models.Model):
+class BasicUserFieldsMixin(models.Model):
     name = models.CharField(
         verbose_name=_('Name'),
         max_length=255,
@@ -76,7 +76,7 @@ class IsActiveMixin(models.Model):
 class VerifiedEmailManagerMixin(object):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.update({
-            'is_active': True,
+            'is_active': extra_fields.pop('is_active', True),
         })
         user = super(VerifiedEmailManagerMixin, self).create_superuser(
             email,
@@ -89,9 +89,11 @@ class VerifiedEmailManager(VerifiedEmailManagerMixin, BaseUserManager):
     pass
 
 
-class VerifiedEmailMixin(models.Model):
+class VeryifyEmailMixin(models.Model):
     is_active = models.BooleanField(_('active'), default=False)
-    verified_email = models.BooleanField(_('Verified email address'), default=False)
+    verified_email = models.BooleanField(_('Verified email address'),
+        default=False,
+        help_text=_('Indicates if the email address has been verified.'))
 
     objects = VerifiedEmailManager()
 
@@ -99,7 +101,7 @@ class VerifiedEmailMixin(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        super(VerifiedEmailMixin, self).save(*args, **kwargs)
+        super(VeryifyEmailMixin, self).save(*args, **kwargs)
         if not self.verified_email:
             self.send_validation_email()
 

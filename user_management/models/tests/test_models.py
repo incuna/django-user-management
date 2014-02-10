@@ -13,14 +13,14 @@ from django.utils.http import urlsafe_base64_encode
 
 from . import models
 from .. import mixins
-from .factories import UserFactory
 
 
 class AbstractModelMixin(object):
     """
-    Base class for tests of model mixins. To use, subclass and specify
-    the mixin class variable. A model using the mixin will be made
-    available in self.model.
+    Mixin class for tests of (abstract) model mixins. To use, subclass and specify
+    the mixin class variable. A model using the mixin will be made available in self.model.
+
+    From http://michael.mior.ca/2012/01/14/blog/unit-testing-django-model-mixins.html
     """
     def setUp(self):
         # Create a dummy model which extends the mixin
@@ -61,10 +61,10 @@ class TestUserManager(TestCase):
 
         self.assertEqual(email, user.email)
         self.assertEqual(signup_datetime, user.date_joined)
-        #self.assertFalse(user.is_active)
+        self.assertFalse(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
-        #self.assertFalse(user.verified_email)
+        self.assertFalse(user.verified_email)
 
     def test_create_user_uppercase_email(self):
         email = 'VALID@EXAMPLE.COM'
@@ -84,7 +84,7 @@ class TestUserManager(TestCase):
 
 
 class TestUser(AbstractModelMixin, TestCase):
-    mixin = mixins.VerifiedEmailMixin
+    mixin = mixins.VeryifyEmailMixin
 
     def test_save(self):
         user = self.model()
