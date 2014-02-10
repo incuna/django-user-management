@@ -59,7 +59,7 @@ class TestUser(TestCase):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
         with patch.object(default_token_generator, 'make_token') as make_token:
-            with patch('user_management.models.send') as send:
+            with patch('user_management.models.mixins.send') as send:
                 user.send_validation_email()
 
         send.assert_called_once_with(
@@ -72,7 +72,7 @@ class TestUser(TestCase):
     def test_verified_email(self):
         user = UserFactory.create(verified_email=True)
 
-        with patch('user_management.models.send') as send:
+        with patch('user_management.models.mixins.send') as send:
             with self.assertRaises(ValueError):
                 user.send_validation_email()
 

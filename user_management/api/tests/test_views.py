@@ -8,9 +8,9 @@ from django.core import mail
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from user_management import views
-from user_management.tests.factories import UserFactory
-from user_management.tests.utils import APIRequestTestCase
+from user_management.api import views
+from user_management.models.tests.factories import UserFactory
+from user_management.models.tests.utils import APIRequestTestCase
 
 
 User = get_user_model()

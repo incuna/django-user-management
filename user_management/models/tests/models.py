@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from ..models import (
+from ..mixins import (
     BaseUserMixin,
     VerifiedEmailMixin,
     VerifiedEmailManagerMixin,

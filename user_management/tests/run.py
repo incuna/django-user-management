@@ -20,13 +20,14 @@ settings.configure(
         'django.contrib.sessions',
         'django.contrib.admin',
 
-        'user_management',
-        'user_management.tests',
+        # Added for templates
+        'user_management.api',
+        'user_management.models.tests',
     ),
     PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',),
     SITE_ID = 1,
     AUTH_USER_MODEL = 'tests.User',
-    ROOT_URLCONF='user_management.tests.urls',
+    ROOT_URLCONF='user_management.api.tests.urls',
     REST_FRAMEWORK={
         'DEFAULT_PERMISSION_CLASSES': (
             'rest_framework.permissions.IsAuthenticated',

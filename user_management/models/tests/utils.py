@@ -2,7 +2,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from user_management.tests.factories import UserFactory
+from .factories import UserFactory
 
 
 class APIRequestTestCase(TestCase):
