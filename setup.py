@@ -10,7 +10,7 @@ install_requires = (
 )
 
 setup(
-    name='django-user-management-api',
+    name='django-user-management',
     packages=find_packages(),
     include_package_data=True,
     version=version,
@@ -18,7 +18,7 @@ setup(
     long_description='',
     author='incuna',
     author_email='admin@incuna.com',
-    url='https://github.com/incuna/django-user-management-api/',
+    url='https://github.com/incuna/django-user-management/',
     install_requires=install_requires,
     zip_safe=False,
 )
