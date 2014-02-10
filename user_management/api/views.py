@@ -58,7 +58,7 @@ class PasswordResetEmailView(views.APIView):
         else:
             self.send_email(user)
 
-        msg = 'Password reset request successful. Please check your email.'
+        msg = _('Password reset request successful. Please check your email.')
         return response.Response(msg, status=status.HTTP_204_NO_CONTENT)
 
     def send_email(self, user):
