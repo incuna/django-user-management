@@ -99,7 +99,7 @@ class TestUserManager(TestCase):
     def test_create_duplicate_email(self):
         existing_user = UserFactory.create()
         with self.assertRaises(IntegrityError):
-            self.manager.create_user(email=existing_user.email)
+            self.manager.create_user(email=existing_user.email.upper())
 
     def test_create_user(self):
         time_before = timezone.now()
