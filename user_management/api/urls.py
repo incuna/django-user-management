@@ -22,11 +22,6 @@ urlpatterns = patterns(
         name='password_reset',
     ),
     url(
-        regex=r'^verify_email/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-        view=csrf_exempt(views.VerifyAccountView.as_view()),
-        name='verify_user',
-    ),
-    url(
         regex=r'^profile/$',
         view=views.ProfileDetailView.as_view(),
         name='profile_detail',
