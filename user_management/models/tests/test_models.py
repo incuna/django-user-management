@@ -83,7 +83,7 @@ class TestUserManager(TestCase):
         self.assertTrue(user.is_superuser)
 
 
-class TestUser(AbstractModelMixin, TestCase):
+class TestVeryifyEmailMixin(AbstractModelMixin, TestCase):
     mixin = mixins.VeryifyEmailMixin
 
     def test_save(self):

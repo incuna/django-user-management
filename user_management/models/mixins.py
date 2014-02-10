@@ -14,7 +14,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         user = self.model(
             email=email.lower(),
-            date_joined=timezone.now(),
+            date_joined=extra_fields.pop('date_joined', timezone.now()),
             **extra_fields
         )
         user.set_password(password)
@@ -66,7 +66,7 @@ class BasicUserFieldsMixin(models.Model):
         return self.name
 
 
-class IsActiveMixin(models.Model):
+class ActiveUserMixin(BasicUserFieldsMixin):
     is_active = models.BooleanField(_('active'), default=True)
 
     class Meta:
@@ -85,11 +85,11 @@ class VerifiedEmailManagerMixin(object):
         return user
 
 
-class VerifiedEmailManager(VerifiedEmailManagerMixin, BaseUserManager):
+class VerifiedEmailManager(VerifiedEmailManagerMixin, UserManager):
     pass
 
 
-class VeryifyEmailMixin(models.Model):
+class VeryifyEmailMixin(BasicUserFieldsMixin):
     is_active = models.BooleanField(_('active'), default=False)
     verified_email = models.BooleanField(_('Verified email address'),
         default=False,
