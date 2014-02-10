@@ -38,7 +38,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def restore_object(self, attrs, instance=None):
         password = attrs.pop('password')
-        instance = super().restore_object(attrs, instance)
+        instance = super(RegistrationSerializer, self).restore_object(attrs, instance)
         instance.set_password(password)
         return instance
 
@@ -53,7 +53,7 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         fields = ('old_password', 'new_password', 'new_password2')
 
     def restore_object(self, attrs, instance=None):
-        instance = super().restore_object(attrs, instance)
+        instance = super(PasswordChangeSerializer, self).restore_object(attrs, instance)
         instance.set_password(attrs['new_password'])
         return instance
 
@@ -80,7 +80,7 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         fields = ('new_password', 'new_password2')
 
     def restore_object(self, attrs, instance=None):
-        instance = super().restore_object(attrs, instance)
+        instance = super(PasswordResetSerializer, self).restore_object(attrs, instance)
         instance.set_password(attrs['new_password'])
         return instance
 
