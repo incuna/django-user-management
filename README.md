@@ -1,4 +1,4 @@
-# django-user-management
+# django-user-management [![Build Status](https://travis-ci.org/incuna/django-user-management.png?branch=merge-version)](https://travis-ci.org/incuna/django-user-management)
 
 User management model mixins and api views.
 
