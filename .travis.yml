@@ -1,0 +1,12 @@
+language: python
+python:
+  - 3.3
+script: make test
+notifications:
+  email: false
+env:
+  - DATABASE_URL='postgres://postgres@localhost/user_management'
+install:
+  - psql -c 'CREATE DATABASE user_management' -U postgres;
+  - pip install -r test_requirements.txt
+  - pip install -e .
