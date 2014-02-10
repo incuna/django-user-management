@@ -9,6 +9,6 @@ addons:
 env:
   - DATABASE_URL='postgres://postgres@localhost/user_management'
 install:
-  - psql -c 'CREATE DATABASE epatient_api' -U postgres;
+  - psql -c 'CREATE DATABASE user_management' -U postgres;
   - pip install -r test_requirements.txt
   - pip install -e .
