@@ -1,5 +1,4 @@
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.db import models
@@ -24,7 +23,6 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.update({
-            'is_active': True,
             'is_staff': True,
             'is_superuser': True,
         })
@@ -32,7 +30,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class AbstractUser(AbstractBaseUser, PermissionsMixin):
+class BaseUserMixin(models.Model):
     name = models.CharField(
         verbose_name=_('Name'),
         max_length=255,
@@ -47,10 +45,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         default=timezone.now,
         editable=False,
     )
-    is_active = models.BooleanField(_('active'), default=False)
     is_staff = models.BooleanField(_('staff status'), default=False)
-
-    verified_email = models.BooleanField(_('Verified email address'), default=False)
 
     objects = UserManager()
 
@@ -69,6 +64,39 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.name
+
+
+class IsActiveMixin(models.Model):
+    is_active = models.BooleanField(_('active'), default=True)
+
+    class Meta:
+        abstract = True
+
+
+class VerifiedEmailManagerMixin(object):
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.update({
+            'is_active': True,
+        })
+        user = super(VerifiedEmailManagerMixin, self).create_superuser(
+            email,
+            password,
+            **extra_fields)
+        return user
+
+
+class VerifiedEmailManager(VerifiedEmailManagerMixin, BaseUserManager):
+    pass
+
+
+class VerifiedEmailMixin(models.Model):
+    is_active = models.BooleanField(_('active'), default=False)
+    verified_email = models.BooleanField(_('Verified email address'), default=False)
+
+    objects = VerifiedEmailManager()
+
+    class Meta:
+        abstract = True
 
     def send_validation_email(self):
         if self.verified_email:
