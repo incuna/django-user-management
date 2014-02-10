@@ -12,21 +12,25 @@ from incuna_mail import send
 class UserManager(BaseUserManager):
     """Django requires user managers to have create_user & create_superuser."""
     def create_user(self, email, password=None, **extra_fields):
+        fields = {
+            'date_joined': timezone.now(),
+        }
+        fields.update(extra_fields)
         user = self.model(
             email=email.lower(),
-            date_joined=extra_fields.pop('date_joined', timezone.now()),
-            **extra_fields
+            **fields
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.update({
-            'is_staff': extra_fields.pop('is_staff', True),
-            'is_superuser': extra_fields.pop('is_superuser', True),
-        })
-        user = self.create_user(email, password, **extra_fields)
+        fields = {
+            'is_staff': True,
+            'is_superuser': True,
+        }
+        fields.update(extra_fields)
+        user = self.create_user(email, password, **fields)
         return user
 
 
@@ -73,19 +77,20 @@ class ActiveUserMixin(BasicUserFieldsMixin):
         abstract = True
 
 
-class VerifiedEmailManagerMixin(object):
+class VeryifyEmailManagerMixin(object):
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.update({
-            'is_active': extra_fields.pop('is_active', True),
-        })
-        user = super(VerifiedEmailManagerMixin, self).create_superuser(
+        fields = {
+            'is_active': True,
+        }
+        fields.update(extra_fields)
+        user = super(VeryifyEmailManagerMixin, self).create_superuser(
             email,
             password,
-            **extra_fields)
+            **fields)
         return user
 
 
-class VerifiedEmailManager(VerifiedEmailManagerMixin, UserManager):
+class VeryifyEmailManager(VeryifyEmailManagerMixin, UserManager):
     pass
 
 
@@ -95,7 +100,7 @@ class VeryifyEmailMixin(BasicUserFieldsMixin):
         default=False,
         help_text=_('Indicates if the email address has been verified.'))
 
-    objects = VerifiedEmailManager()
+    objects = VeryifyEmailManager()
 
     class Meta:
         abstract = True
