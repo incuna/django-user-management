@@ -32,7 +32,6 @@ class UserRegister(generics.CreateAPIView):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        serializer.object.send_validation_email()
 
         return response.Response(
             data={'data': self.ok_message},

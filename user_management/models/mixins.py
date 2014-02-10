@@ -98,6 +98,11 @@ class VerifiedEmailMixin(models.Model):
     class Meta:
         abstract = True
 
+    def save(self, *args, **kwargs):
+        super(VerifiedEmailMixin, self).save(*args, **kwargs)
+        if not self.verified_email:
+            self.send_validation_email()
+
     def send_validation_email(self):
         if self.verified_email:
             raise ValueError('Cannot validate already active user.')
