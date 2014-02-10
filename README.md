@@ -1,0 +1,65 @@
+# django-user-management
+
+User management model mixins and api views.
+
+## Custom user model mixins
+
+###  `user_management.models.mixins.ActiveUserMixin`
+`ActiveUserMixin` provides a base custom user
+mixin with a `name`, `email`, `date_joined`, `is_staff`, and `is_active`.
+
+###  `user_management.models.mixins.VeryifyEmailMixin`
+`VeryifyEmailMixin` extends ActiveUserMixin to
+provide functionality to verify the email. It includes an additional
+`verified_email` field.
+
+
+## Installation
+
+Install the package
+
+    pip install django-user-management
+
+
+Create a custom user model
+
+    from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+    from user_management.models.mixins import ActiveUserMixin
+
+
+    class User(ActiveUserMixin, PermissionsMixin, AbstractBaseUser):
+        pass
+
+If you want to use the `VeryifyEmailMixin` then substitute it for `ActiveUserMixin`
+
+
+Make sure your custom user model in added to `INSTALLED_APPS` and set 
+`AUTH_USER_MODEL` to your custom user model.
+
+
+### To use the api views
+
+Add to your `INSTALLED_APPS` in `settings.py`
+
+    INSTALLED_APPS = (
+        ...
+        user_management.api,
+        ...
+    )
+
+Add the urls to your `ROOT_URLCONF`
+
+    urlpatterns = patterns(''
+        ...
+        url('', include('user_management.api.urls')),
+        ...
+    )
+
+If you are using the `VeryifyEmailMixin` then replace `user_management.api.url`
+with `user_management.api.verify_email_urls`
+
+    urlpatterns = patterns(''
+        ...
+        url('', include('user_management.api.verify_email_urls')),
+        ...
+    )
