@@ -9,6 +9,7 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.encoding import force_bytes
+from django.utils import six
 from django.utils.http import urlsafe_base64_encode
 
 from . import models
@@ -76,9 +77,9 @@ class TestUser(TestCase):
 
     def test_str(self):
         """Does "User.__str__()" work as expected?"""
-        expected = 'Test Name'
+        expected = 'Leopold Stotch'
         user = self.model(name=expected)
-        self.assertEqual(str(user), expected)
+        self.assertEqual(six.text_type(user), expected)
 
     def test_name_methods(self):
         """Do "User.get_full_name()" & "get_short_name()" work as expected?"""
