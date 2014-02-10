@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 """From http://stackoverflow.com/a/12260597/400691"""
 import sys
 
