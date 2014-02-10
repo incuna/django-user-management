@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from user_management import serializers
-from user_management.tests.factories import UserFactory
+from .. import serializers
+from user_management.models.tests.factories import UserFactory
 
 
 class ProfileSerializerTest(TestCase):

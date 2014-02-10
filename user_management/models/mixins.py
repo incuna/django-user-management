@@ -1,5 +1,4 @@
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.db import models
@@ -13,26 +12,29 @@ from incuna_mail import send
 class UserManager(BaseUserManager):
     """Django requires user managers to have create_user & create_superuser."""
     def create_user(self, email, password=None, **extra_fields):
+        fields = {
+            'date_joined': timezone.now(),
+        }
+        fields.update(extra_fields)
         user = self.model(
             email=email.lower(),
-            date_joined=timezone.now(),
-            **extra_fields
+            **fields
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.update({
-            'is_active': True,
+        fields = {
             'is_staff': True,
             'is_superuser': True,
-        })
-        user = self.create_user(email, password, **extra_fields)
+        }
+        fields.update(extra_fields)
+        user = self.create_user(email, password, **fields)
         return user
 
 
-class AbstractUser(AbstractBaseUser, PermissionsMixin):
+class BasicUserFieldsMixin(models.Model):
     name = models.CharField(
         verbose_name=_('Name'),
         max_length=255,
@@ -47,10 +49,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         default=timezone.now,
         editable=False,
     )
-    is_active = models.BooleanField(_('active'), default=False)
     is_staff = models.BooleanField(_('staff status'), default=False)
-
-    verified_email = models.BooleanField(_('Verified email address'), default=False)
 
     objects = UserManager()
 
@@ -69,6 +68,47 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.name
+
+
+class ActiveUserMixin(BasicUserFieldsMixin):
+    is_active = models.BooleanField(_('active'), default=True)
+
+    class Meta:
+        abstract = True
+
+
+class VeryifyEmailManagerMixin(object):
+    def create_superuser(self, email, password, **extra_fields):
+        fields = {
+            'is_active': True,
+        }
+        fields.update(extra_fields)
+        user = super(VeryifyEmailManagerMixin, self).create_superuser(
+            email,
+            password,
+            **fields)
+        return user
+
+
+class VeryifyEmailManager(VeryifyEmailManagerMixin, UserManager):
+    pass
+
+
+class VeryifyEmailMixin(BasicUserFieldsMixin):
+    is_active = models.BooleanField(_('active'), default=False)
+    verified_email = models.BooleanField(_('Verified email address'),
+        default=False,
+        help_text=_('Indicates if the email address has been verified.'))
+
+    objects = VeryifyEmailManager()
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        super(VeryifyEmailMixin, self).save(*args, **kwargs)
+        if not self.verified_email:
+            self.send_validation_email()
 
     def send_validation_email(self):
         if self.verified_email:

@@ -8,9 +8,9 @@ from django.core import mail
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from user_management import views
-from user_management.tests.factories import UserFactory
-from user_management.tests.utils import APIRequestTestCase
+from user_management.api import views
+from user_management.models.tests.factories import UserFactory
+from user_management.models.tests.utils import APIRequestTestCase
 
 
 User = get_user_model()
@@ -31,17 +31,13 @@ class TestRegisterView(APIRequestTestCase):
     def test_authenticated_user_post(self):
         """Authenticated Users should not be able to re-register."""
         request = self.create_request('post', auth=True, data=self.data)
-        with patch.object(User, 'send_validation_email') as send:
-            response = self.view_class.as_view()(request)
+        response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, 403)
-
-        self.assertFalse(send.called)
 
     def test_unauthenticated_user_post(self):
         """Unauthenticated Users should be able to register."""
         request = self.create_request('post', auth=False, data=self.data)
-        with patch.object(User, 'send_validation_email') as send:
-            response = self.view_class.as_view()(request)
+        response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, 201)
 
         user = User.objects.get()
@@ -52,8 +48,6 @@ class TestRegisterView(APIRequestTestCase):
 
         # Password should validate
         self.assertTrue(check_password(self.data['password'], user.password))
-
-        send.assert_called_once_with()
 
     def test_post_with_missing_data(self):
         """Password should not be sent back on failed request."""
@@ -135,7 +129,10 @@ class TestPasswordResetEmailView(APIRequestTestCase):
 
     def test_send_email(self):
         email = 'test@example.com'
-        user = UserFactory.create(email=email)
+        user = UserFactory.create(
+            email=email,
+            # Don't send the verification email
+            verified_email=True)
 
         self.view_class().send_email(user)
 
