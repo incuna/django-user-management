@@ -12,13 +12,12 @@ from incuna_mail import send
 class UserManager(BaseUserManager):
     """Django requires user managers to have create_user & create_superuser."""
     def create_user(self, email, password=None, **extra_fields):
-        fields = {
-            'date_joined': timezone.now(),
-        }
-        fields.update(extra_fields)
+        if not email:
+            raise ValueError('The given email address must be set')
+        email = UserManager.normalize_email(email).lower()
         user = self.model(
-            email=email.lower(),
-            **fields
+            email=email,
+            **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -77,21 +76,17 @@ class ActiveUserMixin(BasicUserFieldsMixin):
         abstract = True
 
 
-class VeryifyEmailManagerMixin(object):
+class VeryifyEmailManager(UserManager):
     def create_superuser(self, email, password, **extra_fields):
         fields = {
             'is_active': True,
         }
         fields.update(extra_fields)
-        user = super(VeryifyEmailManagerMixin, self).create_superuser(
+        user = super(VeryifyEmailManager, self).create_superuser(
             email,
             password,
             **fields)
         return user
-
-
-class VeryifyEmailManager(VeryifyEmailManagerMixin, UserManager):
-    pass
 
 
 class VeryifyEmailMixin(BasicUserFieldsMixin):

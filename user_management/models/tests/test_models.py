@@ -1,4 +1,3 @@
-from datetime import datetime
 from unittest.mock import patch
 
 from django.contrib.auth.tokens import default_token_generator
@@ -6,12 +5,14 @@ from django.contrib.sites.models import Site
 from django.core.management.color import no_style
 from django.db import connection
 from django.db.models.base import ModelBase
+from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from . import models
+from .factories import UserFactory
 from .. import mixins
 
 
@@ -46,25 +47,95 @@ class AbstractModelMixin(object):
             self._cursor.execute(statement)
 
 
+class TestUser(TestCase):
+    """Test the "User" model"""
+    model = models.User
+
+    def test_fields(self):
+        """Do we have the fields we expect?"""
+        fields = self.model._meta.get_all_field_names()
+        expected = {
+            # On model
+            'id',
+            'name',
+            'date_joined',
+            'email',
+            'verified_email',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'password',
+
+            # Incoming
+            'groups',  # Django permission groups
+            'user_permissions',
+            'logentry',  # Django admin logs
+        }
+        self.assertCountEqual(fields, expected)
+
+    def test_str(self):
+        """Does "User.__str__()" work as expected?"""
+        expected = 'Test Name'
+        user = self.model(name=expected)
+        self.assertEqual(str(user), expected)
+
+    def test_name_methods(self):
+        """Do "User.get_full_name()" & "get_short_name()" work as expected?"""
+        expected = 'Professor Chaos'
+        user = self.model(name=expected)
+        self.assertEqual(user.get_full_name(), expected)
+        self.assertEqual(user.get_short_name(), expected)
+
+
 class TestUserManager(TestCase):
     manager = models.User.objects
 
+    def test_create_user_without_email(self):
+        with self.assertRaises(ValueError):
+            self.manager.create_user(email='')
+        self.assertFalse(self.manager.count())
+
+    def test_create_duplicate_email(self):
+        existing_user = UserFactory.create()
+        with self.assertRaises(IntegrityError):
+            self.manager.create_user(email=existing_user.email)
+
     def test_create_user(self):
-        email = 'valid@example.com'
-        signup_datetime = timezone.make_aware(
-            datetime(2013, 11, 28, 12, 29), timezone.utc,
-        )
+        time_before = timezone.now()
+        data = {
+            'email': 'valid@example.com',
+            'name': 'Mysterion',
+            'password': 'I can N3ver DIE!'
+        }
 
-        with patch.object(timezone, 'now') as mocked_now:
-            mocked_now.return_value = signup_datetime
-            user = self.manager.create_user(email)
+        # Call creation method of manager
+        with self.assertNumQueries(1):
+            # Only one query:
+            #     INSERT INTO "users_user" ("fields",)
+            #         VALUES ('blah') RETURNING "users_user"."id"
+            result = self.manager.create_user(**data)
 
-        self.assertEqual(email, user.email)
-        self.assertEqual(signup_datetime, user.date_joined)
+        # Check that user returned is the right one
+        user = self.manager.get()
+        self.assertEqual(user, result)
+
+        # Check that the password is valid
+        self.assertTrue(user.check_password(data['password']))
+
+        # Check name/email is correct
+        self.assertEqual(user.name, data['name'])
+        self.assertEqual(user.email, data['email'])
+
+        # Check defaults
         self.assertFalse(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
         self.assertFalse(user.verified_email)
+
+        # Check that the time is correct (or at least, in range)
+        time_after = timezone.now()
+        self.assertTrue(time_before < user.date_joined < time_after)
 
     def test_create_user_uppercase_email(self):
         email = 'VALID@EXAMPLE.COM'
@@ -76,8 +147,21 @@ class TestUserManager(TestCase):
         email = 'valid@example.com'
         password = 'password'
 
-        user = self.manager.create_superuser(email, password)
+        # Call creation method of manager:
+        with self.assertNumQueries(1):
+            # Only one query:
+            #     INSERT INTO "users_user" ("fields",)
+            #         VALUES ('blah') RETURNING "users_user"."id"
+            result = self.manager.create_superuser(email, password)
 
+        # Check that user returned is the right one
+        user = self.manager.get()
+        self.assertEqual(user, result)
+
+        # Check that the password is valid
+        self.assertTrue(user.check_password(password))
+
+        # Check defaults
         self.assertTrue(user.is_active)
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
