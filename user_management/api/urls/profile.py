@@ -1,11 +1,16 @@
 from django.conf.urls import patterns, url
-from django.views.decorators.csrf import csrf_exempt
 
 from .. import views
 
 
 urlpatterns = patterns(
     '',
+    url(
+        regex=r'^profile$',
+        view=views.ProfileListView.as_view(),
+        name='profile_list',
+    ),
+
     url(
         regex=r'^profile/$',
         view=views.ProfileDetailView.as_view(),

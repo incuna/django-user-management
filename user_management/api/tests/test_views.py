@@ -486,6 +486,7 @@ class TestProfileDetailView(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, 200)
 
+
 class TestProfileListView(APIRequestTestCase):
     view_class = views.ProfileListView
 
