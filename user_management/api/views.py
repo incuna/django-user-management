@@ -104,6 +104,7 @@ class PasswordResetView(OneTimeUseAPIMixin, generics.UpdateAPIView):
 
 class PasswordChangeView(generics.UpdateAPIView):
     model = User
+    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.PasswordChangeSerializer
 
     def get_object(self):
