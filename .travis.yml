@@ -10,4 +10,3 @@ env:
 install:
   - psql -c 'CREATE DATABASE user_management' -U postgres;
   - pip install -r test_requirements.txt
-  - pip install -e .
