@@ -252,6 +252,23 @@ class TestPasswordChangeView(APIRequestTestCase):
         user = User.objects.get(pk=user.pk)
         self.assertTrue(user.check_password(new_password))
 
+    def test_update_anonymous(self):
+        old_password = 'old_password'
+        new_password = 'new_password'
+
+        request = self.create_request(
+            'put',
+            auth=False,
+            data={
+                'old_password': old_password,
+                'new_password': new_password,
+                'new_password2': new_password,
+            },
+        )
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 401)
+
     def test_update_wrong_old_password(self):
         old_password = 'old_password'
         new_password = 'new_password'

@@ -29,9 +29,6 @@ settings.configure(
     AUTH_USER_MODEL = 'tests.User',
     ROOT_URLCONF='user_management.api.tests.urls',
     REST_FRAMEWORK={
-        'DEFAULT_PERMISSION_CLASSES': (
-            'rest_framework.permissions.IsAuthenticated',
-        ),
         'DEFAULT_AUTHENTICATION_CLASSES': (
             'rest_framework.authentication.TokenAuthentication',
             'rest_framework.authentication.SessionAuthentication',
