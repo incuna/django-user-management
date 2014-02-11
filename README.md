@@ -43,7 +43,7 @@ Add to your `INSTALLED_APPS` in `settings.py`
 
     INSTALLED_APPS = (
         ...
-        user_management.api,
+        'user_management.api',
         ...
     )
 
