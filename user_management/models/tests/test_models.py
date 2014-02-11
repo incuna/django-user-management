@@ -167,8 +167,8 @@ class TestUserManager(TestCase):
         self.assertTrue(user.is_superuser)
 
 
-class TestVeryifyEmailMixin(AbstractModelMixin, TestCase):
-    mixin = mixins.VeryifyEmailMixin
+class TestVerifyEmailMixin(AbstractModelMixin, TestCase):
+    mixin = mixins.VerifyEmailMixin
 
     def test_save(self):
         user = self.model()

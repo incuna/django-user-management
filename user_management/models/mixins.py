@@ -76,32 +76,32 @@ class ActiveUserMixin(BasicUserFieldsMixin):
         abstract = True
 
 
-class VeryifyEmailManager(UserManager):
+class VerifyEmailManager(UserManager):
     def create_superuser(self, email, password, **extra_fields):
         fields = {
             'is_active': True,
         }
         fields.update(extra_fields)
-        user = super(VeryifyEmailManager, self).create_superuser(
+        user = super(VerifyEmailManager, self).create_superuser(
             email,
             password,
             **fields)
         return user
 
 
-class VeryifyEmailMixin(BasicUserFieldsMixin):
+class VerifyEmailMixin(BasicUserFieldsMixin):
     is_active = models.BooleanField(_('active'), default=False)
     verified_email = models.BooleanField(_('Verified email address'),
         default=False,
         help_text=_('Indicates if the email address has been verified.'))
 
-    objects = VeryifyEmailManager()
+    objects = VerifyEmailManager()
 
     class Meta:
         abstract = True
 
     def save(self, *args, **kwargs):
-        super(VeryifyEmailMixin, self).save(*args, **kwargs)
+        super(VerifyEmailMixin, self).save(*args, **kwargs)
         if not self.verified_email:
             self.send_validation_email()
 
