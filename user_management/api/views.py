@@ -131,3 +131,9 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class ProfileListView(generics.ListAPIView):
+    model = User
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.ProfileSerializer
