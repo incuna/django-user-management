@@ -22,7 +22,7 @@ class TestRegisterView(APIRequestTestCase):
     view_class = views.UserRegister
 
     def setUp(self):
-        super().setUp()
+        super(TestRegisterView, self).setUp()
         self.data = {
             'name': "Robert'); DROP TABLE Students;--'",
             'email': 'bobby.tables+327@xkcd.com',
