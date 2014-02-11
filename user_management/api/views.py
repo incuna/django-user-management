@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from incuna_mail import send
 from rest_framework import generics, renderers, response, status, views
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from . import serializers, permissions
 
@@ -125,6 +125,7 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     model = User
+    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
 
     def get_object(self):
