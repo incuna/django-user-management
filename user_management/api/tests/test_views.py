@@ -1,5 +1,7 @@
-from collections import ChainMap
-from unittest.mock import patch
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
@@ -441,7 +443,10 @@ class TestProfileDetailView(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, 200)
 
-        expected = ChainMap(data, self.expected_data(user))
+        expected = {}
+        expected.update(self.expected_data(user))
+        expected.update(data)
+
         self.assertEqual(response.data, expected)
 
     def test_patch(self):
@@ -455,7 +460,10 @@ class TestProfileDetailView(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, 200)
 
-        expected = ChainMap(data, self.expected_data(user))
+        expected = {}
+        expected.update(self.expected_data(user))
+        expected.update(data)
+
         self.assertEqual(response.data, expected)
 
     def test_options(self):
