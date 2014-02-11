@@ -1,7 +1,4 @@
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
+from mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password

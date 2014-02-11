@@ -1,7 +1,4 @@
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
+from mock import patch
 
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
