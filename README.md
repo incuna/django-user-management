@@ -55,11 +55,23 @@ Add the urls to your `ROOT_URLCONF`
         ...
     )
 
-If you are using the `VerifyEmailMixin` then replace `user_management.api.url`
-with `user_management.api.verify_email_urls`
+If you are using the `VerifyEmailMixin` then also include
+`user_management.api.urls.verify_email`
 
     urlpatterns = patterns(''
         ...
-        url('', include('user_management.api.verify_email_urls')),
+        url('', include('user_management.api.urls.verify_email')),
+        ...
+    )
+
+If you need more fine-grained control you can replace `user_management.api.urls`
+with a selection from
+
+    urlpatterns = patterns(''
+        ...
+        url('', include('user_management.api.urls.auth')),
+        url('', include('user_management.api.urls.password_reset')),
+        url('', include('user_management.api.urls.profile')),
+        url('', include('user_management.api.urls.register')),
         ...
     )
