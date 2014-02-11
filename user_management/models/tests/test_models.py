@@ -76,7 +76,10 @@ class TestUser(TestCase):
             'user_permissions',
             'logentry',  # Django admin logs
         }
-        self.assertCountEqual(fields, expected)
+        try:
+            self.assertCountEqual(fields, expected)
+        except AttributeError:
+            self.assertItemsEqual(fields, expected)
 
     def test_str(self):
         """Does "User.__str__()" work as expected?"""
