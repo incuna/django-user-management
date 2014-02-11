@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from mock import patch
 
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
@@ -9,6 +9,7 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.encoding import force_bytes
+from django.utils import six
 from django.utils.http import urlsafe_base64_encode
 
 from . import models
@@ -72,13 +73,19 @@ class TestUser(TestCase):
             'user_permissions',
             'logentry',  # Django admin logs
         }
-        self.assertCountEqual(fields, expected)
+
+        try:
+            # python 3 only:
+            self.assertCountEqual(fields, expected)
+        except AttributeError:
+            # python 2 only:
+            self.assertItemsEqual(fields, expected)
 
     def test_str(self):
         """Does "User.__str__()" work as expected?"""
-        expected = 'Test Name'
+        expected = 'Leopold Stotch'
         user = self.model(name=expected)
-        self.assertEqual(str(user), expected)
+        self.assertEqual(six.text_type(user), expected)
 
     def test_name_methods(self):
         """Do "User.get_full_name()" & "get_short_name()" work as expected?"""

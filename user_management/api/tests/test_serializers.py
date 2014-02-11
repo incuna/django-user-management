@@ -132,7 +132,7 @@ class PasswordResetSerializerTest(TestCase):
 
 class RegistrationSerializerTest(TestCase):
     def setUp(self):
-        super().setUp()
+        super(RegistrationSerializerTest, self).setUp()
         self.data = {
             'name': "Robert'); DROP TABLE Students;--'",
             'email': 'bobby.tables+327@xkcd.com',

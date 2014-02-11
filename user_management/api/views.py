@@ -76,7 +76,7 @@ class PasswordResetEmailView(views.APIView):
         )
 
 
-class OneTimeUseAPIMixin:
+class OneTimeUseAPIMixin(object):
     def dispatch(self, request, *args, **kwargs):
         uidb64 = kwargs['uidb64']
         uid = urlsafe_base64_decode(force_text(uidb64))
@@ -90,7 +90,7 @@ class OneTimeUseAPIMixin:
         if not default_token_generator.check_token(self.user, token):
             return response.Response(status=status.HTTP_404_NOT_FOUND)
 
-        return super().dispatch(request, *args, **kwargs)
+        return super(OneTimeUseAPIMixin, self).dispatch(request, *args, **kwargs)
 
 
 class PasswordResetView(OneTimeUseAPIMixin, generics.UpdateAPIView):
