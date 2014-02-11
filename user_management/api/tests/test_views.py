@@ -485,3 +485,25 @@ class TestProfileDetailView(APIRequestTestCase):
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, 200)
+
+class TestProfileListView(APIRequestTestCase):
+    view_class = views.ProfileListView
+
+    def expected_data(self, user):
+        expected = {
+            'name': user.name,
+            'email': user.email,
+            'date_joined': user.date_joined,
+        }
+        return expected
+
+    def test_get(self):
+        user = UserFactory.create()
+
+        request = self.create_request(user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+
+        expected = [self.expected_data(user)]
+        self.assertEqual(response.data, expected)
