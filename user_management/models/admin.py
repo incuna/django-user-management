@@ -58,8 +58,8 @@ class VerifyUserAdmin(UserAdmin):
         try:
             index = fields.index('is_active')
         except ValueError:
-            pass
-        else:
-            fields[index] = ('is_active', 'verified_email')
-            fieldsets_dict['Permissions']['fields'] = tuple(fields)
+            return fieldsets
+
+        fields[index] = ('is_active', 'verified_email')
+        fieldsets_dict['Permissions']['fields'] = tuple(fields)
         return tuple(fieldsets_dict.items())
