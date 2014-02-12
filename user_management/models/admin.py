@@ -40,7 +40,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_active',)
     readonly_fields = ('date_joined',)
     search_fields = ('name', 'email')
-    ordering = ('email',)
+    ordering = ('name',)
 
 
 class VerifyUserAdmin(UserAdmin):
