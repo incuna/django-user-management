@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
@@ -39,3 +41,25 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = ('date_joined',)
     search_fields = ('name', 'email')
     ordering = ('email',)
+
+
+class VerifyUserAdmin(UserAdmin):
+    readonly_fields = ('date_joined', 'verified_email')
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super(VerifyUserAdmin, self).get_fieldsets(request, obj)
+        fieldsets_dict = OrderedDict(fieldsets)
+
+        try:
+            fields = list(fieldsets_dict['Permissions']['fields'])
+        except KeyError:
+            return fieldsets
+
+        try:
+            index = fields.index('is_active')
+        except ValueError:
+            pass
+        else:
+            fields[index] = ('is_active', 'verified_email')
+            fieldsets_dict['Permissions']['fields'] = tuple(fields)
+        return tuple(fieldsets_dict.items())
