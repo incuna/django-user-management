@@ -6,7 +6,12 @@ script: make test
 notifications:
   email: false
 env:
-  - DATABASE_URL='postgres://postgres@localhost/user_management'
+  global:
+    - DATABASE_URL='postgres://postgres@localhost/user_management'
+  matrix:
+    - DJANGO='django>=1.6,<1.7'
+    - DJANGO='https://github.com/django/django/archive/1.7a2.zip'
 install:
   - psql -c 'CREATE DATABASE user_management' -U postgres;
   - pip install -r test_requirements.txt
+  - pip install $DJANGO
