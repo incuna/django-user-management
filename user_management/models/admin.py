@@ -36,7 +36,7 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-    list_display = ('email',)
+    list_display = ('name', 'email')
     list_filter = ('is_active',)
     readonly_fields = ('date_joined',)
     search_fields = ('name', 'email')
