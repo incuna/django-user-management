@@ -508,3 +508,9 @@ class TestProfileListView(APIRequestTestCase):
 
         expected = [self.expected_data(user)]
         self.assertEqual(response.data, expected)
+
+    def test_option(self):
+        request = self.create_request('options')
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
