@@ -48,7 +48,6 @@ class UserCreationForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError(
                 self.error_messages['password_mismatch'])
-        # In django 1.8, this dictionary will no longer need to be returned
         return cleaned_data
 
     def save(self, commit=True):
