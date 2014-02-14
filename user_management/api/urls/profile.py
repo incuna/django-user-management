@@ -8,12 +8,12 @@ urlpatterns = patterns(
 
     url(
         regex=r'^profile$',
-        view=views.ProfileDetailView.as_view(),
+        view=views.ProfileDetail.as_view(),
         name='profile_detail',
     ),
     url(
         regex=r'^profile/password$',
-        view=views.PasswordChangeView.as_view(),
+        view=views.PasswordChange.as_view(),
         name='password_change',
     ),
 )

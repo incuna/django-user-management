@@ -87,8 +87,8 @@ class TestRegisterView(APIRequestTestCase):
         self.assertFalse(User.objects.count() > 1)
 
 
-class TestPasswordResetEmailView(APIRequestTestCase):
-    view_class = views.PasswordResetEmailView
+class TestPasswordResetEmail(APIRequestTestCase):
+    view_class = views.PasswordResetEmail
 
     def test_existent_email(self):
         email = 'exists@example.com'
@@ -144,8 +144,8 @@ class TestPasswordResetEmailView(APIRequestTestCase):
         self.assertIn('https://', sent_mail.body)
 
 
-class TestPasswordResetView(APIRequestTestCase):
-    view_class = views.PasswordResetView
+class TestPasswordReset(APIRequestTestCase):
+    view_class = views.PasswordReset
 
     def test_options(self):
         user = UserFactory.create()
@@ -225,8 +225,8 @@ class TestPasswordResetView(APIRequestTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class TestPasswordChangeView(APIRequestTestCase):
-    view_class = views.PasswordChangeView
+class TestPasswordChange(APIRequestTestCase):
+    view_class = views.PasswordChange
 
     def test_update(self):
         old_password = 'old_password'
@@ -418,8 +418,8 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertFalse(logged_in_user.verified_email)
 
 
-class TestProfileDetailView(APIRequestTestCase):
-    view_class = views.ProfileDetailView
+class TestProfileDetail(APIRequestTestCase):
+    view_class = views.ProfileDetail
 
     def expected_data(self, user):
         expected = {
@@ -487,8 +487,8 @@ class TestProfileDetailView(APIRequestTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class TestUserListView(APIRequestTestCase):
-    view_class = views.UserListView
+class TestUserList(APIRequestTestCase):
+    view_class = views.UserList
 
     def expected_data(self, user):
         expected = {
@@ -516,8 +516,8 @@ class TestUserListView(APIRequestTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class TestUserDetailView(APIRequestTestCase):
-    view_class = views.UserDetailView
+class TestUserDetail(APIRequestTestCase):
+    view_class = views.UserDetail
 
     def expected_data(self, user):
         expected = {

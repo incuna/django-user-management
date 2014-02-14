@@ -1,6 +1,8 @@
 ## v0.0.6
 
-* Separate user detail / list urls from (my) profile
+* Separate user detail / list urls from (my) profile.
+* Rename views to not end View.
+
 
 ## v0.0.5
 

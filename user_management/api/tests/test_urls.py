@@ -19,26 +19,26 @@ class TestURLs(TestCase):
 
     def test_password_reset_confirm_url(self):
         self.check_url(
-            view_name='PasswordResetView',
+            view_name='PasswordReset',
             url='/auth/password_reset/confirm/a/x-y',
             url_name='password_reset_confirm',
             url_kwargs={'uidb64': 'a', 'token': 'x-y'})
 
     def test_password_reset_url(self):
         self.check_url(
-            view_name='PasswordResetEmailView',
+            view_name='PasswordResetEmail',
             url='/auth/password_reset',
             url_name='password_reset')
 
     def test_profile_detail_url(self):
         self.check_url(
-            view_name='ProfileDetailView',
+            view_name='ProfileDetail',
             url='/profile',
             url_name='profile_detail')
 
     def test_password_change_url(self):
         self.check_url(
-            view_name='PasswordChangeView',
+            view_name='PasswordChange',
             url='/profile/password',
             url_name='password_change')
 
@@ -50,13 +50,13 @@ class TestURLs(TestCase):
 
     def test_user_detail_url(self):
         self.check_url(
-            view_name='UserDetailView',
+            view_name='UserDetail',
             url='/users/1',
             url_name='user_detail',
             url_kwargs={'pk': 1})
 
     def test_user_list_url(self):
         self.check_url(
-            view_name='UserListView',
+            view_name='UserList',
             url='/users',
             url_name='user_list')
