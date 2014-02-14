@@ -516,7 +516,7 @@ class TestUserListView(APIRequestTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class TestUserDetailViewView(APIRequestTestCase):
+class TestUserDetailView(APIRequestTestCase):
     view_class = views.UserDetailView
 
     def expected_data(self, user):
