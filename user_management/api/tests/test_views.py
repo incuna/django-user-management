@@ -529,11 +529,12 @@ class TestUserDetailView(APIRequestTestCase):
 
     def test_get(self):
         user = UserFactory.create()
+        other = UserFactory.create()
 
         request = self.create_request(user=user)
         view = self.view_class.as_view()
-        response = view(request, pk=user.pk)
+        response = view(request, pk=other.pk)
         self.assertEqual(response.status_code, 200)
 
-        expected = self.expected_data(user)
+        expected = self.expected_data(other)
         self.assertEqual(response.data, expected)
