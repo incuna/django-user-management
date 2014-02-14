@@ -521,8 +521,7 @@ class TestUserDetail(APIRequestTestCase):
     view_class = views.UserDetail
 
     def setUp(self):
-        self.user = UserFactory.create()
-        self.other = UserFactory.create()
+        self.user, self.other_user = UserFactory.create_batch(2)
 
     def expected_data(self, user):
         expected = {
@@ -535,22 +534,22 @@ class TestUserDetail(APIRequestTestCase):
     def check_method_forbidden(self, method):
         request = self.create_request(method, user=self.user)
         view = self.view_class.as_view()
-        response = view(request, pk=self.other.pk)
+        response = view(request, pk=self.other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get(self):
         request = self.create_request(user=self.user)
         view = self.view_class.as_view()
-        response = view(request, pk=self.other.pk)
+        response = view(request, pk=self.other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        expected = self.expected_data(self.other)
+        expected = self.expected_data(self.other_user)
         self.assertEqual(response.data, expected)
 
     def test_get_anonymous(self):
         request = self.create_request(auth=False)
         view = self.view_class.as_view()
-        response = view(request, pk=self.other.pk)
+        response = view(request, pk=self.other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_post_unauthorised(self):
@@ -568,7 +567,6 @@ class TestUserDetail(APIRequestTestCase):
     def test_put(self):
         """ Tests PUT existing user for staff """
         self.user.is_staff = True
-        self.user.save()
 
         data = {
             'name': 'Jean Dujardin',
@@ -581,16 +579,15 @@ class TestUserDetail(APIRequestTestCase):
 
         view = self.view_class.as_view()
 
-        response = view(request, pk=self.other.pk)
+        response = view(request, pk=self.other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
 
-        user = User.objects.get(pk=self.other.pk)
+        user = User.objects.get(pk=self.other_user.pk)
         self.assertEqual(user.name, data['name'])
 
     def test_patch(self):
         """ Tests PATCH new user for staff """
         self.user.is_staff = True
-        self.user.save()
 
         data = {
             'name': 'Jean Deschamps',
@@ -603,22 +600,21 @@ class TestUserDetail(APIRequestTestCase):
 
         view = self.view_class.as_view()
 
-        response = view(request, pk=self.other.pk)
+        response = view(request, pk=self.other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
 
-        user = User.objects.get(pk=self.other.pk)
+        user = User.objects.get(pk=self.other_user.pk)
         self.assertEqual(user.name, data['name'])
 
     def test_delete(self):
         """ Tests DELETE user for staff """
         self.user.is_staff = True
-        self.user.save()
 
         request = self.create_request('delete', user=self.user)
 
         view = self.view_class.as_view()
 
-        response = view(request, pk=self.other.pk)
+        response = view(request, pk=self.other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         user = User.objects.get()
