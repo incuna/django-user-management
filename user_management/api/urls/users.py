@@ -7,12 +7,12 @@ urlpatterns = patterns(
     '',
     url(
         regex=r'^users$',
-        view=views.UserListView.as_view(),
+        view=views.UserList.as_view(),
         name='user_list'
     ),
     url(
         regex=r'^users/(?P<pk>\d+)/?$',
-        view=views.UserDetailView.as_view(),
+        view=views.UserDetail.as_view(),
         name='user_detail'
     ),
 )

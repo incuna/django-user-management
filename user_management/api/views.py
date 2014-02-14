@@ -39,7 +39,7 @@ class UserRegister(generics.CreateAPIView):
         )
 
 
-class PasswordResetEmailView(views.APIView):
+class PasswordResetEmail(views.APIView):
     permission_classes = [permissions.IsNotAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -93,7 +93,7 @@ class OneTimeUseAPIMixin(object):
         return super(OneTimeUseAPIMixin, self).dispatch(request, *args, **kwargs)
 
 
-class PasswordResetView(OneTimeUseAPIMixin, generics.UpdateAPIView):
+class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
     permission_classes = [permissions.IsNotAuthenticated]
     model = User
     serializer_class = serializers.PasswordResetSerializer
@@ -102,7 +102,7 @@ class PasswordResetView(OneTimeUseAPIMixin, generics.UpdateAPIView):
         return self.user
 
 
-class PasswordChangeView(generics.UpdateAPIView):
+class PasswordChange(generics.UpdateAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.PasswordChangeSerializer
@@ -124,7 +124,7 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
-class ProfileDetailView(generics.RetrieveUpdateAPIView):
+class ProfileDetail(generics.RetrieveUpdateAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
@@ -133,13 +133,13 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class UserListView(generics.ListAPIView):
+class UserList(generics.ListAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
 
 
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
