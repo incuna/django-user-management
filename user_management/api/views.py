@@ -133,7 +133,13 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class ProfileListView(generics.ListAPIView):
+class UserListView(generics.ListAPIView):
+    model = User
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.ProfileSerializer
+
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
