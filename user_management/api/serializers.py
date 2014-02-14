@@ -103,3 +103,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ('name', 'email', 'date_joined')
         read_only_fields = ('email',)
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('url', 'name', 'email', 'date_joined')
+        read_only_fields = ('email',)
+        view_name = 'user_detail'

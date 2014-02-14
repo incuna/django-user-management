@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
+from django.core.urlresolvers import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
@@ -13,6 +14,7 @@ from user_management.models.tests.utils import APIRequestTestCase
 
 
 User = get_user_model()
+TEST_SERVER = 'http://testserver'
 
 
 class TestRegisterView(APIRequestTestCase):
@@ -491,7 +493,9 @@ class TestUserList(APIRequestTestCase):
     view_class = views.UserList
 
     def expected_data(self, user):
+        url = url = reverse('user_detail', kwargs={'pk': user.pk})
         expected = {
+            'url': TEST_SERVER + url,
             'name': user.name,
             'email': user.email,
             'date_joined': user.date_joined,
@@ -520,7 +524,9 @@ class TestUserDetail(APIRequestTestCase):
     view_class = views.UserDetail
 
     def expected_data(self, user):
+        url = url = reverse('user_detail', kwargs={'pk': user.pk})
         expected = {
+            'url': TEST_SERVER + url,
             'name': user.name,
             'email': user.email,
             'date_joined': user.date_joined,

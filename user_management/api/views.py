@@ -136,10 +136,10 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
 class UserList(generics.ListAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.ProfileSerializer
+    serializer_class = serializers.UserSerializer
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.ProfileSerializer
+    serializer_class = serializers.UserSerializer

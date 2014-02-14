@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from .. import serializers
@@ -161,3 +162,28 @@ class RegistrationSerializerTest(TestCase):
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('password2', serializer.errors)
+
+
+class UserSerializerTest(TestCase):
+    def test_serialize(self):
+        user = UserFactory.create()
+        serializer = serializers.UserSerializer(user)
+
+        url = reverse('user_detail', kwargs={'pk': user.pk})
+
+        expected = {
+            'url': url,
+            'name': user.name,
+            'email': user.email,
+            'date_joined': user.date_joined,
+        }
+        self.assertEqual(serializer.data, expected)
+
+    def test_deserialize(self):
+        user = UserFactory.build()
+        data = {
+            'name': 'New Name',
+        }
+        serializer = serializers.UserSerializer(user, data=data)
+        self.assertTrue(serializer.is_valid())
+
