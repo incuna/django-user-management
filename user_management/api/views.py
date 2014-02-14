@@ -141,5 +141,5 @@ class UserList(generics.ListAPIView):
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     model = User
-    permission_classes = (permissions.IsAdminOrReadOnly,)
+    permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly,)
     serializer_class = serializers.ProfileSerializer

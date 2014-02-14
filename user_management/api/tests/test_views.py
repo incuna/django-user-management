@@ -547,6 +547,12 @@ class TestUserDetail(APIRequestTestCase):
         expected = self.expected_data(self.other)
         self.assertEqual(response.data, expected)
 
+    def test_get_anonymous(self):
+        request = self.create_request(auth=False)
+        view = self.view_class.as_view()
+        response = view(request, pk=self.other.pk)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_post_unauthorised(self):
         self.check_method_forbidden('post')
 
