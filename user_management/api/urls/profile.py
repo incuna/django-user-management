@@ -12,7 +12,7 @@ urlpatterns = patterns(
         name='profile_detail',
     ),
     url(
-        regex=r'^profile/password/$',
+        regex=r'^profile/password$',
         view=views.PasswordChangeView.as_view(),
         name='password_change',
     ),
