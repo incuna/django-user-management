@@ -103,3 +103,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ('name', 'email', 'date_joined')
         read_only_fields = ('email',)
+
+
+class ProfileSerializerCreate(ProfileSerializer):
+    class Meta(ProfileSerializer.Meta):
+        read_only_fields = ('date_joined',)

@@ -499,6 +499,12 @@ class TestUserList(APIRequestTestCase):
         }
         return expected
 
+    def test_get_anonymous(self):
+        request = self.create_request(auth=False)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_get(self):
         user = UserFactory.create()
 
@@ -515,6 +521,27 @@ class TestUserList(APIRequestTestCase):
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_post(self):
+        """Users should be able to create."""
+        data = {
+            'name': "Robert'); DROP TABLE Students;--'",
+            'email': 'bobby.tables+327@xkcd.com',
+        }
+        request = self.create_request('post', auth=True, data=data)
+        request.user.is_staff = True
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        user = User.objects.get(email=data['email'])
+        self.assertEqual(user.name, data['name'])
+        self.assertEqual(user.email, data['email'])
+
+    def test_post_unauthorised(self):
+        request = self.create_request('post', auth=True)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class TestUserDetail(APIRequestTestCase):
