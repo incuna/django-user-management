@@ -102,9 +102,36 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('name', 'email', 'date_joined')
-        read_only_fields = ('email',)
+        read_only_fields = ('email', 'date_joined')
 
 
-class ProfileSerializerCreate(ProfileSerializer):
-    class Meta(ProfileSerializer.Meta):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    def validate_email(self, attrs, source):
+        email = attrs.get('email')
+
+        # Required check happens elsewhere, so no error if email is None
+        if email is None:
+            return attrs
+
+        qs = User.objects.all()
+        if self.object and self.object.pk:
+            qs = qs.exclude(pk=self.object.pk)
+
+        try:
+            qs.get(email__iexact=email)
+        except User.DoesNotExist:
+            return attrs
+        else:
+            msg = _('That email address is already in use.')
+            raise serializers.ValidationError(msg)
+
+    class Meta:
+        model = User
+        fields = ('url', 'name', 'email', 'date_joined')
+        read_only_fields = ('email', 'date_joined')
+        view_name = 'user_detail'
+
+
+class UserSerializerCreate(UserSerializer):
+    class Meta(UserSerializer.Meta):
         read_only_fields = ('date_joined',)

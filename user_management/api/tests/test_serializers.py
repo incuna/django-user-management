@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from .. import serializers
@@ -161,3 +162,56 @@ class RegistrationSerializerTest(TestCase):
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('password2', serializer.errors)
+
+
+class UserSerializerTest(TestCase):
+    def test_serialize(self):
+        user = UserFactory.create()
+        serializer = serializers.UserSerializer(user)
+
+        url = reverse('user_detail', kwargs={'pk': user.pk})
+
+        expected = {
+            'url': url,
+            'name': user.name,
+            'email': user.email,
+            'date_joined': user.date_joined,
+        }
+        self.assertEqual(serializer.data, expected)
+
+    def test_deserialize(self):
+        user = UserFactory.build()
+        data = {
+            'name': 'New Name',
+        }
+        serializer = serializers.UserSerializer(user, data=data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_deserialize_create_email_in_use(self):
+        other_user = UserFactory.create()
+        data = {
+            'name': "Robert'); DROP TABLE Students;--'",
+            'email': other_user.email,
+            'password': 'Sup3RSecre7paSSw0rD',
+            'password2': 'Sup3RSecre7paSSw0rD',
+        }
+        serializer = serializers.RegistrationSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer._errors['email'],
+            ['That email address has already been registered.'])
+
+    def test_deserialize_update_email_in_use(self):
+        user = UserFactory.create()
+        other_user = UserFactory.create()
+        data = {
+            'name': "Robert'); DROP TABLE Students;--'",
+            'email': other_user.email,
+            'password': 'Sup3RSecre7paSSw0rD',
+            'password2': 'Sup3RSecre7paSSw0rD',
+        }
+        serializer = serializers.RegistrationSerializer(user, data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer._errors['email'],
+            ['That email address has already been registered.'])
