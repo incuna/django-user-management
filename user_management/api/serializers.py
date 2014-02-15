@@ -102,7 +102,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('name', 'email', 'date_joined')
-        read_only_fields = ('email',)
+        read_only_fields = ('email', 'date_joined')
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -128,7 +128,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'name', 'email', 'date_joined')
-        read_only_fields = ('email',)
+        read_only_fields = ('email', 'date_joined')
         view_name = 'user_detail'
 
 
