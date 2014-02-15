@@ -494,7 +494,7 @@ class TestUserList(APIRequestTestCase):
     view_class = views.UserList
 
     def expected_data(self, user):
-        url = url = reverse('user_detail', kwargs={'pk': user.pk})
+        url = url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -555,7 +555,7 @@ class TestUserDetail(APIRequestTestCase):
         self.user, self.other_user = UserFactory.create_batch(2)
 
     def expected_data(self, user):
-        url = url = reverse('user_detail', kwargs={'pk': user.pk})
+        url = url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,

@@ -2,6 +2,9 @@
 
 * Separate user detail / list urls from (my) profile.
 * Rename views to not end View.
+* Make users views hyperlinked.
+* Add `user_management_api` namesapce to api urls. Include with
+  `include('user_management.api.urls', namespace='something', app_name='user_management_api')`
 
 
 ## v0.0.5
