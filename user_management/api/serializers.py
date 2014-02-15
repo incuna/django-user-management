@@ -129,7 +129,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('url', 'name', 'email', 'date_joined')
         read_only_fields = ('email', 'date_joined')
-        view_name = 'user_detail'
+        view_name = 'user_management_api:user_detail'
 
 
 class UserSerializerCreate(UserSerializer):

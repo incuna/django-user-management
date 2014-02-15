@@ -69,7 +69,7 @@ If you are using the `VerifyEmailMixin` then also include
 
     urlpatterns = patterns(''
         ...
-        url('', include('user_management.api.urls.verify_email')),
+        url('', include('user_management.api.urls.verify_email', namespace='user_management_api')),
         ...
     )
 
@@ -78,9 +78,9 @@ with a selection from
 
     urlpatterns = patterns(''
         ...
-        url('', include('user_management.api.urls.auth')),
-        url('', include('user_management.api.urls.password_reset')),
-        url('', include('user_management.api.urls.profile')),
-        url('', include('user_management.api.urls.register')),
+        url('', include('user_management.api.urls.auth', namespace='user_management_api')),
+        url('', include('user_management.api.urls.password_reset', namespace='user_management_api')),
+        url('', include('user_management.api.urls.profile', namespace='user_management_api')),
+        url('', include('user_management.api.urls.register', namespace='user_management_api')),
         ...
     )

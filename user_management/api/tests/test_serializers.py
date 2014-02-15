@@ -169,7 +169,7 @@ class UserSerializerTest(TestCase):
         user = UserFactory.create()
         serializer = serializers.UserSerializer(user)
 
-        url = reverse('user_detail', kwargs={'pk': user.pk})
+        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
 
         expected = {
             'url': url,

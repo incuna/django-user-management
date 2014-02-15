@@ -15,48 +15,48 @@ class TestURLs(TestCase):
         self.check_url(
             view_name='GetToken',
             url='/auth',
-            url_name='auth')
+            url_name='user_management_api:auth')
 
     def test_password_reset_confirm_url(self):
         self.check_url(
             view_name='PasswordReset',
             url='/auth/password_reset/confirm/a/x-y',
-            url_name='password_reset_confirm',
+            url_name='user_management_api:password_reset_confirm',
             url_kwargs={'uidb64': 'a', 'token': 'x-y'})
 
     def test_password_reset_url(self):
         self.check_url(
             view_name='PasswordResetEmail',
             url='/auth/password_reset',
-            url_name='password_reset')
+            url_name='user_management_api:password_reset')
 
     def test_profile_detail_url(self):
         self.check_url(
             view_name='ProfileDetail',
             url='/profile',
-            url_name='profile_detail')
+            url_name='user_management_api:profile_detail')
 
     def test_password_change_url(self):
         self.check_url(
             view_name='PasswordChange',
             url='/profile/password',
-            url_name='password_change')
+            url_name='user_management_api:password_change')
 
     def test_register_url(self):
         self.check_url(
             view_name='UserRegister',
             url='/register',
-            url_name='register')
+            url_name='user_management_api:register')
 
     def test_user_detail_url(self):
         self.check_url(
             view_name='UserDetail',
             url='/users/1',
-            url_name='user_detail',
+            url_name='user_management_api:user_detail',
             url_kwargs={'pk': 1})
 
     def test_user_list_url(self):
         self.check_url(
             view_name='UserList',
             url='/users',
-            url_name='user_list')
+            url_name='user_management_api:user_list')
