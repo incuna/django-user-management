@@ -1,3 +1,7 @@
+## v0.0.7
+
+* Ensure all urls accept a trailing slash.
+
 ## v0.0.6
 
 * Separate user detail / list urls from (my) profile.

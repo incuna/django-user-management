@@ -6,7 +6,7 @@ from .. import views
 urlpatterns = patterns(
     '',
     url(
-        regex=r'^users$',
+        regex=r'^users/?$',
         view=views.UserList.as_view(),
         name='user_list'
     ),
