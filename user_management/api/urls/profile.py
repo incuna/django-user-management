@@ -7,12 +7,12 @@ urlpatterns = patterns(
     '',
 
     url(
-        regex=r'^profile$',
+        regex=r'^profile/?$',
         view=views.ProfileDetail.as_view(),
         name='profile_detail',
     ),
     url(
-        regex=r'^profile/password$',
+        regex=r'^profile/password/?$',
         view=views.PasswordChange.as_view(),
         name='password_change',
     ),
