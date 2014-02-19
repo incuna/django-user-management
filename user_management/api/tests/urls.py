@@ -7,6 +7,7 @@ urlpatterns = patterns('',
             url(r'', include('user_management.api.urls')),
             url(r'', include('user_management.api.urls.users')),
             url(r'', include('user_management.api.urls.verify_email')),
+            url(r'', include('user_management.api.urls.avatar')),
         ),
         namespace='user_management_api'
     ))

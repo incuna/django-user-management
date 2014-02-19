@@ -48,6 +48,12 @@ class TestURLs(TestCase):
             url='/register',
             url_name='user_management_api:register')
 
+    def test_avatar_url(self):
+        self.check_url(
+            view_name='Avatar',
+            url='/avatar',
+            url_name='user_management_api:avatar')
+
     def test_user_detail_url(self):
         self.check_url(
             view_name='UserDetail',
