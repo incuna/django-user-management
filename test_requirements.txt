@@ -6,6 +6,6 @@ pillow==2.3.0
 psycopg2==2.5.2
 dj-database-url==0.2.2
 mock==1.0.1
-# Required for avatar (file upload) functionality
+# Required for avatar (file upload) functionality (https://github.com/tomchristie/django-rest-framework/pull/1377)
 # Remove when 2.3.13 is released
 git+https://github.com/tomchristie/django-rest-framework.git@8f921160e5a4b50f622449f368df41e5e36c0ebe#egg=djangorestframework
