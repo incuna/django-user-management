@@ -11,6 +11,7 @@ settings.configure(
     DATABASES={
         'default': dj_database_url.config(default='postgres://localhost/user_management_api'),
     },
+    DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage',
     INSTALLED_APPS=(
         # Put contenttypes before auth to work around test issue.
         # See: https://code.djangoproject.com/ticket/10827#comment:12

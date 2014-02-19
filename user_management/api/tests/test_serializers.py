@@ -164,6 +164,14 @@ class RegistrationSerializerTest(TestCase):
         self.assertIn('password2', serializer.errors)
 
 
+class AvatarSerializerTest(TestCase):
+    def test_deserialize(self):
+        user = UserFactory.build()
+        data = {'avatar': ''}
+        serializer = serializers.AvatarSerializer(user, data=data)
+        self.assertTrue(serializer.is_valid())
+
+
 class UserSerializerTest(TestCase):
     def test_serialize(self):
         user = UserFactory.create()

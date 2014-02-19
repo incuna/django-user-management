@@ -5,7 +5,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
 from incuna_mail import send
-from rest_framework import generics, renderers, response, status, views
+from rest_framework import generics, parsers, renderers, response, status, views
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -128,6 +128,15 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
+
+    def get_object(self):
+        return self.request.user
+
+
+class Avatar(generics.RetrieveUpdateAPIView):
+    model = User
+    serializer_class = serializers.AvatarSerializer
+    parser_classes = (parsers.MultiPartParser,)
 
     def get_object(self):
         return self.request.user

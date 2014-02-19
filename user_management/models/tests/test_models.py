@@ -67,6 +67,7 @@ class TestUser(TestCase):
             'is_superuser',
             'last_login',
             'password',
+            'avatar',
 
             # Incoming
             'groups',  # Django permission groups

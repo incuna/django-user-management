@@ -105,6 +105,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ('email', 'date_joined')
 
 
+class AvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('avatar',)
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     def validate_email(self, attrs, source):
         email = attrs.get('email')
