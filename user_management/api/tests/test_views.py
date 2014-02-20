@@ -1,3 +1,4 @@
+from io import BytesIO
 from mock import patch
 
 from django.contrib.auth import get_user_model
@@ -7,7 +8,9 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from PIL import Image
 from rest_framework import status
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from user_management.api import views
 from user_management.models.tests.factories import UserFactory
@@ -16,6 +19,17 @@ from user_management.models.tests.utils import APIRequestTestCase
 
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
+
+
+def _simple_png():
+    """Create a 1x1 black png in memory."""
+    image_file = BytesIO()
+    image = Image.new('RGBA', (1, 1))
+    image.save(image_file, 'png')
+    image_file.name = 'test.png'
+    image_file.seek(0)
+    return image_file
+SIMPLE_PNG = _simple_png()
 
 
 class TestRegisterView(APIRequestTestCase):
@@ -488,6 +502,35 @@ class TestProfileDetail(APIRequestTestCase):
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class TestAvatar(APIRequestTestCase):
+    view_class = views.Avatar
+
+    def test_get(self):
+        user = UserFactory.build(avatar=SIMPLE_PNG)
+
+        request = self.create_request(user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['avatar'], SIMPLE_PNG.name)
+
+    def test_put(self):
+        user = UserFactory.create()
+        data = {'avatar': SIMPLE_PNG}
+
+        request = APIRequestFactory().put('/', data=data)
+        request.user = user
+        force_authenticate(request, user)
+
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+
+        SIMPLE_PNG.seek(0)
+        user = User.objects.get(pk=user.pk)
+        self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
 
 
 class TestUserList(APIRequestTestCase):
