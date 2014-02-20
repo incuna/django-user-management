@@ -1,5 +1,10 @@
+import copy
+from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
+from imagekit.cachefiles import ImageCacheFile
+from imagekit.registry import generator_registry
+from imagekit.templatetags.imagekit import DEFAULT_THUMBNAIL_GENERATOR
 from rest_framework import serializers
 
 
@@ -105,10 +110,68 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ('email', 'date_joined')
 
 
+class HyperlinkedImageField(serializers.ImageField):
+    """Image field that returns the images url."""
+    def to_native(self, value):
+        request = self.context.get('request', None)
+        if value.name is None:
+            return None
+        url = value.url
+        if request is not None:
+            url = request.build_absolute_uri(value.url)
+        return url
+
+
 class AvatarSerializer(serializers.ModelSerializer):
+    # Override default ImageField mapping to use HyperlinkedImageField
+    field_mapping = copy.copy(serializers.ModelSerializer.field_mapping)
+    field_mapping.update({
+        models.ImageField: HyperlinkedImageField,
+    })
+
     class Meta:
         model = User
         fields = ('avatar',)
+
+
+class AvatarThumbnailSerializer(serializers.ModelSerializer):
+    thumbnail = serializers.SerializerMethodField('get_thumbnail')
+
+    class Meta:
+        model = User
+        fields = ('thumbnail',)
+
+    def get_generator_kwargs(self, query_params):
+        generator_id = query_params.get('generator', DEFAULT_THUMBNAIL_GENERATOR)
+        width = int(query_params.get('width', 0)) or None
+        height = int(query_params.get('height', 0)) or None
+        return {
+            'id': generator_id,
+            'width': width,
+            'height': height,
+            'anchor': query_params.get('anchor', None),
+            'crop': query_params.get('crop', None),
+            'upscale': query_params.get('upscale', None)
+        }
+
+    def generate_thnumbnail(self, source, **kwargs):
+        generator = generator_registry.get(source=source, **kwargs)
+        return ImageCacheFile(generator, storage=source.storage)
+
+    def get_thumbnail(self, obj):
+        if obj.avatar.name is None:
+            return None
+
+        request = self.context.get('request', None)
+        if request is None:
+            return obj.avatar.url
+
+        image = obj.avatar
+        kwargs = self.get_generator_kwargs(request.QUERY_PARAMS)
+        if kwargs.get('width') or kwargs.get('height'):
+            image = self.generate_thnumbnail(image, **kwargs)
+
+        return request.build_absolute_uri(image.url)
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
