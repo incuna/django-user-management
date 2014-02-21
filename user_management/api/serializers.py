@@ -135,17 +135,16 @@ class AvatarSerializer(serializers.ModelSerializer):
 
 class AvatarThumbnailSerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField('get_thumbnail')
+    generator_id = DEFAULT_THUMBNAIL_GENERATOR
 
     class Meta:
         model = User
         fields = ('thumbnail',)
 
     def get_generator_kwargs(self, query_params):
-        generator_id = query_params.get('generator', DEFAULT_THUMBNAIL_GENERATOR)
         width = int(query_params.get('width', 0)) or None
         height = int(query_params.get('height', 0)) or None
         return {
-            'id': generator_id,
             'width': width,
             'height': height,
             'anchor': query_params.get('anchor', None),
@@ -154,7 +153,10 @@ class AvatarThumbnailSerializer(serializers.ModelSerializer):
         }
 
     def generate_thnumbnail(self, source, **kwargs):
-        generator = generator_registry.get(source=source, **kwargs)
+        generator = generator_registry.get(
+            self.generator_id,
+            source=source,
+            **kwargs)
         return ImageCacheFile(generator)
 
     def get_thumbnail(self, obj):
