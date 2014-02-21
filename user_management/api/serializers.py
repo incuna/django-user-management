@@ -1,4 +1,3 @@
-import copy
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -113,21 +112,21 @@ class ProfileSerializer(serializers.ModelSerializer):
 class HyperlinkedImageField(serializers.ImageField):
     """Image field that returns the images url."""
     def to_native(self, value):
-        request = self.context.get('request', None)
         if value.name is None:
             return None
         url = value.url
+        request = self.context.get('request', None)
         if request is not None:
-            url = request.build_absolute_uri(value.url)
+            url = request.build_absolute_uri(url)
         return url
 
 
 class AvatarSerializer(serializers.ModelSerializer):
-    # Override default ImageField mapping to use HyperlinkedImageField
-    field_mapping = copy.copy(serializers.ModelSerializer.field_mapping)
-    field_mapping.update({
+    # Override default field_mapping to map ImageField to HyperlinkedImageField.
+    # As there is only one field this is the only mapping needed.
+    field_mapping = {
         models.ImageField: HyperlinkedImageField,
-    })
+    }
 
     class Meta:
         model = User
@@ -156,7 +155,7 @@ class AvatarThumbnailSerializer(serializers.ModelSerializer):
 
     def generate_thnumbnail(self, source, **kwargs):
         generator = generator_registry.get(source=source, **kwargs)
-        return ImageCacheFile(generator, storage=source.storage)
+        return ImageCacheFile(generator)
 
     def get_thumbnail(self, obj):
         if obj.avatar.name is None:
