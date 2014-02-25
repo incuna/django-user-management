@@ -1,4 +1,4 @@
--e .
+-e .[avatar]
 django==1.6.1
 django-inmemorystorage==0.1.1
 factory_boy==2.3.1

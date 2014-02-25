@@ -27,6 +27,10 @@ def _simple_png():
     image = Image.new('RGBA', (1, 1))
     image.save(image_file, 'png')
     image_file.name = 'test.png'
+    image_file.url = '{0}/{1}'.format(
+        TEST_SERVER,
+        image_file.name
+    )
     image_file.seek(0)
     return image_file
 SIMPLE_PNG = _simple_png()
@@ -514,7 +518,16 @@ class TestAvatar(APIRequestTestCase):
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['avatar'], SIMPLE_PNG.name)
+        self.assertEqual(response.data['avatar'], SIMPLE_PNG.url)
+
+    def test_get_no_avatar(self):
+        user = UserFactory.build()
+
+        request = self.create_request(user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['avatar'], None)
 
     def test_put(self):
         user = UserFactory.create()
@@ -525,12 +538,88 @@ class TestAvatar(APIRequestTestCase):
         force_authenticate(request, user)
 
         view = self.view_class.as_view()
-        response = view(request)
+        with patch('django.core.files.storage.Storage.url') as mocked_url:
+            mocked_url.return_value = 'mocked-url'
+            response = view(request)
         self.assertEqual(response.status_code, 200)
 
         SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=user.pk)
         self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
+
+    def test_options(self):
+        request = self.create_request('options')
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class TestAvatarThumbnail(APIRequestTestCase):
+    view_class = views.AvatarThumbnail
+
+    def test_get(self):
+        user = UserFactory.build(avatar=SIMPLE_PNG)
+
+        request = self.create_request(user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['thumbnail'], SIMPLE_PNG.url)
+
+    def test_get_no_avatar(self):
+        user = UserFactory.build()
+
+        request = self.create_request(user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['thumbnail'], None)
+
+    def test_get_resize(self):
+        user = UserFactory.build(avatar=SIMPLE_PNG)
+
+        data = {
+            'width': 10,
+            'height': 10,
+        }
+        request = self.create_request(user=user, data=data)
+        view = self.view_class.as_view()
+        expected_url = 'mocked-url'
+        with patch('django.core.files.storage.Storage.url') as mocked_url:
+            mocked_url.return_value = expected_url
+            response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.data['thumbnail'], expected_url)
+
+    def test_get_resize_width(self):
+        user = UserFactory.build(avatar=SIMPLE_PNG)
+
+        data = {
+            'width': 10,
+        }
+        request = self.create_request(user=user, data=data)
+        view = self.view_class.as_view()
+        expected_url = 'mocked-url'
+        with patch('django.core.files.storage.Storage.url') as mocked_url:
+            mocked_url.return_value = expected_url
+            response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.data['thumbnail'], expected_url)
+
+    def test_get_resize_height(self):
+        user = UserFactory.build(avatar=SIMPLE_PNG)
+
+        data = {
+            'height': 10,
+        }
+        request = self.create_request(user=user, data=data)
+        view = self.view_class.as_view()
+        expected_url = 'mocked-url'
+        with patch('django.core.files.storage.Storage.url') as mocked_url:
+            mocked_url.return_value = expected_url
+            response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.data['thumbnail'], expected_url)
 
 
 class TestUserList(APIRequestTestCase):

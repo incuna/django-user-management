@@ -134,8 +134,32 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
 
 
 class Avatar(generics.RetrieveUpdateAPIView):
+    """Retrieve and update the authenticated user's avatar."""
     model = User
     serializer_class = serializers.AvatarSerializer
+    parser_classes = (parsers.MultiPartParser,)
+
+    def get_object(self):
+        return self.request.user
+
+
+class AvatarThumbnail(generics.RetrieveAPIView):
+    """
+    Avatar thumbnail. Retrieve a thumbnail of the authenticated user's avatar.
+
+    Thumbnail options can be specified as get parameters. Options are:
+        width: Specify the width (in pixels) to resize / crop to.
+        height: Specify the height (in pixels) to resize / crop to.
+        crop: Whether to crop or not [1,0]
+        anchor: Where to anchor the crop [t,r,b,l]
+
+    If no options are specified the users avatar is returned.
+
+    To crop avatar to 100x100 anchored to the top right:
+        avatar-thumbnail?width=100&height=100&crop=1&anchor=tr
+    """
+    model = User
+    serializer_class = serializers.AvatarThumbnailSerializer
     parser_classes = (parsers.MultiPartParser,)
 
     def get_object(self):

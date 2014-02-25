@@ -10,4 +10,9 @@ urlpatterns = patterns(
         view=views.Avatar.as_view(),
         name='avatar',
     ),
+    url(
+        regex=r'^avatar-thumbnail/?$',
+        view=views.AvatarThumbnail.as_view(),
+        name='avatar-thumbnail',
+    ),
 )

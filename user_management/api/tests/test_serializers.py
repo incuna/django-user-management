@@ -172,6 +172,14 @@ class AvatarSerializerTest(TestCase):
         self.assertTrue(serializer.is_valid())
 
 
+class AvatarThumbnailSerializerTest(TestCase):
+    def test_deserialize(self):
+        user = UserFactory.build()
+        data = {'thumbnail': ''}
+        serializer = serializers.AvatarThumbnailSerializer(user, data=data)
+        self.assertTrue(serializer.is_valid())
+
+
 class UserSerializerTest(TestCase):
     def test_serialize(self):
         user = UserFactory.create()
