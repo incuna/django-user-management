@@ -43,6 +43,10 @@ Install the package
 
     pip install django-user-management
 
+Install with avatar functionality
+
+    pip install django-user-management[avatar]
+
 
 Create a custom user model
 
