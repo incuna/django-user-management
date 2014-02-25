@@ -1,3 +1,10 @@
+## v0.0.8
+
+* Add thumbnail endpoint.
+* Update avatar endpoint to return the file url (rather than the file name).
+* Make avatar field not required.
+  **This will require a migration.**
+
 ## v0.0.7
 
 * Ensure all urls accept a trailing slash.
