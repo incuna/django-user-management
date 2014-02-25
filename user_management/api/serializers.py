@@ -152,7 +152,7 @@ class AvatarThumbnailSerializer(serializers.ModelSerializer):
             'upscale': query_params.get('upscale', None)
         }
 
-    def generate_thnumbnail(self, source, **kwargs):
+    def generate_thumbnail(self, source, **kwargs):
         generator = generator_registry.get(
             self.generator_id,
             source=source,
@@ -170,7 +170,7 @@ class AvatarThumbnailSerializer(serializers.ModelSerializer):
         image = obj.avatar
         kwargs = self.get_generator_kwargs(request.QUERY_PARAMS)
         if kwargs.get('width') or kwargs.get('height'):
-            image = self.generate_thnumbnail(image, **kwargs)
+            image = self.generate_thumbnail(image, **kwargs)
 
         return request.build_absolute_uri(image.url)
 

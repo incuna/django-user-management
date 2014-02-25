@@ -9,6 +9,12 @@ install_requires = (
     'incuna_mail>=0.1.1',
 )
 
+extras_require = {
+    'avatar': [
+        'django-imagekit>=3.2',
+    ],
+}
+
 setup(
     name='django-user-management',
     packages=find_packages(),
@@ -20,5 +26,6 @@ setup(
     author_email='admin@incuna.com',
     url='https://github.com/incuna/django-user-management/',
     install_requires=install_requires,
+    extras_require=extras_require,
     zip_safe=False,
 )
