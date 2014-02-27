@@ -54,12 +54,6 @@ class TestURLs(TestCase):
             url='/avatar',
             url_name='user_management_api:avatar')
 
-    def test_avatar_thumbnail_url(self):
-        self.check_url(
-            view_name='AvatarThumbnail',
-            url='/avatar-thumbnail',
-            url_name='user_management_api:avatar-thumbnail')
-
     def test_user_detail_url(self):
         self.check_url(
             view_name='UserDetail',

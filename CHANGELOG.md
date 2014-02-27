@@ -1,4 +1,4 @@
-## v0.0.8
+## Upcoming version
 
 * Add thumbnail endpoint.
 * Update avatar endpoint to return the file url (rather than the file name).

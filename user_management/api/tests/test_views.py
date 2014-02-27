@@ -511,6 +511,9 @@ class TestProfileDetail(APIRequestTestCase):
 class TestAvatar(APIRequestTestCase):
     view_class = views.Avatar
 
+    def tearDown(self):
+        SIMPLE_PNG.seek(0)
+
     def test_get(self):
         user = UserFactory.build(avatar=SIMPLE_PNG)
 
@@ -542,7 +545,6 @@ class TestAvatar(APIRequestTestCase):
             mocked_url.return_value = 'mocked-url'
             response = view(request)
         self.assertEqual(response.status_code, 200)
-
         SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=user.pk)
         self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
@@ -552,28 +554,6 @@ class TestAvatar(APIRequestTestCase):
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-
-class TestAvatarThumbnail(APIRequestTestCase):
-    view_class = views.AvatarThumbnail
-
-    def test_get(self):
-        user = UserFactory.build(avatar=SIMPLE_PNG)
-
-        request = self.create_request(user=user)
-        view = self.view_class.as_view()
-        response = view(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['thumbnail'], SIMPLE_PNG.url)
-
-    def test_get_no_avatar(self):
-        user = UserFactory.build()
-
-        request = self.create_request(user=user)
-        view = self.view_class.as_view()
-        response = view(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['thumbnail'], None)
 
     def test_get_resize(self):
         user = UserFactory.build(avatar=SIMPLE_PNG)
@@ -589,7 +569,7 @@ class TestAvatarThumbnail(APIRequestTestCase):
             mocked_url.return_value = expected_url
             response = view(request)
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(response.data['thumbnail'], expected_url)
+        self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_get_resize_width(self):
         user = UserFactory.build(avatar=SIMPLE_PNG)
@@ -604,7 +584,7 @@ class TestAvatarThumbnail(APIRequestTestCase):
             mocked_url.return_value = expected_url
             response = view(request)
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(response.data['thumbnail'], expected_url)
+        self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_get_resize_height(self):
         user = UserFactory.build(avatar=SIMPLE_PNG)
@@ -619,7 +599,7 @@ class TestAvatarThumbnail(APIRequestTestCase):
             mocked_url.return_value = expected_url
             response = view(request)
         self.assertEqual(response.status_code, 200)
-        self.assertNotEqual(response.data['thumbnail'], expected_url)
+        self.assertNotEqual(response.data['avatar'], expected_url)
 
 
 class TestUserList(APIRequestTestCase):
