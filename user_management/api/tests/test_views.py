@@ -1,5 +1,5 @@
 from io import BytesIO
-from mock import patch, Mock
+from mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
