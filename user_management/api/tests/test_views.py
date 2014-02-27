@@ -508,8 +508,8 @@ class TestProfileDetail(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-class TestAvatar(APIRequestTestCase):
-    view_class = views.Avatar
+class TestProfileAvatar(APIRequestTestCase):
+    view_class = views.ProfileAvatar
 
     def tearDown(self):
         SIMPLE_PNG.seek(0)
@@ -764,3 +764,94 @@ class TestUserDetail(APIRequestTestCase):
 
         user = User.objects.get()
         self.assertEqual(self.user, user)
+
+
+#class TestUserAvatar(APIRequestTestCase):
+#    view_class = views.UserAvatar
+
+#    def tearDown(self):
+#        SIMPLE_PNG.seek(0)
+
+#    def test_get(self):
+#        user = UserFactory.build()
+#        other_user = UserFactory.build(avatar=SIMPLE_PNG)
+
+#        request = self.create_request(user=user)
+#        view = self.view_class.as_view()
+#        response = view(request, pk=other_user.pk)
+#        self.assertEqual(response.status_code, status.HTTP_200_OK)
+#        self.assertEqual(response.data['avatar'], SIMPLE_PNG.url)
+
+#    def test_get_no_avatar(self):
+#        user = UserFactory.build()
+#        other_user = UserFactory.build()
+
+#        request = self.create_request(user=user)
+#        view = self.view_class.as_view()
+#        response = view(request, pk=other_user.pk)
+#        self.assertEqual(response.status_code, 200)
+#        self.assertEqual(response.data['avatar'], None)
+
+#    def test_put(self):
+#        user = UserFactory.create(is_staff=True)
+#        other_user = UserFactory.build()
+#        data = {'avatar': SIMPLE_PNG}
+
+#        request = APIRequestFactory().put('/', data=data)
+#        request.user = user
+#        force_authenticate(request, user)
+
+#        view = self.view_class.as_view()
+#        with patch('django.core.files.storage.Storage.url') as mocked_url:
+#            mocked_url.return_value = 'mocked-url'
+#            response = view(request, pk=other_user.pk)
+#        self.assertEqual(response.status_code, 200)
+#        SIMPLE_PNG.seek(0)
+#        user = User.objects.get(pk=user.pk)
+#        self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
+
+#    def test_get_resize(self):
+#        user = UserFactory.build(avatar=SIMPLE_PNG)
+
+#        data = {
+#            'width': 10,
+#            'height': 10,
+#        }
+#        request = self.create_request(user=user, data=data)
+#        view = self.view_class.as_view()
+#        expected_url = 'mocked-url'
+#        with patch('django.core.files.storage.Storage.url') as mocked_url:
+#            mocked_url.return_value = expected_url
+#            response = view(request)
+#        self.assertEqual(response.status_code, 200)
+#        self.assertNotEqual(response.data['avatar'], expected_url)
+
+#    def test_get_resize_width(self):
+#        user = UserFactory.build(avatar=SIMPLE_PNG)
+
+#        data = {
+#            'width': 10,
+#        }
+#        request = self.create_request(user=user, data=data)
+#        view = self.view_class.as_view()
+#        expected_url = 'mocked-url'
+#        with patch('django.core.files.storage.Storage.url') as mocked_url:
+#            mocked_url.return_value = expected_url
+#            response = view(request)
+#        self.assertEqual(response.status_code, 200)
+#        self.assertNotEqual(response.data['avatar'], expected_url)
+
+#    def test_get_resize_height(self):
+#        user = UserFactory.build(avatar=SIMPLE_PNG)
+
+#        data = {
+#            'height': 10,
+#        }
+#        request = self.create_request(user=user, data=data)
+#        view = self.view_class.as_view()
+#        expected_url = 'mocked-url'
+#        with patch('django.core.files.storage.Storage.url') as mocked_url:
+#            mocked_url.return_value = expected_url
+#            response = view(request)
+#        self.assertEqual(response.status_code, 200)
+#        self.assertNotEqual(response.data['avatar'], expected_url)

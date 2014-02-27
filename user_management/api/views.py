@@ -133,7 +133,7 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class Avatar(generics.RetrieveUpdateAPIView):
+class ProfileAvatar(generics.RetrieveUpdateAPIView):
     """
     Retrieve and update the authenticated user's avatar. Pass get parameters to
     retrieve a thumbnail of the avatar.
@@ -167,3 +167,10 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializer
+
+
+class UserAvatar(generics.RetrieveUpdateAPIView):
+    model = User
+    permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
+    parser_classes = (parsers.MultiPartParser,)
+    serializer_class = serializers.AvatarSerializer
