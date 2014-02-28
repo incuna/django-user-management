@@ -777,7 +777,10 @@ class TestUserAvatar(APIRequestTestCase):
         SIMPLE_PNG.seek(0)
 
     def get_response(self, request):
-        """Create a response object by patching view_class.get_object."""
+        """
+        Create a response object by patching view_class.get_object to return
+        self.other_user, allowing self.other_user to not be saved.
+        """
         view = self.view_class.as_view()
         with patch.object(self.view_class, 'get_object') as get_object:
             get_object.return_value = self.other_user
