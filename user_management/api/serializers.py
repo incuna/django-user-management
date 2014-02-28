@@ -117,6 +117,7 @@ class ThumbnailField(serializers.ImageField):
         height: Specify the height (in pixels) to resize / crop to.
         crop: Whether to crop or not [1,0]
         anchor: Where to anchor the crop [t,r,b,l]
+        upscale: Whether to upscale or not [1,0]
 
     If no options are specified the users avatar is returned.
 
