@@ -147,7 +147,7 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
     If no options are specified the users avatar is returned.
 
     To crop avatar to 100x100 anchored to the top right:
-        avatar-thumbnail?width=100&height=100&crop=1&anchor=tr
+        avatar?width=100&height=100&crop=1&anchor=tr
     """
     model = User
     serializer_class = serializers.AvatarSerializer
