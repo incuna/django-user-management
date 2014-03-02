@@ -147,7 +147,7 @@ class ThumbnailField(serializers.ImageField):
         return ImageCacheFile(generator)
 
     def to_native(self, image):
-        if image.name is None:
+        if not image.name:
             return None
 
         request = self.context.get('request', None)
