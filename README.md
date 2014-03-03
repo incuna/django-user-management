@@ -20,22 +20,26 @@ will be sent including a link to verify the email and activate the account.
 serializers require `django-imagekit`.
 
 #### Avatar views
-`user_management.api.views.Avatar` provides an endpoint to retrieve 
+`user_management.api.views.ProfileAvatar` provides an endpoint to retrieve 
 and update the logged in user's avatar.
 
-`user_management.api.views.AvatarThumbnail` provides an endpoint to retrieve
-a thumbnail of the authenticated user's avatar.
+`user_management.api.views.UserAvatar` provides an endpoint to retrieve 
+and update other user's avatar. Only admin user can update other user's data.
+
+Both avatar views provides an endpoint to retrieve a thumbnail of the
+authenticated user's avatar.
 
     Thumbnail options can be specified as get parameters. Options are:
         width: Specify the width (in pixels) to resize / crop to.
         height: Specify the height (in pixels) to resize / crop to.
         crop: Whether to crop or not [1,0]
         anchor: Where to anchor the crop [t,r,b,l]
+        upscale: Whether to upscale or not [1,0]
 
     If no options are specified the users avatar is returned.
 
     To crop avatar to 100x100 anchored to the top right:
-        avatar-thumbnail?width=100&height=100&crop=1&anchor=tr
+        avatar?width=100&height=100&crop=1&anchor=tr
 
 
 ## Installation
