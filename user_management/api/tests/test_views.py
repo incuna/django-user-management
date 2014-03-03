@@ -1,5 +1,4 @@
 from io import BytesIO
-from mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
@@ -8,6 +7,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from mock import patch
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate

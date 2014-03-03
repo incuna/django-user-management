@@ -1,5 +1,3 @@
-from mock import patch
-
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.core.management.color import no_style
@@ -11,6 +9,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils import six
 from django.utils.http import urlsafe_base64_encode
+from mock import patch
 
 from . import models
 from .factories import UserFactory
