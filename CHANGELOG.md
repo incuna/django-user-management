@@ -1,8 +1,7 @@
 ##  v0.0.8
 
-* Make avatar field not required.
-  **This will require a migration.**
-* Add user avatar endpoint.
+* Add user avatar model mixin, serializer and endpoint.
+  **Requires djangorestframework>=2.3.13.**
 
 ## v0.0.7
 
