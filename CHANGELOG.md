@@ -1,9 +1,7 @@
-## Upcoming version
+##  v0.0.8
 
 * Make avatar field not required.
   **This will require a migration.**
-* Update avatar endpoint to return the file url (rather than the file name).
-* Update avatar endpoint to thumbnail the avatar based on get parameters.
 * Add user avatar endpoint.
 
 ## v0.0.7
