@@ -1,10 +1,7 @@
-## Upcoming version
+##  v0.0.8
 
-* Make avatar field not required.
-  **This will require a migration.**
-* Update avatar endpoint to return the file url (rather than the file name).
-* Update avatar endpoint to thumbnail the avatar based on get parameters.
-* Add user avatar endpoint.
+* Add user avatar model mixin, serializer and endpoint.
+  **Requires djangorestframework>=2.3.13.**
 
 ## v0.0.7
 

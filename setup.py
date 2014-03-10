@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 
-version = '0.0.7'
+version = '0.0.8'
 
 
 install_requires = (
-    'djangorestframework>=2.3.12,<3',
+    'djangorestframework>=2.3.13,<3',
     'incuna_mail>=0.1.1,<0.2',
 )
 
