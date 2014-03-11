@@ -1,4 +1,8 @@
-##  v0.0.8
+## v0.0.9
+
+* Add labels to password serializers' fields.
+
+## v0.0.8
 
 * Add user avatar model mixin, serializer and endpoint.
   **Requires djangorestframework>=2.3.13.**
