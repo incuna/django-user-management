@@ -48,9 +48,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class PasswordChangeSerializer(serializers.ModelSerializer):
-    old_password = serializers.CharField(write_only=True)
-    new_password = serializers.CharField(write_only=True, min_length=8)
-    new_password2 = serializers.CharField(write_only=True, min_length=8)
+    old_password = serializers.CharField(
+        write_only=True, label=_('Old password'))
+    new_password = serializers.CharField(
+        write_only=True, min_length=8, label=_('New password'))
+    new_password2 = serializers.CharField(
+        write_only=True, min_length=8, label=_('Repeat new password'))
 
     class Meta:
         model = User
@@ -76,8 +79,10 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
 
 
 class PasswordResetSerializer(serializers.ModelSerializer):
-    new_password = serializers.CharField(write_only=True, min_length=8)
-    new_password2 = serializers.CharField(write_only=True, min_length=8)
+    new_password = serializers.CharField(
+        write_only=True, min_length=8, label=_('New password'))
+    new_password2 = serializers.CharField(
+        write_only=True, min_length=8, label=_('Repeat new password'))
 
     class Meta:
         model = User
@@ -96,7 +101,7 @@ class PasswordResetSerializer(serializers.ModelSerializer):
 
 
 class PasswordResetEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=511)
+    email = serializers.EmailField(max_length=511, label=_('Email address'))
 
     class Meta:
         fields = ['email']
