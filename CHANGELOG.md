@@ -1,3 +1,7 @@
+## v0.1.0
+
+* Bump required version of incuna_mail to 0.2
+
 ## v0.0.9
 
 * Add labels to password serializers' fields.
