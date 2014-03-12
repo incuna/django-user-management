@@ -65,6 +65,7 @@ class PasswordResetEmail(views.APIView):
         site = Site.objects.get_current()
         context = {
             'protocol': 'https',
+            'site': site,
             'token': default_token_generator.make_token(user),
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         }
@@ -72,7 +73,7 @@ class PasswordResetEmail(views.APIView):
             to=[user.email],
             template_name='user_management/password_reset_email.html',
             subject='{} password reset'.format(site.domain),
-            extra_context=context,
+            context=context,
         )
 
 

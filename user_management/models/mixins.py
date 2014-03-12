@@ -92,7 +92,8 @@ class VerifyEmailManager(UserManager):
 
 class VerifyEmailMixin(BasicUserFieldsMixin):
     is_active = models.BooleanField(_('active'), default=False)
-    verified_email = models.BooleanField(_('Verified email address'),
+    verified_email = models.BooleanField(
+        _('Verified email address'),
         default=False,
         help_text=_('Indicates if the email address has been verified.'))
 
@@ -110,17 +111,18 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
         if self.verified_email:
             raise ValueError('Cannot validate already active user.')
 
+        site = Site.objects.get_current()
         context = {
             'uid': urlsafe_base64_encode(force_bytes(self.pk)),
             'token': default_token_generator.make_token(self),
+            'site': site,
         }
-        site = Site.objects.get_current()
 
         send(
             to=[self.email],
             template_name='user_management/account_validation_email.html',
             subject='{} account validate'.format(site.domain),
-            extra_context=context,
+            context=context,
         )
 
 
