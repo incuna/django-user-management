@@ -204,7 +204,7 @@ class TestVerifyEmailMixin(AbstractModelMixin, TestCase):
             to=[user.email],
             subject=subject,
             template_name=template,
-            extra_context={'token': make_token(), 'uid': uid},
+            context={'site': site, 'token': make_token(), 'uid': uid},
         )
 
     def test_verified_email(self):

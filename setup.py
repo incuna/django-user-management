@@ -6,7 +6,7 @@ version = '0.0.9'
 
 install_requires = (
     'djangorestframework>=2.3.13,<3',
-    'incuna_mail>=0.1.1,<0.2',
+    'incuna_mail>=0.2,<0.3',
 )
 
 extras_require = {
