@@ -16,14 +16,14 @@ By default users will be created with `is_active = False`, a verification email
 will be sent including a link to verify the email and activate the account. 
 
 ###  AvatarMixin
-`user_management.models.mixins.AvatarMixin` adds an avatar field. The 
+`user_management.api.avatar.mixins.AvatarMixin` adds an avatar field. The 
 serializers require `django-imagekit`.
 
 #### Avatar views
-`user_management.api.views.ProfileAvatar` provides an endpoint to retrieve 
+`user_management.api.avatar.views.ProfileAvatar` provides an endpoint to retrieve 
 and update the logged in user's avatar.
 
-`user_management.api.views.UserAvatar` provides an endpoint to retrieve 
+`user_management.api.avatar.views.UserAvatar` provides an endpoint to retrieve 
 and update other user's avatar. Only admin user can update other user's data.
 
 Both avatar views provides an endpoint to retrieve a thumbnail of the
@@ -74,7 +74,6 @@ Make sure your custom user model in added to `INSTALLED_APPS` and set
     incuna_mail
 
 The optional `AvatarMixin` functionality depends on `django-imagekit`.
-    
 
 
 ### To use the api views
@@ -113,11 +112,11 @@ If you are using the `VerifyEmailMixin` then also include
     )
 
 If you are using the `AvatarMixin` then also include
-`user_management.api.urls.avatar`
+`user_management.api.avatar.urls.avatar`
 
     urlpatterns = patterns(''
         ...
-        url('', include('user_management.api.urls.avatar')),
+        url('', include('user_management.api.avatar.urls.avatar')),
         ...
     )
 
