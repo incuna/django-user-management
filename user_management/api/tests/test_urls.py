@@ -43,24 +43,11 @@ class TestURLs(URLsTestCase):
             expected_url='/register',
             url_name='user_management_api:register')
 
-    def test_profile_avatar_url(self):
-        self.check_url(
-            view_class=views.ProfileAvatar,
-            expected_url='/profile/avatar',
-            url_name='user_management_api:profile_avatar')
-
     def test_user_detail_url(self):
         self.check_url(
             view_class=views.UserDetail,
             expected_url='/users/1',
             url_name='user_management_api:user_detail',
-            url_kwargs={'pk': 1})
-
-    def test_user_avatar_url(self):
-        self.check_url(
-            view_class=views.UserAvatar,
-            expected_url='/users/1/avatar',
-            url_name='user_management_api:user_avatar',
             url_kwargs={'pk': 1})
 
     def test_user_list_url(self):
