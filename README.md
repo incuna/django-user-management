@@ -16,7 +16,7 @@ By default users will be created with `is_active = False`, a verification email
 will be sent including a link to verify the email and activate the account. 
 
 ###  AvatarMixin
-`user_management.api.avatar.mixins.AvatarMixin` adds an avatar field. The 
+`user_management.models.mixins.AvatarMixin` adds an avatar field. The 
 serializers require `django-imagekit`.
 
 #### Avatar views

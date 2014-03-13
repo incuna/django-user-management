@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
-from ..mixins import VerifyEmailMixin
-from user_management.api.avatar.mixins import AvatarMixin
+from ..mixins import VerifyEmailMixin, AvatarMixin
 
 
 class User(AvatarMixin, VerifyEmailMixin, PermissionsMixin, AbstractBaseUser):
