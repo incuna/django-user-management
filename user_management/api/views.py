@@ -5,7 +5,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
 from incuna_mail import send
-from rest_framework import generics, parsers, renderers, response, status, views
+from rest_framework import generics, renderers, response, status, views
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -134,31 +134,6 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class ProfileAvatar(generics.RetrieveUpdateAPIView):
-    """
-    Retrieve and update the authenticated user's avatar. Pass get parameters to
-    retrieve a thumbnail of the avatar.
-
-    Thumbnail options are specified as get parameters. Options are:
-        width: Specify the width (in pixels) to resize / crop to.
-        height: Specify the height (in pixels) to resize / crop to.
-        crop: Whether to crop or not [1,0]
-        anchor: Where to anchor the crop [t,r,b,l]
-        upscale: Whether to upscale or not [1,0]
-
-    If no options are specified the users avatar is returned.
-
-    To crop avatar to 100x100 anchored to the top right:
-        avatar?width=100&height=100&crop=1&anchor=tr
-    """
-    model = User
-    serializer_class = serializers.AvatarSerializer
-    parser_classes = (parsers.MultiPartParser,)
-
-    def get_object(self):
-        return self.request.user
-
-
 class UserList(generics.ListCreateAPIView):
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
@@ -169,26 +144,3 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializer
-
-
-class UserAvatar(generics.RetrieveUpdateAPIView):
-    """
-    Retrieve and update the user's avatar. Pass get parameters to
-    retrieve a thumbnail of the avatar.
-
-    Thumbnail options are specified as get parameters. Options are:
-        width: Specify the width (in pixels) to resize / crop to.
-        height: Specify the height (in pixels) to resize / crop to.
-        crop: Whether to crop or not [1,0]
-        anchor: Where to anchor the crop [t,r,b,l]
-        upscale: Whether to upscale or not [1,0]
-
-    If no options are specified the users avatar is returned.
-
-    To crop avatar to 100x100 anchored to the top right:
-        avatar?width=100&height=100&crop=1&anchor=tr
-    """
-    model = User
-    permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
-    parser_classes = (parsers.MultiPartParser,)
-    serializer_class = serializers.AvatarSerializer
