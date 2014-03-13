@@ -1,8 +1,13 @@
 ## v1.0.0
 
-* Move `avatar` related code to self-contained app so it does not break
+* Move `avatar` code to self-contained app so it does not break
   when extra dependencies are not installed.
+
   **Note: this is backward incompatible release.**
+  Avatar related code should now be imported from `api.avatar` namespace
+  instead of previous `api` namespace. An example `ProfileAvatar` class view
+  lives now at `user_management.api.avatar.views.ProfileAvatar`
+  (not `user_management.api.views.ProfileAvatar`).
 
 ## v0.1.0
 
