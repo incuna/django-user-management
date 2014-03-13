@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 
-version = '0.1.0'
+version = '0.2.0'
 
 
 install_requires = (
@@ -22,7 +22,7 @@ setup(
     version=version,
     description='',
     long_description='',
-    author='incuna',
+    author='Incuna',
     author_email='admin@incuna.com',
     url='https://github.com/incuna/django-user-management/',
     install_requires=install_requires,
