@@ -1,4 +1,4 @@
-## v0.2.0
+## v1.0.0
 
 * Move `avatar` related code to self-contained app so it does not break
   when extra dependencies are not installed.
