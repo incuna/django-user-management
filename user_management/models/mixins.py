@@ -124,10 +124,3 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
             subject='{} account validate'.format(site.domain),
             context=context,
         )
-
-
-class AvatarMixin(models.Model):
-    avatar = models.ImageField(upload_to='user_avatar', null=True, blank=True)
-
-    class Meta:
-        abstract = True
