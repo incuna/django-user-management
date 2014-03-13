@@ -1,3 +1,9 @@
+## v0.2.0
+
+* Move `avatar` related code to self-contained app so it does not break
+  when extra dependencies are not installed.
+  **Note: this is backward incompatible release.**
+
 ## v0.1.0
 
 * Bump required version of incuna_mail to 0.2
