@@ -114,6 +114,7 @@ class PasswordChange(generics.UpdateAPIView):
 
 class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
     permission_classes = [AllowAny]
+    ok_message = _('Your account has been verified.')
 
     def post(self, request, *args, **kwargs):
         if self.user.verified_email:
@@ -122,7 +123,11 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
         self.user.verified_email = True
         self.user.is_active = True
         self.user.save()
-        return response.Response(status=status.HTTP_200_OK)
+
+        return response.Response(
+            data={'data': self.ok_message},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class ProfileDetail(generics.RetrieveUpdateAPIView):

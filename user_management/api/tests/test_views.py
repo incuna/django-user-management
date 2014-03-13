@@ -352,7 +352,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         request = self.create_request('post', auth=True)
         view = self.view_class.as_view()
         response = view(request, uidb64=uid, token=token)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
         self.assertTrue(updated_user.verified_email)
@@ -366,7 +366,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         request = self.create_request('post', auth=False)
         view = self.view_class.as_view()
         response = view(request, uidb64=uid, token=token)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
         self.assertTrue(updated_user.verified_email)
@@ -411,7 +411,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         request = self.create_request('post', user=other_user)
         view = self.view_class.as_view()
         response = view(request, uidb64=uid, token=token)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
         self.assertTrue(updated_user.verified_email)
