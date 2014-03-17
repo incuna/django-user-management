@@ -30,7 +30,7 @@ class VerifyUserAdminTest(TestCase):
             ('Personal info', {'fields': ('name',)}),
             ('Permissions', {
                 'fields': (
-                    ('is_active', 'verified_email'),
+                    ('is_active', 'email_verification_required'),
                     'is_staff',
                     'is_superuser',
                     'groups',

@@ -32,6 +32,8 @@ class UserRegister(generics.CreateAPIView):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
+        if serializer.object.email_verification_required:
+            serializer.object.send_validation_email()
 
         return response.Response(
             data={'data': self.ok_message},
@@ -117,10 +119,10 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
     ok_message = _('Your account has been verified.')
 
     def post(self, request, *args, **kwargs):
-        if self.user.verified_email:
+        if not self.user.email_verification_required:
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
-        self.user.verified_email = True
+        self.user.email_verification_required = False
         self.user.is_active = True
         self.user.save()
 

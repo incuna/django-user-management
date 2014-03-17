@@ -60,7 +60,7 @@ class TestUser(TestCase):
             'name',
             'date_joined',
             'email',
-            'verified_email',
+            'email_verification_required',
             'is_active',
             'is_staff',
             'is_superuser',
@@ -138,7 +138,7 @@ class TestUserManager(TestCase):
         self.assertFalse(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
-        self.assertFalse(user.verified_email)
+        self.assertTrue(user.email_verification_required)
 
         # Check that the time is correct (or at least, in range)
         time_after = timezone.now()
@@ -179,11 +179,9 @@ class TestVerifyEmailMixin(AbstractModelMixin, TestCase):
 
     def test_save(self):
         user = self.model()
-        with patch.object(self.model, 'send_validation_email') as send:
-            user.save()
+        user.save()
         self.assertFalse(user.is_active)
-        self.assertFalse(user.verified_email)
-        send.assert_called_once_with()
+        self.assertTrue(user.email_verification_required)
 
     def test_send_validation_email(self):
         site = Site.objects.get_current()
@@ -208,7 +206,7 @@ class TestVerifyEmailMixin(AbstractModelMixin, TestCase):
         )
 
     def test_verified_email(self):
-        user = self.model(verified_email=True)
+        user = self.model(email_verification_required=False)
 
         with patch('user_management.models.mixins.send') as send:
             with self.assertRaises(ValueError):
