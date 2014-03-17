@@ -59,7 +59,7 @@ class TestRegisterView(APIRequestTestCase):
     @patch('user_management.api.serializers.RegistrationSerializer.Meta.model',
            new=BasicUser)
     def test_unauthenticated_user_post_no_verify_email(self):
-        """Unauthenticated Users should be able to register."""
+        """An email should not be sent if email_verification_required is False."""
         request = self.create_request('post', auth=False, data=self.data)
 
         send_email_path = 'user_management.models.mixins.VerifyEmailMixin.send_validation_email'
