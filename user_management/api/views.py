@@ -22,7 +22,6 @@ class GetToken(ObtainAuthToken):
 class UserRegister(generics.CreateAPIView):
     serializer_class = serializers.RegistrationSerializer
     permission_classes = [permissions.IsNotAuthenticated]
-    ok_message = _('Your account has been created and an activation link sent to your email address. Please check your email to continue.')
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.DATA, files=request.FILES)
@@ -32,9 +31,14 @@ class UserRegister(generics.CreateAPIView):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
+        if serializer.object.email_verification_required:
+            serializer.object.send_validation_email()
+            ok_message = _('Your account has been created and an activation link sent to your email address. Please check your email to continue.')
+        else:
+            ok_message = _('Your account has been created.')
 
         return response.Response(
-            data={'data': self.ok_message},
+            data={'data': ok_message},
             status=status.HTTP_201_CREATED,
         )
 
@@ -117,10 +121,10 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
     ok_message = _('Your account has been verified.')
 
     def post(self, request, *args, **kwargs):
-        if self.user.verified_email:
+        if not self.user.email_verification_required:
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
-        self.user.verified_email = True
+        self.user.email_verification_required = False
         self.user.is_active = True
         self.user.save()
 

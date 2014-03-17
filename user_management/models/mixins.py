@@ -50,6 +50,7 @@ class BasicUserFieldsMixin(models.Model):
         editable=False,
     )
     is_staff = models.BooleanField(_('staff status'), default=False)
+    email_verification_required = False
 
     objects = UserManager()
 
@@ -92,23 +93,18 @@ class VerifyEmailManager(UserManager):
 
 class VerifyEmailMixin(BasicUserFieldsMixin):
     is_active = models.BooleanField(_('active'), default=False)
-    verified_email = models.BooleanField(
-        _('Verified email address'),
-        default=False,
-        help_text=_('Indicates if the email address has been verified.'))
+    email_verification_required = models.BooleanField(
+        _('Email verification required?'),
+        default=True,
+        help_text=_('Indicates if the email address needs to be verified.'))
 
     objects = VerifyEmailManager()
 
     class Meta:
         abstract = True
 
-    def save(self, *args, **kwargs):
-        super(VerifyEmailMixin, self).save(*args, **kwargs)
-        if not self.verified_email:
-            self.send_validation_email()
-
     def send_validation_email(self):
-        if self.verified_email:
+        if not self.email_verification_required:
             raise ValueError('Cannot validate already active user.')
 
         site = Site.objects.get_current()

@@ -10,6 +10,7 @@ from rest_framework import status
 
 from user_management.api import views
 from user_management.models.tests.factories import UserFactory
+from user_management.models.tests.models import BasicUser
 from user_management.models.tests.utils import APIRequestTestCase
 
 
@@ -38,8 +39,13 @@ class TestRegisterView(APIRequestTestCase):
     def test_unauthenticated_user_post(self):
         """Unauthenticated Users should be able to register."""
         request = self.create_request('post', auth=False, data=self.data)
-        response = self.view_class.as_view()(request)
+
+        send_email_path = 'user_management.models.mixins.VerifyEmailMixin.send_validation_email'
+        with patch(send_email_path) as send:
+            response = self.view_class.as_view()(request)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        send.assert_called_once_with()
 
         user = User.objects.get()
         self.assertEqual(user.name, self.data['name'])
@@ -49,6 +55,19 @@ class TestRegisterView(APIRequestTestCase):
 
         # Password should validate
         self.assertTrue(check_password(self.data['password'], user.password))
+
+    @patch('user_management.api.serializers.RegistrationSerializer.Meta.model',
+           new=BasicUser)
+    def test_unauthenticated_user_post_no_verify_email(self):
+        """An email should not be sent if email_verification_required is False."""
+        request = self.create_request('post', auth=False, data=self.data)
+
+        send_email_path = 'user_management.models.mixins.VerifyEmailMixin.send_validation_email'
+        with patch(send_email_path) as send:
+            response = self.view_class.as_view()(request)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertFalse(send.called)
 
     def test_post_with_missing_data(self):
         """Password should not be sent back on failed request."""
@@ -133,7 +152,8 @@ class TestPasswordResetEmail(APIRequestTestCase):
         user = UserFactory.create(
             email=email,
             # Don't send the verification email
-            verified_email=True)
+            email_verification_required=False,
+        )
 
         self.view_class().send_email(user)
 
@@ -355,7 +375,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertTrue(updated_user.verified_email)
+        self.assertFalse(updated_user.email_verification_required)
         self.assertTrue(updated_user.is_active)
 
     def test_post_unauthenticated(self):
@@ -369,7 +389,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertTrue(updated_user.verified_email)
+        self.assertFalse(updated_user.email_verification_required)
         self.assertTrue(updated_user.is_active)
 
     def test_post_invalid_user(self):
@@ -393,7 +413,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_verified_email(self):
-        user = UserFactory.create(verified_email=True)
+        user = UserFactory.create(email_verification_required=False)
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
@@ -414,10 +434,10 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertTrue(updated_user.verified_email)
+        self.assertFalse(updated_user.email_verification_required)
 
         logged_in_user = User.objects.get(pk=other_user.pk)
-        self.assertFalse(logged_in_user.verified_email)
+        self.assertTrue(logged_in_user.email_verification_required)
 
 
 class TestProfileDetail(APIRequestTestCase):

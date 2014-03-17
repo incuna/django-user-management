@@ -1,3 +1,7 @@
+## Upcoming release
+
+* Move sending of verification emails into UserRegister view from VerifyEmailMixin.
+
 ## v0.2.0
 
 * Move `avatar` code to self-contained app so it does not break
