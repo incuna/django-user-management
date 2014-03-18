@@ -1,6 +1,8 @@
-## Upcoming release
+## v1.0.0
 
 * Move sending of verification emails into UserRegister view from VerifyEmailMixin.
+* Add delete method to GetToken view.
+* Return HTTP_201_CREATED and ok message from VerifyAccountView.
 
 ## v0.2.0
 
