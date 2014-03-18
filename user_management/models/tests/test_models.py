@@ -72,6 +72,7 @@ class TestUser(TestCase):
             'groups',  # Django permission groups
             'user_permissions',
             'logentry',  # Django admin logs
+            'auth_token',  # Rest framework authtoken
         }
 
         try:
