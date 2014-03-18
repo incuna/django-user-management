@@ -6,6 +6,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
 from incuna_mail import send
 from rest_framework import generics, renderers, response, status, views
+from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -17,6 +18,15 @@ User = get_user_model()
 
 class GetToken(ObtainAuthToken):
     renderer_classes = (renderers.JSONRenderer, renderers.BrowsableAPIRenderer)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            token = Token.objects.get(user=request.user)
+        except Token.DoesNotExist:
+            pass
+        else:
+            token.delete()
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserRegister(generics.CreateAPIView):

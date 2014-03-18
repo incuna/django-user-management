@@ -21,6 +21,8 @@ settings.configure(
         'django.contrib.sessions',
         'django.contrib.admin',
 
+        'rest_framework.authtoken',
+
         # Added for templates
         'user_management.api',
         'user_management.models.tests',

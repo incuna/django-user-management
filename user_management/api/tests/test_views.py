@@ -7,6 +7,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 
 from user_management.api import views
 from user_management.models.tests.factories import UserFactory
@@ -16,6 +17,21 @@ from user_management.models.tests.utils import APIRequestTestCase
 
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
+
+
+class GetTokenTest(APIRequestTestCase):
+    view_class = views.GetToken
+
+    def test_delete(self):
+        user = UserFactory.create()
+        token = Token.objects.create(user=user)
+
+        request = self.create_request('delete', user=user)
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        with self.assertRaises(Token.DoesNotExist):
+            Token.objects.get(pk=token.pk)
 
 
 class TestRegisterView(APIRequestTestCase):
