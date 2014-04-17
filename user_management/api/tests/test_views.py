@@ -529,7 +529,7 @@ class TestUserList(APIRequestTestCase):
     view_class = views.UserList
 
     def expected_data(self, user):
-        url = url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -590,7 +590,7 @@ class TestUserDetail(APIRequestTestCase):
         self.user, self.other_user = UserFactory.create_batch(2)
 
     def expected_data(self, user):
-        url = url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -636,14 +636,9 @@ class TestUserDetail(APIRequestTestCase):
         """ Tests PUT existing user for staff """
         self.user.is_staff = True
 
-        data = {
-            'name': 'Jean Dujardin',
-        }
+        data = {'name': 'Jean Dujardin'}
 
-        request = self.create_request(
-            'put',
-            user=self.user,
-            data=data)
+        request = self.create_request('put', user=self.user, data=data)
 
         view = self.view_class.as_view()
 
@@ -657,14 +652,9 @@ class TestUserDetail(APIRequestTestCase):
         """ Tests PATCH new user for staff """
         self.user.is_staff = True
 
-        data = {
-            'name': 'Jean Deschamps',
-        }
+        data = {'name': 'Jean Deschamps'}
 
-        request = self.create_request(
-            'patch',
-            user=self.user,
-            data=data)
+        request = self.create_request('patch', user=self.user, data=data)
 
         view = self.view_class.as_view()
 
