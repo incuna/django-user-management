@@ -22,6 +22,32 @@ TEST_SERVER = 'http://testserver'
 class GetTokenTest(APIRequestTestCase):
     view_class = views.GetToken
 
+    def test_post(self):
+        username = 'Test@example.com'
+        password = 'myepicstrongpassword'
+        user = UserFactory.build(email=username.lower(), is_active=True)
+        user.set_password(password)
+        user.save()
+
+        data = {'username': username, 'password': password}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+
+    def test_post_username(self):
+        username = 'Test@example.com'
+        password = 'myepicstrongpassword'
+        user = UserFactory.build(email=username, is_active=True)
+        user.set_password(password)
+        user.save()
+
+        data = {'username': username.lower(), 'password': password}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+
     def test_delete(self):
         user = UserFactory.create()
         token = Token.objects.create(user=user)
@@ -119,7 +145,7 @@ class TestRegisterView(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        self.assertTrue('email' in response.data)
+        self.assertTrue('email' in response.data, msg=response.data)
 
         self.assertFalse(User.objects.count() > 1)
 
@@ -529,7 +555,7 @@ class TestUserList(APIRequestTestCase):
     view_class = views.UserList
 
     def expected_data(self, user):
-        url = url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -565,16 +591,15 @@ class TestUserList(APIRequestTestCase):
         """Users should be able to create."""
         data = {
             'name': "Robert'); DROP TABLE Students;--'",
-            'email': 'bobby.tables+327@xkcd.com',
+            'email': 'Bobby.Tables+327@xkcd.com',
         }
         request = self.create_request('post', auth=True, data=data)
         request.user.is_staff = True
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        user = User.objects.get(email=data['email'])
+        user = User.objects.get(email=data['email'].lower())
         self.assertEqual(user.name, data['name'])
-        self.assertEqual(user.email, data['email'])
 
     def test_post_unauthorised(self):
         request = self.create_request('post', auth=True)
@@ -590,7 +615,7 @@ class TestUserDetail(APIRequestTestCase):
         self.user, self.other_user = UserFactory.create_batch(2)
 
     def expected_data(self, user):
-        url = url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -636,14 +661,9 @@ class TestUserDetail(APIRequestTestCase):
         """ Tests PUT existing user for staff """
         self.user.is_staff = True
 
-        data = {
-            'name': 'Jean Dujardin',
-        }
+        data = {'name': 'Jean Dujardin'}
 
-        request = self.create_request(
-            'put',
-            user=self.user,
-            data=data)
+        request = self.create_request('put', user=self.user, data=data)
 
         view = self.view_class.as_view()
 
@@ -657,14 +677,9 @@ class TestUserDetail(APIRequestTestCase):
         """ Tests PATCH new user for staff """
         self.user.is_staff = True
 
-        data = {
-            'name': 'Jean Deschamps',
-        }
+        data = {'name': 'Jean Deschamps'}
 
-        request = self.create_request(
-            'patch',
-            user=self.user,
-            data=data)
+        request = self.create_request('patch', user=self.user, data=data)
 
         view = self.view_class.as_view()
 

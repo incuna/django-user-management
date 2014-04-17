@@ -38,7 +38,7 @@ class UserCreationForm(forms.ModelForm):
         try:
             User._default_manager.get(email__iexact=email)
         except User.DoesNotExist:
-            return email
+            return email.lower()
         raise forms.ValidationError(self.error_messages['duplicate_email'])
 
     def clean(self):
