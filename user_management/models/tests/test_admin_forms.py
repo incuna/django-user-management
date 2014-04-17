@@ -7,12 +7,12 @@ from . factories import UserFactory
 
 class UserCreationFormTest(TestCase):
     def test_clean_email(self):
-        email = 'test@example.com'
+        email = 'Test@example.com'
 
         form = admin_forms.UserCreationForm()
         form.cleaned_data = {'email': email}
 
-        self.assertEqual(form.clean_email(), email)
+        self.assertEqual(form.clean_email(), email.lower())
 
     def test_clean_duplicate_email(self):
         user = UserFactory.create()
