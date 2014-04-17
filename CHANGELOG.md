@@ -1,3 +1,8 @@
+## v1.1.0
+
+* Add CaseInsensitiveEmailBackend authentication backend
+* Consistently convert email addresses to lower-case
+
 ## v1.0.0
 
 * Move sending of verification emails into UserRegister view from VerifyEmailMixin.
