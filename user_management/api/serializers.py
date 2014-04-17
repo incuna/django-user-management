@@ -17,7 +17,7 @@ class ValidateEmailMixin(object):
         email = email.lower()
 
         try:
-            User.objects.get(email=email)
+            User.objects.get(email__iexact=email)
         except User.DoesNotExist:
             attrs[source] = email
             return attrs
