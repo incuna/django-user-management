@@ -6,28 +6,33 @@ from rest_framework import serializers
 User = get_user_model()
 
 
-class RegistrationSerializer(serializers.ModelSerializer):
+class ValidateEmailMixin(object):
+    def validate_email(self, attrs, source):
+        email = attrs.get(source)
+
+        # Required check happens elsewhere, so no error if email is None
+        if email is None:
+            return attrs
+
+        email = email.lower()
+
+        try:
+            User.objects.get(email=email)
+        except User.DoesNotExist:
+            attrs[source] = email
+            return attrs
+        else:
+            msg = _('That email address has already been registered.')
+            raise serializers.ValidationError(msg)
+
+
+class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8, label=_('Password'))
     password2 = serializers.CharField(write_only=True, min_length=8, label=_('Repeat password'))
 
     class Meta:
         fields = ['name', 'email', 'password', 'password2']
         model = User
-
-    def validate_email(self, attrs, source):
-        email = attrs.get('email')
-
-        # Required check happens elsewhere, so no error if email is None
-        if email is None:
-            return attrs
-
-        try:
-            User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            return attrs
-        else:
-            msg = _('That email address has already been registered.')
-            raise serializers.ValidationError(msg)
 
     def validate_password2(self, attrs, source):
         password2 = attrs.pop(source)
@@ -111,25 +116,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    def validate_email(self, attrs, source):
-        email = attrs.get('email')
-
-        # Required check happens elsewhere, so no error if email is None
-        if email is None:
-            return attrs
-
-        qs = User.objects.all()
-        if self.object and self.object.pk:
-            qs = qs.exclude(pk=self.object.pk)
-
-        try:
-            qs.get(email__iexact=email)
-        except User.DoesNotExist:
-            return attrs
-        else:
-            msg = _('That email address is already in use.')
-            raise serializers.ValidationError(msg)
-
     class Meta:
         model = User
         fields = ('url', 'name', 'email', 'date_joined')
@@ -137,6 +123,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         view_name = 'user_management_api:user_detail'
 
 
-class UserSerializerCreate(UserSerializer):
+class UserSerializerCreate(ValidateEmailMixin, UserSerializer):
     class Meta(UserSerializer.Meta):
         read_only_fields = ('date_joined',)

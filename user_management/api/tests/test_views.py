@@ -119,7 +119,7 @@ class TestRegisterView(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        self.assertTrue('email' in response.data)
+        self.assertTrue('email' in response.data, msg=response.data)
 
         self.assertFalse(User.objects.count() > 1)
 
@@ -565,16 +565,15 @@ class TestUserList(APIRequestTestCase):
         """Users should be able to create."""
         data = {
             'name': "Robert'); DROP TABLE Students;--'",
-            'email': 'bobby.tables+327@xkcd.com',
+            'email': 'Bobby.Tables+327@xkcd.com',
         }
         request = self.create_request('post', auth=True, data=data)
         request.user.is_staff = True
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        user = User.objects.get(email=data['email'])
+        user = User.objects.get(email=data['email'].lower())
         self.assertEqual(user.name, data['name'])
-        self.assertEqual(user.email, data['email'])
 
     def test_post_unauthorised(self):
         request = self.create_request('post', auth=True)

@@ -136,7 +136,7 @@ class RegistrationSerializerTest(TestCase):
         super(RegistrationSerializerTest, self).setUp()
         self.data = {
             'name': "Robert'); DROP TABLE Students;--'",
-            'email': 'bobby.tables+327@xkcd.com',
+            'email': 'Bobby.Tables+327@xkcd.com',
             'password': 'Sup3RSecre7paSSw0rD',
             'password2': 'Sup3RSecre7paSSw0rD',
         }
@@ -147,6 +147,7 @@ class RegistrationSerializerTest(TestCase):
 
         user = serializer.object
         self.assertEqual(user.name, self.data['name'])
+        self.assertEqual(user.email, self.data['email'].lower())
         self.assertTrue(user.check_password(self.data['password']))
 
     def test_deserialize_invalid_new_password(self):
