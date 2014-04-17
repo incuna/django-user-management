@@ -11,7 +11,7 @@ settings.configure(
     DATABASES={
         'default': dj_database_url.config(default='postgres://localhost/user_management_api'),
     },
-    DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage',
+    DEFAULT_FILE_STORAGE='inmemorystorage.InMemoryStorage',
     INSTALLED_APPS=(
         # Put contenttypes before auth to work around test issue.
         # See: https://code.djangoproject.com/ticket/10827#comment:12
@@ -30,6 +30,9 @@ settings.configure(
     PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',),
     SITE_ID = 1,
     AUTH_USER_MODEL = 'tests.User',
+    AUTHENTICATION_BACKENDS = (
+        'user_management.models.backends.CaseInsensitiveEmailBackend',
+    ),
     ROOT_URLCONF='user_management.api.tests.urls',
     REST_FRAMEWORK={
         'DEFAULT_AUTHENTICATION_CLASSES': (

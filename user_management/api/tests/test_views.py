@@ -22,6 +22,32 @@ TEST_SERVER = 'http://testserver'
 class GetTokenTest(APIRequestTestCase):
     view_class = views.GetToken
 
+    def test_post(self):
+        username = 'Test@example.com'
+        password = 'myepicstrongpassword'
+        user = UserFactory.build(email=username.lower(), is_active=True)
+        user.set_password(password)
+        user.save()
+
+        data = {'username': username, 'password': password}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+
+    def test_post_username(self):
+        username = 'Test@example.com'
+        password = 'myepicstrongpassword'
+        user = UserFactory.build(email=username, is_active=True)
+        user.set_password(password)
+        user.save()
+
+        data = {'username': username.lower(), 'password': password}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+
     def test_delete(self):
         user = UserFactory.create()
         token = Token.objects.create(user=user)
