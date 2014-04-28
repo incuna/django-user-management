@@ -2,6 +2,7 @@
 """From http://stackoverflow.com/a/12260597/400691"""
 import sys
 
+from colour_runner.django_runner import ColourRunnerMixin
 from django.conf import settings
 
 import dj_database_url
@@ -43,7 +44,12 @@ settings.configure(
 
 from django.test.runner import DiscoverRunner
 
-test_runner = DiscoverRunner(verbosity=1)
+
+class TestRunner(ColourRunnerMixin, DiscoverRunner):
+    pass
+
+
+test_runner = TestRunner(verbosity=1)
 failures = test_runner.run_tests(['user_management'])
 if failures:
     sys.exit(1)
