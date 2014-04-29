@@ -1,9 +1,9 @@
-{% spaceless %}{% load i18n %}{% autoescape off %}
+{% spaceless %}{% load i18n %}{% autoescape off %}{% blocktrans %}
 You are receiving this email because your email address has been used to
 register an account at {{ site.name }}.
 
 Please click the following link to complete your registration:
-
+{% endblocktrans %}
 http://{{ site.domain }}#/register/verify/{{ uid }}/{{ token }}/
 
 {% endautoescape %}
