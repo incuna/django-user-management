@@ -25,9 +25,7 @@ class GetTokenTest(APIRequestTestCase):
     def test_post(self):
         username = 'Test@example.com'
         password = 'myepicstrongpassword'
-        user = UserFactory.build(email=username.lower(), is_active=True)
-        user.set_password(password)
-        user.save()
+        UserFactory.create(email=username.lower(), password=password, is_active=True)
 
         data = {'username': username, 'password': password}
         request = self.create_request('post', auth=False, data=data)
@@ -38,9 +36,7 @@ class GetTokenTest(APIRequestTestCase):
     def test_post_username(self):
         username = 'Test@example.com'
         password = 'myepicstrongpassword'
-        user = UserFactory.build(email=username, is_active=True)
-        user.set_password(password)
-        user.save()
+        UserFactory.create(email=username, password=password, is_active=True)
 
         data = {'username': username.lower(), 'password': password}
         request = self.create_request('post', auth=False, data=data)
@@ -224,9 +220,7 @@ class TestPasswordReset(APIRequestTestCase):
     def test_put(self):
         old_password = 'old_password'
         new_password = 'new_password'
-        user = UserFactory.create()
-        user.set_password(old_password)
-        user.save()
+        user = UserFactory.create(password=old_password)
 
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -248,9 +242,7 @@ class TestPasswordReset(APIRequestTestCase):
         old_password = 'old_password'
         new_password = 'new_password'
         invalid_password = 'different_new_password'
-        user = UserFactory.create()
-        user.set_password(old_password)
-        user.save()
+        user = UserFactory.create(password=old_password)
 
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -296,9 +288,7 @@ class TestPasswordChange(APIRequestTestCase):
         old_password = 'old_password'
         new_password = 'new_password'
 
-        user = UserFactory.create()
-        user.set_password(old_password)
-        user.save()
+        user = UserFactory.create(password=old_password)
 
         request = self.create_request(
             'put',
@@ -336,9 +326,7 @@ class TestPasswordChange(APIRequestTestCase):
         old_password = 'old_password'
         new_password = 'new_password'
 
-        user = UserFactory.create()
-        user.set_password(old_password)
-        user.save()
+        user = UserFactory.create(password=old_password)
 
         request = self.create_request(
             'put',
@@ -359,9 +347,7 @@ class TestPasswordChange(APIRequestTestCase):
         old_password = 'old_password'
         new_password = '2short'
 
-        user = UserFactory.create()
-        user.set_password(old_password)
-        user.save()
+        user = UserFactory.create(password=old_password)
 
         request = self.create_request(
             'put',
@@ -383,9 +369,7 @@ class TestPasswordChange(APIRequestTestCase):
         new_password = 'new_password'
         invalid_password = 'different_new_password'
 
-        user = UserFactory.create()
-        user.set_password(old_password)
-        user.save()
+        user = UserFactory.create(password=old_password)
 
         request = self.create_request(
             'put',

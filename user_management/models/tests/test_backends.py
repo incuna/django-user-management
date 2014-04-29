@@ -9,9 +9,7 @@ class CaseInsensitveEmailBackendTest(TestCase):
         email = 'test-Email@example.com'
         password = 'arandomsuperstrongpassword'
 
-        user = UserFactory.build(email=email, is_active=True)
-        user.set_password(password)
-        user.save()
+        user = UserFactory.create(email=email, password=password, is_active=True)
 
         backend = CaseInsensitiveEmailBackend()
         authenticated_user = backend.authenticate(
