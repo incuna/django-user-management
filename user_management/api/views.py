@@ -35,15 +35,24 @@ class UserRegister(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.DATA, files=request.FILES)
+        if serializer.is_valid():
+            return self.is_valid(serializer)
+        return self.is_invalid(serializer)
 
-        if not serializer.is_valid():
-            return response.Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def is_invalid(self, serializer):
+        return response.Response(
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
+    def is_valid(self, serializer):
         serializer.save()
         if serializer.object.email_verification_required:
             serializer.object.send_validation_email()
-            ok_message = _('Your account has been created and an activation link sent to your email address. Please check your email to continue.')
+            ok_message = _(
+                'Your account has been created and an activation link sent ' +
+                'to your email address. Please check your email to continue.'
+            )
         else:
             ok_message = _('Your account has been created.')
 
