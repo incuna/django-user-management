@@ -86,7 +86,7 @@ class PasswordResetEmail(views.APIView):
         send(
             to=[user.email],
             template_name='user_management/password_reset_email.html',
-            subject='{} password reset'.format(site.domain),
+            subject=_('{domain} password reset').format(domain=site.domain),
             context=context,
         )
 

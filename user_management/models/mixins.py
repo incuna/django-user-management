@@ -13,7 +13,7 @@ class UserManager(BaseUserManager):
     """Django requires user managers to have create_user & create_superuser."""
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('The given email address must be set')
+            raise ValueError(_('The given email address must be set'))
         email = self.normalize_email(email).lower()
         user = self.model(
             email=email,
@@ -105,7 +105,7 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
 
     def send_validation_email(self):
         if not self.email_verification_required:
-            raise ValueError('Cannot validate already active user.')
+            raise ValueError(_('Cannot validate already active user.'))
 
         site = Site.objects.get_current()
         context = {
@@ -117,7 +117,7 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
         send(
             to=[self.email],
             template_name='user_management/account_validation_email.html',
-            subject='{} account validate'.format(site.domain),
+            subject=_('{domain} account validate').format(domain=site.domain),
             context=context,
         )
 
