@@ -64,6 +64,15 @@ class UserRegister(generics.CreateAPIView):
 
 class PasswordResetEmail(views.APIView):
     permission_classes = [permissions.IsNotAuthenticated]
+    template_name = 'user_management/password_reset_email.html'
+
+    def email_context(self, site, user):
+        return {
+            'protocol': 'https',
+            'site': site,
+            'token': default_token_generator.make_token(user),
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        }
 
     def post(self, request, *args, **kwargs):
         serializer = serializers.PasswordResetEmailSerializer(data=request.DATA)
@@ -86,17 +95,11 @@ class PasswordResetEmail(views.APIView):
 
     def send_email(self, user):
         site = Site.objects.get_current()
-        context = {
-            'protocol': 'https',
-            'site': site,
-            'token': default_token_generator.make_token(user),
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        }
         send(
             to=[user.email],
-            template_name='user_management/password_reset_email.html',
+            template_name=self.template_name,
             subject=_('{domain} password reset').format(domain=site.domain),
-            context=context,
+            context=self.email_context(site, user),
         )
 
 
