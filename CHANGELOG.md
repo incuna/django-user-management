@@ -1,3 +1,7 @@
+## v1.1.2
+
+* Add hooks to PasswordResetEmail view to allow easier subclassing
+
 ## v1.1.1
 
 * Improve UserFactory to deal with passwords neatly.
