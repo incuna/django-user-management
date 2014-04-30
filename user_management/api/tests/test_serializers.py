@@ -31,9 +31,7 @@ class PasswordChangeSerializerTest(TestCase):
         old_password = 'old_password'
         new_password = 'new_password'
 
-        user = UserFactory.create()
-        user.set_password(old_password)
-        user.save()
+        user = UserFactory.create(password=old_password)
 
         serializer = serializers.PasswordChangeSerializer(user, data={
             'old_password': old_password,
@@ -49,8 +47,7 @@ class PasswordChangeSerializerTest(TestCase):
         old_password = 'old_password'
         new_password = 'new_password'
 
-        user = UserFactory.build()
-        user.set_password(old_password)
+        user = UserFactory.build(password=old_password)
 
         serializer = serializers.PasswordChangeSerializer(user, data={
             'old_password': 'invalid_password',
@@ -64,8 +61,7 @@ class PasswordChangeSerializerTest(TestCase):
         old_password = 'old_password'
         new_password = '2short'
 
-        user = UserFactory.build()
-        user.set_password(old_password)
+        user = UserFactory.build(password=old_password)
 
         serializer = serializers.PasswordChangeSerializer(user, data={
             'old_password': old_password,
@@ -81,9 +77,7 @@ class PasswordChangeSerializerTest(TestCase):
         new_password = 'new_password'
         other_password = 'other_new_password'
 
-        user = UserFactory.create()
-        user.set_password(old_password)
-        user.save()
+        user = UserFactory.create(password=old_password)
 
         serializer = serializers.PasswordChangeSerializer(user, data={
             'old_password': old_password,
