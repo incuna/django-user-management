@@ -1,3 +1,7 @@
+## v1.1.1
+
+* Improve UserFactory to deal with passwords neatly.
+
 ## v1.1.0
 
 * Add CaseInsensitiveEmailBackend authentication backend
