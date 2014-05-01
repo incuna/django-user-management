@@ -42,6 +42,10 @@ settings.configure(
     },
 )
 
+import django
+if django.VERSION >= (1, 7):
+    django.setup()
+
 from django.test.runner import DiscoverRunner
 
 

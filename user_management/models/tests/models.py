@@ -9,3 +9,7 @@ class User(AvatarMixin, VerifyEmailMixin, PermissionsMixin, AbstractBaseUser):
 
 class BasicUser(BasicUserFieldsMixin, AbstractBaseUser):
     pass
+
+
+class VerifyEmailUser(VerifyEmailMixin):
+    pass
