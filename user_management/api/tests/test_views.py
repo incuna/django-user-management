@@ -55,6 +55,11 @@ class GetTokenTest(APIRequestTestCase):
         with self.assertRaises(Token.DoesNotExist):
             Token.objects.get(pk=token.pk)
 
+    def test_delete_no_token(self):
+        request = self.create_request('delete')
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 
 class TestRegisterView(APIRequestTestCase):
     view_class = views.UserRegister
