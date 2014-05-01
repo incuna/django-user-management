@@ -158,6 +158,13 @@ class RegistrationSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn('password2', serializer.errors)
 
+    def test_deserialize_no_email(self):
+        self.data['email'] = None
+
+        serializer = serializers.RegistrationSerializer(data=self.data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('email', serializer.errors)
+
 
 class UserSerializerTest(TestCase):
     def test_serialize(self):
@@ -210,3 +217,17 @@ class UserSerializerTest(TestCase):
         self.assertEqual(
             serializer._errors['email'],
             ['That email address has already been registered.'])
+
+
+class TestUserSerializerCreate(TestCase):
+    def test_deserialize_no_email(self):
+        data = {
+            'name': "Robert'); DROP TABLE Students;--'",
+            'email': None,
+            'password': 'Sup3RSecre7paSSw0rD',
+            'password2': 'Sup3RSecre7paSSw0rD',
+        }
+
+        serializer = serializers.UserSerializerCreate(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('email', serializer.errors)
