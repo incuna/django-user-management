@@ -27,6 +27,7 @@ class UserCreationForm(forms.ModelForm):
     )
 
     class Meta:
+        fields = ('email',)
         model = User
 
     def clean_email(self):
