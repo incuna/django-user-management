@@ -6,6 +6,10 @@ from .factories import UserFactory
 
 class CaseInsensitveEmailBackendTest(TestCase):
     def test_authenticate(self):
+        """
+        Check case-insensitive username authentication
+        """
+
         email = 'test-Email@example.com'
         password = 'arandomsuperstrongpassword'
 
@@ -18,6 +22,10 @@ class CaseInsensitveEmailBackendTest(TestCase):
         self.assertEqual(user, authenticated_user)
 
     def test_authenticate_no_username(self):
+        """
+        Passing USERNAME_FIELD to authenticate is valid
+        """
+
         email = 'test-Email@example.com'
         password = 'arandomsuperstrongpassword'
 
@@ -30,6 +38,10 @@ class CaseInsensitveEmailBackendTest(TestCase):
         self.assertEqual(user, authenticated_user)
 
     def test_authenticate_no_user(self):
+        """
+        If no username is provided, just return None
+        """
+
         email = 'test-Email@example.com'
         password = 'arandomsuperstrongpassword'
 
