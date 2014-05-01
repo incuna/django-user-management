@@ -1,0 +1,3 @@
+[run]
+source = user_management
+omit = *migrations*, *tests*
