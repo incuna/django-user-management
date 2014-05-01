@@ -8,13 +8,7 @@ User = get_user_model()
 
 class ValidateEmailMixin(object):
     def validate_email(self, attrs, source):
-        email = attrs.get(source)
-
-        # Required check happens elsewhere, so no error if email is None
-        if email is None:
-            return attrs
-
-        email = email.lower()
+        email = attrs.get(source).lower()
 
         try:
             User.objects.get(email__iexact=email)

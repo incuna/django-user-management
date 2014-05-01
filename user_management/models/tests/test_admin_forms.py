@@ -40,6 +40,19 @@ class UserCreationFormTest(TestCase):
         with self.assertRaises(ValidationError):
             form.clean()
 
+    def test_save(self):
+        data = {
+            'email': 'test@example.com',
+            'password1': 'pass123',
+            'password2': 'pass123',
+        }
+
+        form = admin_forms.UserCreationForm(data)
+        self.assertTrue(form.is_valid(), form.errors.items())
+
+        user = form.save()
+        self.assertEqual(user.email, data['email'])
+
 
 class UserChangeFormTest(TestCase):
     def test_clean_password(self):

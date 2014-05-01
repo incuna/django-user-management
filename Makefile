@@ -9,4 +9,5 @@ release:
 	python setup.py register sdist bdist_wheel upload
 
 test:
-	./user_management/tests/run.py
+	@coverage run ./user_management/tests/run.py
+	@coverage report --show-missing
