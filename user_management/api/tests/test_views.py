@@ -288,17 +288,13 @@ class TestPasswordReset(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_full_stack_wrong_url(self):
-        old = 'old_password'
-        new = 'new_password'
-        data = json.dumps({'new_password': new, 'new_password2': new})
-
-        user = UserFactory.create(password=old)
+        user = UserFactory.create()
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(b'0')  # Invaid responses
 
         view_name = 'user_management_api:password_reset_confirm'
         url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
-        response = self.client.put(url, data, content_type="application/json")
+        response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         self.assertTrue(hasattr(response, 'accepted_renderer'))
