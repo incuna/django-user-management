@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
@@ -285,6 +287,18 @@ class TestPasswordReset(APIRequestTestCase):
         response = view(request, uidb64=uid, token=token)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_full_stack_wrong_url(self):
+        user = UserFactory.create()
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(b'0')  # Invalid uid, therefore bad url
+
+        view_name = 'user_management_api:password_reset_confirm'
+        url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        self.assertTrue(hasattr(response, 'accepted_renderer'))
+
 
 class TestPasswordChange(APIRequestTestCase):
     view_class = views.PasswordChange
@@ -469,6 +483,18 @@ class TestVerifyAccountView(APIRequestTestCase):
 
         logged_in_user = User.objects.get(pk=other_user.pk)
         self.assertTrue(logged_in_user.email_verification_required)
+
+    def test_full_stack_wrong_url(self):
+        user = UserFactory.create()
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(b'0')  # Invalid uid, therefore bad url
+
+        view_name = 'user_management_api:verify_user'
+        url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        self.assertTrue(hasattr(response, 'accepted_renderer'))
 
 
 class TestProfileDetail(APIRequestTestCase):

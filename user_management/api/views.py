@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
+from django.http import Http404
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
@@ -104,20 +105,20 @@ class PasswordResetEmail(views.APIView):
 
 
 class OneTimeUseAPIMixin(object):
-    def dispatch(self, request, *args, **kwargs):
+    def initial(self, request, *args, **kwargs):
         uidb64 = kwargs['uidb64']
         uid = urlsafe_base64_decode(force_text(uidb64))
 
         try:
             self.user = User.objects.get(pk=uid)
         except User.DoesNotExist:
-            return response.Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404()
 
         token = kwargs['token']
         if not default_token_generator.check_token(self.user, token):
-            return response.Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404()
 
-        return super(OneTimeUseAPIMixin, self).dispatch(request, *args, **kwargs)
+        return super(OneTimeUseAPIMixin, self).initial(request, *args, **kwargs)
 
 
 class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
