@@ -290,7 +290,7 @@ class TestPasswordReset(APIRequestTestCase):
     def test_full_stack_wrong_url(self):
         user = UserFactory.create()
         token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(b'0')  # Invaid responses
+        uid = urlsafe_base64_encode(b'0')  # Invalid uid, therefore bad url
 
         view_name = 'user_management_api:password_reset_confirm'
         url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
@@ -487,7 +487,7 @@ class TestVerifyAccountView(APIRequestTestCase):
     def test_full_stack_wrong_url(self):
         user = UserFactory.create()
         token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(b'0')
+        uid = urlsafe_base64_encode(b'0')  # Invalid uid, therefore bad url
 
         view_name = 'user_management_api:verify_user'
         url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
