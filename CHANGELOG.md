@@ -1,3 +1,7 @@
+## v1.1.3
+
+* Fix error in OneTimeUseAPIMixin that made it 500 with bad urls
+
 ## v1.1.2
 
 * Add hooks to PasswordResetEmail view to allow easier subclassing
