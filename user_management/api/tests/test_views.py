@@ -208,6 +208,27 @@ class TestPasswordResetEmail(APIRequestTestCase):
         self.assertIn('auth/password_reset/confirm/', sent_mail.body)
         self.assertIn('https://', sent_mail.body)
 
+    def test_options(self):
+        """Ensure information about email field is included in options request"""
+        request = self.create_request('options', auth=False)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        expected_post_options = {
+            'email': {
+                'type': 'email',
+                'required': True,
+                'read_only': False,
+                'label': 'Email address',
+                'max_length': 511,
+            },
+        }
+        self.assertEqual(
+            response.data['actions']['POST'],
+            expected_post_options,
+        )
+
 
 class TestPasswordReset(APIRequestTestCase):
     view_class = views.PasswordReset

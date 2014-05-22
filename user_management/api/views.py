@@ -63,9 +63,10 @@ class UserRegister(generics.CreateAPIView):
         )
 
 
-class PasswordResetEmail(views.APIView):
+class PasswordResetEmail(generics.GenericAPIView):
     permission_classes = [permissions.IsNotAuthenticated]
     template_name = 'user_management/password_reset_email.html'
+    serializer_class = serializers.PasswordResetEmailSerializer
 
     def email_context(self, site, user):
         return {
@@ -76,7 +77,7 @@ class PasswordResetEmail(views.APIView):
         }
 
     def post(self, request, *args, **kwargs):
-        serializer = serializers.PasswordResetEmailSerializer(data=request.DATA)
+        serializer = self.get_serializer(data=request.DATA)
         if not serializer.is_valid():
             return response.Response(
                 serializer.errors,
