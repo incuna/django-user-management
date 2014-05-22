@@ -1,3 +1,7 @@
+## v1.1.4
+
+* Add email field to PasswordResetEmail response to OPTIONS request
+
 ## v1.1.3
 
 * Fix error in OneTimeUseAPIMixin that made it 500 with bad urls
