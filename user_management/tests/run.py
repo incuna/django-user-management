@@ -39,6 +39,10 @@ settings.configure(
         'DEFAULT_AUTHENTICATION_CLASSES': (
             'rest_framework.authentication.TokenAuthentication',
         ),
+        'DEFAULT_THROTTLE_RATES': {
+            'anon': '10/day',
+            'user': '100/day'
+        },
     },
 )
 

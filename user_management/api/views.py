@@ -10,6 +10,7 @@ from rest_framework import generics, renderers, response, status, views
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 from . import serializers, permissions
 
@@ -19,6 +20,7 @@ User = get_user_model()
 
 class GetToken(ObtainAuthToken):
     renderer_classes = (renderers.JSONRenderer, renderers.BrowsableAPIRenderer)
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
     def delete(self, request, *args, **kwargs):
         try:
@@ -124,6 +126,7 @@ class OneTimeUseAPIMixin(object):
 
 class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
     permission_classes = [permissions.IsNotAuthenticated]
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     model = User
     serializer_class = serializers.PasswordResetSerializer
 
