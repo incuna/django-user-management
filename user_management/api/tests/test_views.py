@@ -29,23 +29,31 @@ class TestThrottle(APIRequestTestCase):
     })
     def test_user_auth_throttle(self):
         auth_url = reverse('user_management_api:auth')
+        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
 
         request = APIRequestFactory().get(auth_url)
-        for x in range(2):
-            response = self.view_class.as_view()(request)
-        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+
+        response = self.view_class.as_view()(request)
+        self.assertNotEqual(response.status_code, expected_status)
+
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, expected_status)
 
     @patch('rest_framework.throttling.SimpleRateThrottle.THROTTLE_RATES', new={
-        'anon': '1/day',
-        'user': '1/day',
+        'anon': '2/day',
+        'user': '2/day',
     })
     def test_user_password_reset_throttle(self):
         auth_url = reverse('user_management_api:password_reset')
+        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
 
         request = APIRequestFactory().get(auth_url)
-        for x in range(2):
-            response = self.view_class.as_view()(request)
-        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+
+        response = self.view_class.as_view()(request)
+        self.assertNotEqual(response.status_code, expected_status)
+
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, expected_status)
 
 
 class GetTokenTest(APIRequestTestCase):
