@@ -8,6 +8,7 @@ from django.utils.http import urlsafe_base64_encode
 from mock import patch
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.test import APIRequestFactory
 
 from user_management.api import views
 from user_management.models.tests.factories import UserFactory
@@ -17,6 +18,34 @@ from user_management.models.tests.utils import APIRequestTestCase
 
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
+
+
+class TestThrottle(APIRequestTestCase):
+    view_class = views.GetToken
+
+    @patch('rest_framework.throttling.SimpleRateThrottle.THROTTLE_RATES', new={
+        'anon': '1/day',
+        'user': '1/day',
+    })
+    def test_user_auth_throttle(self):
+        auth_url = reverse('user_management_api:auth')
+
+        request = APIRequestFactory().get(auth_url)
+        for x in range(2):
+            response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+
+    @patch('rest_framework.throttling.SimpleRateThrottle.THROTTLE_RATES', new={
+        'anon': '1/day',
+        'user': '1/day',
+    })
+    def test_user_password_reset_throttle(self):
+        auth_url = reverse('user_management_api:password_reset')
+
+        request = APIRequestFactory().get(auth_url)
+        for x in range(2):
+            response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
 
 class GetTokenTest(APIRequestTestCase):
