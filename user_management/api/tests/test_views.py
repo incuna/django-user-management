@@ -25,7 +25,6 @@ class TestThrottle(APIRequestTestCase):
 
     @patch('rest_framework.throttling.AnonRateThrottle.THROTTLE_RATES', new={
         'anon': '1/day',
-        'user': '1/day',
     })
     def test_user_auth_throttle(self):
         auth_url = reverse('user_management_api:auth')
@@ -40,7 +39,6 @@ class TestThrottle(APIRequestTestCase):
         self.assertEqual(response.status_code, expected_status)
 
     @patch('rest_framework.throttling.UserRateThrottle.THROTTLE_RATES', new={
-        'anon': '1/day',
         'user': '1/day',
     })
     def test_user_password_reset_throttle(self):
