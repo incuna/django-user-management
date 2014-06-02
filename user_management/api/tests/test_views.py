@@ -2,12 +2,14 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.test import APIRequestFactory
 
 from user_management.api import views
 from user_management.models.tests.factories import UserFactory
@@ -21,6 +23,9 @@ TEST_SERVER = 'http://testserver'
 
 class GetTokenTest(APIRequestTestCase):
     view_class = views.GetToken
+
+    def tearDown(self):
+        cache.clear()
 
     def test_post(self):
         username = 'Test@example.com'
@@ -59,6 +64,21 @@ class GetTokenTest(APIRequestTestCase):
         request = self.create_request('delete')
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
+        'logins': '1/minute',
+    })
+    def test_user_auth_throttle(self):
+        auth_url = reverse('user_management_api:auth')
+        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
+
+        request = APIRequestFactory().get(auth_url)
+
+        response = self.view_class.as_view()(request)
+        self.assertNotEqual(response.status_code, expected_status)
+
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, expected_status)
 
 
 class TestRegisterView(APIRequestTestCase):
@@ -154,6 +174,9 @@ class TestRegisterView(APIRequestTestCase):
 class TestPasswordResetEmail(APIRequestTestCase):
     view_class = views.PasswordResetEmail
 
+    def tearDown(self):
+        cache.clear()
+
     def test_existent_email(self):
         email = 'exists@example.com'
         user = UserFactory.create(email=email)
@@ -228,6 +251,21 @@ class TestPasswordResetEmail(APIRequestTestCase):
             response.data['actions']['POST'],
             expected_post_options,
         )
+
+    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
+        'passwords': '1/minute',
+    })
+    def test_user_password_reset_throttle(self):
+        auth_url = reverse('user_management_api:password_reset')
+        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
+
+        request = APIRequestFactory().get(auth_url)
+
+        response = self.view_class.as_view()(request)
+        self.assertNotEqual(response.status_code, expected_status)
+
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, expected_status)
 
 
 class TestPasswordReset(APIRequestTestCase):

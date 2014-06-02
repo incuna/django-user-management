@@ -132,3 +132,11 @@ with a selection from
         url('', include('user_management.api.urls.register')),
         ...
     )
+
+
+### Throttling protection
+The `/auth/` and `/auth/password_reset/` URLs are protected against throttling
+using the built-in [DRF throttle module](http://www.django-rest-framework.org/api-guide/throttling).
+
+You need to set the throttling rates in `DEFAULT_THROTTLE_RATES` setting for
+`REST_FRAMEWORK` in your `settings.py`.

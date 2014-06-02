@@ -1,3 +1,7 @@
+## Upcoming
+
+* Protect auth login and password reset views against throttling.
+
 ## v1.1.4
 
 * Add email field to PasswordResetEmail response to OPTIONS request
