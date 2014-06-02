@@ -1,4 +1,4 @@
-## Upcoming
+## v1.2.0
 
 * Protect auth login and password reset views against throttling.
 
