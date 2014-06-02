@@ -23,7 +23,7 @@ TEST_SERVER = 'http://testserver'
 class TestThrottle(APIRequestTestCase):
     view_class = views.GetToken
 
-    @patch('rest_framework.throttling.SimpleRateThrottle.THROTTLE_RATES', new={
+    @patch('rest_framework.throttling.AnonRateThrottle.THROTTLE_RATES', new={
         'anon': '1/day',
         'user': '1/day',
     })
@@ -39,9 +39,9 @@ class TestThrottle(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, expected_status)
 
-    @patch('rest_framework.throttling.SimpleRateThrottle.THROTTLE_RATES', new={
-        'anon': '2/day',
-        'user': '2/day',
+    @patch('rest_framework.throttling.UserRateThrottle.THROTTLE_RATES', new={
+        'anon': '1/day',
+        'user': '1/day',
     })
     def test_user_password_reset_throttle(self):
         auth_url = reverse('user_management_api:password_reset')
