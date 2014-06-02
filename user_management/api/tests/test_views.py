@@ -27,9 +27,6 @@ class GetTokenTest(APIRequestTestCase):
     def tearDown(self):
         cache.clear()
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'logins': '1/minute',
-    })
     def test_post(self):
         username = 'Test@example.com'
         password = 'myepicstrongpassword'
@@ -41,9 +38,6 @@ class GetTokenTest(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'logins': '1/minute',
-    })
     def test_post_username(self):
         username = 'Test@example.com'
         password = 'myepicstrongpassword'
@@ -55,9 +49,6 @@ class GetTokenTest(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'logins': '1/minute',
-    })
     def test_delete(self):
         user = UserFactory.create()
         token = Token.objects.create(user=user)
@@ -69,9 +60,6 @@ class GetTokenTest(APIRequestTestCase):
         with self.assertRaises(Token.DoesNotExist):
             Token.objects.get(pk=token.pk)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'logins': '1/minute',
-    })
     def test_delete_no_token(self):
         request = self.create_request('delete')
         response = self.view_class.as_view()(request)
@@ -189,9 +177,6 @@ class TestPasswordResetEmail(APIRequestTestCase):
     def tearDown(self):
         cache.clear()
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
     def test_existent_email(self):
         email = 'exists@example.com'
         user = UserFactory.create(email=email)
@@ -204,18 +189,12 @@ class TestPasswordResetEmail(APIRequestTestCase):
 
         send_email.assert_called_once_with(user)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
     def test_authenticated(self):
         request = self.create_request('post', auth=True)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
     def test_non_existent_email(self):
         email = 'doesnotexist@example.com'
         UserFactory.create(email='exists@example.com')
@@ -228,18 +207,12 @@ class TestPasswordResetEmail(APIRequestTestCase):
 
         self.assertFalse(send_email.called)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
     def test_missing_email(self):
         request = self.create_request('post', auth=False)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
     def test_send_email(self):
         email = 'test@example.com'
         user = UserFactory.create(
@@ -258,9 +231,6 @@ class TestPasswordResetEmail(APIRequestTestCase):
         self.assertIn('auth/password_reset/confirm/', sent_mail.body)
         self.assertIn('https://', sent_mail.body)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
     def test_options(self):
         """Ensure information about email field is included in options request"""
         request = self.create_request('options', auth=False)
