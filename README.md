@@ -139,4 +139,9 @@ The `/auth/` and `/auth/password_reset/` URLs are protected against throttling
 using the built-in [DRF throttle module](http://www.django-rest-framework.org/api-guide/throttling).
 
 You need to set the throttling rates in `DEFAULT_THROTTLE_RATES` setting for
-`REST_FRAMEWORK` in your `settings.py`.
+`REST_FRAMEWORK` in your `settings.py`:
+
+    DEFAULT_THROTTLE_RATES = {
+        'logins': '100/day',
+        'passwords': 100/day',
+    }
