@@ -10,9 +10,8 @@ from rest_framework import generics, renderers, response, status, views
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.throttling import ScopedRateThrottle
 
-from . import serializers, permissions
+from . import permissions, serializers, throttling
 
 
 User = get_user_model()
@@ -20,7 +19,7 @@ User = get_user_model()
 
 class GetToken(ObtainAuthToken):
     renderer_classes = (renderers.JSONRenderer, renderers.BrowsableAPIRenderer)
-    throttle_classes = [ScopedRateThrottle]
+    throttle_classes = [throttling.LoginRateThrottle]
     throttle_scope = 'logins'
 
     def delete(self, request, *args, **kwargs):
@@ -70,7 +69,7 @@ class PasswordResetEmail(generics.GenericAPIView):
     permission_classes = [permissions.IsNotAuthenticated]
     template_name = 'user_management/password_reset_email.html'
     serializer_class = serializers.PasswordResetEmailSerializer
-    throttle_classes = [ScopedRateThrottle]
+    throttle_classes = [throttling.PasswordResetRateThrottle]
     throttle_scope = 'passwords'
 
     def email_context(self, site, user):

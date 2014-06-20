@@ -65,6 +65,24 @@ class GetTokenTest(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_default_user_auth_throttle(self):
+        default_rate = 10
+        auth_url = reverse('user_management_api:auth')
+        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
+
+        request = APIRequestFactory().get(auth_url)
+        view = self.view_class.as_view()
+
+        # make all but one of our allowed requests
+        for i in range(default_rate - 1):
+            view(request)
+
+        response = view(request)  # our last allowed request
+        self.assertNotEqual(response.status_code, expected_status)
+
+        response = view(request)  # our throttled request
+        self.assertEqual(response.status_code, expected_status)
+
     @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
         'logins': '1/minute',
     })
@@ -251,6 +269,24 @@ class TestPasswordResetEmail(APIRequestTestCase):
             response.data['actions']['POST'],
             expected_post_options,
         )
+
+    def test_default_user_password_reset_throttle(self):
+        default_rate = 3
+        auth_url = reverse('user_management_api:password_reset')
+        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
+
+        request = APIRequestFactory().get(auth_url)
+        view = self.view_class.as_view()
+
+        # make all but one of our allowed requests
+        for i in range(default_rate - 1):
+            view(request)
+
+        response = view(request)  # our last allowed request
+        self.assertNotEqual(response.status_code, expected_status)
+
+        response = view(request)  # our throttled request
+        self.assertEqual(response.status_code, expected_status)
 
     @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
         'passwords': '1/minute',
