@@ -1,3 +1,7 @@
+## v1.2.1
+
+* Bump required version of `incuna-mail` in order to fix circular import.
+
 ## v1.2.0
 
 * Protect auth login and password reset views against throttling.
