@@ -1,6 +1,10 @@
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
+try:
+    from django.core import checks
+except ImportError:
+    pass
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import force_bytes, python_2_unicode_compatible
@@ -121,6 +125,25 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
             context=context,
         )
 
+    @classmethod
+    def check(cls, **kwargs):
+        errors = super(VerifyEmailMixin, cls).check(**kwargs)
+        errors.extend(cls._check_manager(**kwargs))
+        return errors
+
+    @classmethod
+    def _check_manager(cls, **kwargs):
+        if isinstance(cls.objects, VerifyEmailManager):
+            return []
+
+        return [
+            checks.Warning(
+                "Manager should be an instance of 'VerifyEmailManager'",
+                hint="Subclass a custom manager from 'VerifyEmailManager'",
+                obj=cls,
+                id='user_management.W001',
+            ),
+        ]
 
 class AvatarMixin(models.Model):
     avatar = models.ImageField(upload_to='user_avatar', null=True, blank=True)

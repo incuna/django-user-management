@@ -1,5 +1,12 @@
+import unittest
+
+import django
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
+try:
+    from django.core import checks
+except ImportError:
+    pass
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
@@ -8,6 +15,7 @@ from django.utils import six
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
 
+from .. import mixins
 from . import models
 from .factories import UserFactory
 
@@ -179,3 +187,24 @@ class TestVerifyEmailMixin(TestCase):
                 user.send_validation_email()
 
         self.assertFalse(send.called)
+
+    @unittest.skipIf(django.VERSION < (1, 7), 'Checks only available in django>=1.7')
+    def test_manager_check_valid(self):
+        errors = self.model.check()
+        self.assertEqual(errors, [])
+
+    @unittest.skipIf(django.VERSION < (1, 7), 'Checks only available in django>=1.7')
+    def test_manager_check_invalid(self):
+        class InvalidUser(self.model):
+            objects = mixins.UserManager()
+
+        expected = [
+            checks.Warning(
+                "Manager should be an instance of 'VerifyEmailManager'",
+                hint="Subclass a custom manager from 'VerifyEmailManager'",
+                obj=InvalidUser,
+                id='user_management.W001',
+            ),
+        ]
+        errors = InvalidUser.check()
+        self.assertEqual(errors, expected)
