@@ -3,10 +3,7 @@ import unittest
 import django
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
-try:
-    from django.core import checks
-except ImportError:
-    pass
+from django.core import checks
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
@@ -18,6 +15,12 @@ from mock import patch
 from .. import mixins
 from . import models
 from .factories import UserFactory
+
+
+skip_if_checks_unavailable = unittest.skipIf(
+    django.VERSION < (1, 7),
+    'Checks only available in django>=1.7',
+)
 
 
 class TestUser(TestCase):
@@ -188,12 +191,12 @@ class TestVerifyEmailMixin(TestCase):
 
         self.assertFalse(send.called)
 
-    @unittest.skipIf(django.VERSION < (1, 7), 'Checks only available in django>=1.7')
+    @skip_if_checks_unavailable
     def test_manager_check_valid(self):
         errors = self.model.check()
         self.assertEqual(errors, [])
 
-    @unittest.skipIf(django.VERSION < (1, 7), 'Checks only available in django>=1.7')
+    @skip_if_checks_unavailable
     def test_manager_check_invalid(self):
         class InvalidUser(self.model):
             objects = mixins.UserManager()

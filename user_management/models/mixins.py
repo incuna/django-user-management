@@ -1,10 +1,7 @@
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
-try:
-    from django.core import checks
-except ImportError:
-    pass
+from django.core import checks
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import force_bytes, python_2_unicode_compatible
