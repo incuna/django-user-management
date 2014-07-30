@@ -48,3 +48,9 @@ class VerifyUserAdminTest(TestCase):
             verify_user_admin.get_fieldsets(request=None, obj=user),
             expected_fieldsets,
         )
+
+        # Django admin can call get_fieldsets twice, so check we don't break
+        self.assertEqual(
+            verify_user_admin.get_fieldsets(request=None, obj=user),
+            expected_fieldsets,
+        )

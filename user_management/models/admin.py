@@ -55,7 +55,13 @@ class VerifyUserAdmin(UserAdmin):
         except KeyError:
             return fieldsets
 
-        index = fields.index('is_active')
+        try:
+            index = fields.index('is_active')
+        except ValueError:
+            # If get_fieldsets is called twice, 'is_active' will already be
+            # removed and fieldsets will be correct so return it
+            return fieldsets
+
         fields[index] = ('is_active', 'email_verification_required')
         fieldsets_dict['Permissions']['fields'] = tuple(fields)
         return tuple(fieldsets_dict.items())

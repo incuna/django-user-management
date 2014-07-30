@@ -1,3 +1,7 @@
+## Upcoming Release
+
+* Fix bug where VerifyUserAdmin.get_fieldsets is called twice
+
 ## v1.2.1
 
 * Bump required version of `incuna-mail` in order to fix circular import.
