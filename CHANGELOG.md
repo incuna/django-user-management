@@ -1,4 +1,4 @@
-## Upcoming Release
+## v1.2.2
 
 * Fix bug where VerifyUserAdmin.get_fieldsets is called twice
 
