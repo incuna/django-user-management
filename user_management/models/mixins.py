@@ -106,14 +106,15 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
     class Meta:
         abstract = True
 
-    def _get_email_kwargs(self, site):
-        context = {
+    def _get_email_context(self, site):
+        return {
             'uid': urlsafe_base64_encode(force_bytes(self.pk)),
             'token': default_token_generator.make_token(self),
             'site': site,
         }
 
-        subject = _(self.EMAIL_SUBJECT_TEMPLATE).format(domain=site.domain)
+    def _get_email_kwargs(self, context, domain):
+        subject = _(self.EMAIL_SUBJECT_TEMPLATE).format(domain=domain)
         kwargs = {
             'to': [self.email],
             'template_name': 'user_management/account_validation_email.txt',
@@ -127,7 +128,8 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
             raise ValueError(_('Cannot validate already active user.'))
 
         site = Site.objects.get_current()
-        send(**self._get_email_kwargs(site))
+        context = self._get_email_context(site)
+        send(**self._get_email_kwargs(context, site.domain))
 
     @classmethod
     def check(cls, **kwargs):

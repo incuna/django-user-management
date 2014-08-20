@@ -160,23 +160,33 @@ class TestVerifyEmailMixin(TestCase):
         self.assertFalse(user.is_active)
         self.assertTrue(user.email_verification_required)
 
-    def test__get_email_kwargs(self):
+    def test__email_context(self):
         site = Site.objects.get_current()
-        subject = 'Example'
+        user = self.model()
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        with patch.object(default_token_generator, 'make_token') as make_token:
+            context = user._get_email_context(site)
+
+        expected_context = {'uid': uid, 'token': make_token(), 'site': site}
+        self.assertEqual(context, expected_context)
+
+    def test__get_email_kwargs(self):
+        context = {}
+        domain = 'http://example.com'
+        subject = '{domain} registration'
         text_template = 'user_management/account_validation_email.txt'
 
         user = self.model(email='dummy@example.com')
         user.EMAIL_SUBJECT_TEMPLATE = subject
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-        with patch.object(default_token_generator, 'make_token') as make_token:
-            kwargs = user._get_email_kwargs(site)
+        kwargs = user._get_email_kwargs(context, domain)
 
         expected_kwargs = {
             'to': [user.email],
             'template_name': text_template,
-            'subject': subject,
-            'context': {'uid': uid, 'token': make_token(), 'site': site},
+            'subject': subject.format(domain=domain),
+            'context': context,
         }
         self.assertEqual(kwargs, expected_kwargs)
 
