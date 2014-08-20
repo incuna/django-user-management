@@ -1,3 +1,11 @@
+## v2.0.0
+
+**Backwards incompatible** due to incuna-mail update
+
+* Update VerifyEmailMixin.send_validation_email to send a multipart email by default
+* Allow overriding the verification email's subject and django templates
+* Update incuna-mail to v2.0.0
+
 ## v1.2.2
 
 * Fix bug where VerifyUserAdmin.get_fieldsets is called twice
