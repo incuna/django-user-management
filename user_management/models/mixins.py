@@ -101,27 +101,33 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
 
     objects = VerifyEmailManager()
 
+    EMAIL_SUBJECT_TEMPLATE = '{domain} account validate'
+
     class Meta:
         abstract = True
 
-    def send_validation_email(self):
-        if not self.email_verification_required:
-            raise ValueError(_('Cannot validate already active user.'))
-
-        site = Site.objects.get_current()
+    def _get_email_kwargs(self, site):
         context = {
             'uid': urlsafe_base64_encode(force_bytes(self.pk)),
             'token': default_token_generator.make_token(self),
             'site': site,
         }
 
+        subject = _(self.EMAIL_SUBJECT_TEMPLATE).format(domain=site.domain)
         kwargs = {
             'to': [self.email],
             'template_name': 'user_management/account_validation_email.txt',
-            'subject': _('{domain} account validate').format(domain=site.domain),
+            'subject': subject,
             'context': context,
         }
-        send(**kwargs)
+        return kwargs
+
+    def send_validation_email(self):
+        if not self.email_verification_required:
+            raise ValueError(_('Cannot validate already active user.'))
+
+        site = Site.objects.get_current()
+        send(**self._get_email_kwargs(site))
 
     @classmethod
     def check(cls, **kwargs):

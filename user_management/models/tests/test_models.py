@@ -160,6 +160,26 @@ class TestVerifyEmailMixin(TestCase):
         self.assertFalse(user.is_active)
         self.assertTrue(user.email_verification_required)
 
+    def test__get_email_kwargs(self):
+        site = Site.objects.get_current()
+        subject = 'Example'
+        text_template = 'user_management/account_validation_email.txt'
+
+        user = self.model(email='dummy@example.com')
+        user.EMAIL_SUBJECT_TEMPLATE = subject
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        with patch.object(default_token_generator, 'make_token') as make_token:
+            kwargs = user._get_email_kwargs(site)
+
+        expected_kwargs = {
+            'to': [user.email],
+            'template_name': text_template,
+            'subject': subject,
+            'context': {'uid': uid, 'token': make_token(), 'site': site},
+        }
+        self.assertEqual(kwargs, expected_kwargs)
+
     def test_send_validation_email(self):
         site = Site.objects.get_current()
         subject = '{} account validate'.format(site.domain)
