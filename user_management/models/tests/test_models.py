@@ -160,27 +160,90 @@ class TestVerifyEmailMixin(TestCase):
         self.assertFalse(user.is_active)
         self.assertTrue(user.email_verification_required)
 
-    def test_send_validation_email(self):
-        site = Site.objects.get_current()
-        subject = '{} account validate'.format(site.domain)
-        template = 'user_management/account_validation_email.html'
+    def test_get_email_subject(self):
+        domain = 'http://example.com'
+        expected_subject = '{} account validate'.format(domain)
         user = self.model()
 
-        # send_validation_email requires user to have an email
-        user.email = 'dummy@test.com'
+        self.assertEqual(user.get_email_subject(domain), expected_subject)
 
+    def test_get_email_subject_custom_template(self):
+        domain = 'http://example.com'
+        subject_template = '{domain} register'
+        expected_subject = subject_template.format(domain=domain)
+        user = self.model()
+        user.EMAIL_SUBJECT = subject_template
+
+        self.assertEqual(user.get_email_subject(domain), expected_subject)
+
+    def test_email_context(self):
+        site = Site.objects.get_current()
+        user = self.model()
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
         with patch.object(default_token_generator, 'make_token') as make_token:
-            with patch('user_management.models.mixins.send') as send:
-                user.send_validation_email()
+            context = user.email_context(site)
 
-        send.assert_called_once_with(
-            to=[user.email],
-            subject=subject,
-            template_name=template,
-            context={'site': site, 'token': make_token(), 'uid': uid},
-        )
+        expected_context = {'uid': uid, 'token': make_token(), 'site': site}
+        self.assertEqual(context, expected_context)
+
+    def test_email_kwargs_default(self):
+        context = {}
+        domain = 'http://example.com'
+        subject = '{} account validate'.format(domain)
+        text_template = 'user_management/account_validation_email.txt'
+        html_template = 'user_management/account_validation_email.html'
+
+        user = self.model(email='dummy@example.com')
+
+        kwargs = user.email_kwargs(context, domain)
+
+        expected_kwargs = {
+            'to': [user.email],
+            'template_name': text_template,
+            'html_template_name': html_template,
+            'subject': subject,
+            'context': context,
+        }
+        self.assertEqual(kwargs, expected_kwargs)
+
+    def test_email_kwargs_custom(self):
+        context = {}
+        domain = 'http://example.com'
+        subject = '{} account validate'.format(domain)
+        text_template = 'user_management/validation_email.txt'
+        html_template = 'user_management/validation_email.html'
+
+        user = self.model(email='dummy@example.com')
+        user.TEXT_EMAIL_TEMPLATE = text_template
+        user.HTML_EMAIL_TEMPLATE = html_template
+
+        kwargs = user.email_kwargs(context, domain)
+
+        expected_kwargs = {
+            'to': [user.email],
+            'template_name': text_template,
+            'html_template_name': html_template,
+            'subject': subject,
+            'context': context,
+        }
+        self.assertEqual(kwargs, expected_kwargs)
+
+    def test_send_validation_email(self):
+        context = {}
+        kwargs = {'context': context}
+        site = Site.objects.get_current()
+        user = self.model()
+
+        with patch.object(user, 'email_context') as get_context:
+            get_context.return_value = context
+            with patch.object(user, 'email_kwargs') as get_kwargs:
+                get_kwargs.return_value = kwargs
+                with patch('user_management.models.mixins.send') as send:
+                    user.send_validation_email()
+
+        get_kwargs.assert_called_once_with(context, site.domain)
+        send.assert_called_once_with(**kwargs)
 
     def test_verified_email(self):
         user = self.model(email_verification_required=False)
