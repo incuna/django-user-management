@@ -171,7 +171,7 @@ class TestVerifyEmailMixin(TestCase):
         expected_context = {'uid': uid, 'token': make_token(), 'site': site}
         self.assertEqual(context, expected_context)
 
-    def test__get_email_kwargs_default(self):
+    def test_email_kwargs_default(self):
         context = {}
         domain = 'http://example.com'
         subject = '{} account validate'.format(domain)
@@ -180,7 +180,7 @@ class TestVerifyEmailMixin(TestCase):
 
         user = self.model(email='dummy@example.com')
 
-        kwargs = user._get_email_kwargs(context, domain)
+        kwargs = user.email_kwargs(context, domain)
 
         expected_kwargs = {
             'to': [user.email],
@@ -191,7 +191,7 @@ class TestVerifyEmailMixin(TestCase):
         }
         self.assertEqual(kwargs, expected_kwargs)
 
-    def test__get_email_kwargs_custom(self):
+    def test_email_kwargs_custom(self):
         context = {}
         domain = 'http://example.com'
         subject = '{domain} registration'
@@ -203,7 +203,7 @@ class TestVerifyEmailMixin(TestCase):
         user.TEXT_EMAIL_TEMPLATE = text_template
         user.HTML_EMAIL_TEMPLATE = html_template
 
-        kwargs = user._get_email_kwargs(context, domain)
+        kwargs = user.email_kwargs(context, domain)
 
         expected_kwargs = {
             'to': [user.email],
@@ -222,7 +222,7 @@ class TestVerifyEmailMixin(TestCase):
 
         with patch.object(user, 'email_context') as get_context:
             get_context.return_value = context
-            with patch.object(user, '_get_email_kwargs') as get_kwargs:
+            with patch.object(user, 'email_kwargs') as get_kwargs:
                 get_kwargs.return_value = kwargs
                 with patch('user_management.models.mixins.send') as send:
                     user.send_validation_email()

@@ -115,7 +115,8 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
             'site': site,
         }
 
-    def _get_email_kwargs(self, context, domain):
+    def email_kwargs(self, context, domain):
+        """Prepare the kwargs to be passed to incuna_mail.send"""
         subject = _(self.EMAIL_SUBJECT_TEMPLATE).format(domain=domain)
         kwargs = {
             'to': [self.email],
@@ -141,14 +142,16 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
 
         You can also customise the context available in the email templates
         by extending VerifyEmailMixin.email_context.
-        """
 
+        If you want more control over the sending of the email you can
+        extend VerifyEmailMixin.email_kwargs.
+        """
         if not self.email_verification_required:
             raise ValueError(_('Cannot validate already active user.'))
 
         site = Site.objects.get_current()
         context = self.email_context(site)
-        send(**self._get_email_kwargs(context, site.domain))
+        send(**self.email_kwargs(context, site.domain))
 
     @classmethod
     def check(cls, **kwargs):
