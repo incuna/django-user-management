@@ -102,11 +102,13 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
     objects = VerifyEmailManager()
 
     EMAIL_SUBJECT_TEMPLATE = '{domain} account validate'
+    TEXT_EMAIL_TEMPLATE = 'user_management/account_validation_email.txt'
+    HTML_EMAIL_TEMPLATE = 'user_management/account_validation_email.html'
 
     class Meta:
         abstract = True
 
-    def _get_email_context(self, site):
+    def email_context(self, site):
         return {
             'uid': urlsafe_base64_encode(force_bytes(self.pk)),
             'token': default_token_generator.make_token(self),
@@ -117,18 +119,35 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
         subject = _(self.EMAIL_SUBJECT_TEMPLATE).format(domain=domain)
         kwargs = {
             'to': [self.email],
-            'template_name': 'user_management/account_validation_email.txt',
+            'template_name': self.TEXT_EMAIL_TEMPLATE,
+            'html_template_name': self.HTML_EMAIL_TEMPLATE,
             'subject': subject,
             'context': context,
         }
         return kwargs
 
     def send_validation_email(self):
+        """
+        Send a validation email to the user's email address.
+
+        The email subject can be customised by overriding
+        VerifyEmailMixin.EMAIL_SUBJECT_TEMPLATE. To include your site's
+        domain in the subject, include {domain} in the template.
+
+        By default send_validation_email sends a multipart email using
+        VerifyEmailMixin.TEXT_EMAIL_TEMPLATE and
+        VerifyEmailMixin.HTML_EMAIL_TEMPLATE. To send a text-only email
+        set VerifyEmailMixin.HTML_EMAIL_TEMPLATE to None.
+
+        You can also customise the context available in the email templates
+        by extending VerifyEmailMixin.email_context.
+        """
+
         if not self.email_verification_required:
             raise ValueError(_('Cannot validate already active user.'))
 
         site = Site.objects.get_current()
-        context = self._get_email_context(site)
+        context = self.email_context(site)
         send(**self._get_email_kwargs(context, site.domain))
 
     @classmethod

@@ -160,31 +160,55 @@ class TestVerifyEmailMixin(TestCase):
         self.assertFalse(user.is_active)
         self.assertTrue(user.email_verification_required)
 
-    def test__email_context(self):
+    def test_email_context(self):
         site = Site.objects.get_current()
         user = self.model()
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
         with patch.object(default_token_generator, 'make_token') as make_token:
-            context = user._get_email_context(site)
+            context = user.email_context(site)
 
         expected_context = {'uid': uid, 'token': make_token(), 'site': site}
         self.assertEqual(context, expected_context)
 
-    def test__get_email_kwargs(self):
+    def test__get_email_kwargs_default(self):
         context = {}
         domain = 'http://example.com'
-        subject = '{domain} registration'
+        subject = '{} account validate'.format(domain)
         text_template = 'user_management/account_validation_email.txt'
+        html_template = 'user_management/account_validation_email.html'
 
         user = self.model(email='dummy@example.com')
-        user.EMAIL_SUBJECT_TEMPLATE = subject
 
         kwargs = user._get_email_kwargs(context, domain)
 
         expected_kwargs = {
             'to': [user.email],
             'template_name': text_template,
+            'html_template_name': html_template,
+            'subject': subject,
+            'context': context,
+        }
+        self.assertEqual(kwargs, expected_kwargs)
+
+    def test__get_email_kwargs_custom(self):
+        context = {}
+        domain = 'http://example.com'
+        subject = '{domain} registration'
+        text_template = 'user_management/validation_email.txt'
+        html_template = 'user_management/validation_email.html'
+
+        user = self.model(email='dummy@example.com')
+        user.EMAIL_SUBJECT_TEMPLATE = subject
+        user.TEXT_EMAIL_TEMPLATE = text_template
+        user.HTML_EMAIL_TEMPLATE = html_template
+
+        kwargs = user._get_email_kwargs(context, domain)
+
+        expected_kwargs = {
+            'to': [user.email],
+            'template_name': text_template,
+            'html_template_name': html_template,
             'subject': subject.format(domain=domain),
             'context': context,
         }
@@ -196,7 +220,7 @@ class TestVerifyEmailMixin(TestCase):
         site = Site.objects.get_current()
         user = self.model()
 
-        with patch.object(user, '_get_email_context') as get_context:
+        with patch.object(user, 'email_context') as get_context:
             get_context.return_value = context
             with patch.object(user, '_get_email_kwargs') as get_kwargs:
                 get_kwargs.return_value = kwargs
