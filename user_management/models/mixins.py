@@ -117,14 +117,13 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
 
     def email_kwargs(self, context, domain):
         """Prepare the kwargs to be passed to incuna_mail.send"""
-        kwargs = {
+        return {
             'to': [self.email],
             'template_name': self.TEXT_EMAIL_TEMPLATE,
             'html_template_name': self.HTML_EMAIL_TEMPLATE,
             'subject': self.get_email_subject(domain),
             'context': context,
         }
-        return kwargs
 
     def get_email_subject(self, domain):
         return _(self.EMAIL_SUBJECT).format(domain=domain)
