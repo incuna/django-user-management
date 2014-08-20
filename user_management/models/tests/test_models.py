@@ -163,7 +163,7 @@ class TestVerifyEmailMixin(TestCase):
     def test_send_validation_email(self):
         site = Site.objects.get_current()
         subject = '{} account validate'.format(site.domain)
-        template = 'user_management/account_validation_email.html'
+        template = 'user_management/account_validation_email.txt'
         user = self.model()
 
         # send_validation_email requires user to have an email

@@ -115,12 +115,13 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
             'site': site,
         }
 
-        send(
-            to=[self.email],
-            template_name='user_management/account_validation_email.html',
-            subject=_('{domain} account validate').format(domain=site.domain),
-            context=context,
-        )
+        kwargs = {
+            'to': [self.email],
+            'template_name': 'user_management/account_validation_email.txt',
+            'subject': _('{domain} account validate').format(domain=site.domain),
+            'context': context,
+        }
+        send(**kwargs)
 
     @classmethod
     def check(cls, **kwargs):
@@ -141,6 +142,7 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
                 id='user_management.W001',
             ),
         ]
+
 
 class AvatarMixin(models.Model):
     avatar = models.ImageField(upload_to='user_avatar', null=True, blank=True)
