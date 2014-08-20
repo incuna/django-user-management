@@ -191,26 +191,20 @@ class TestVerifyEmailMixin(TestCase):
         self.assertEqual(kwargs, expected_kwargs)
 
     def test_send_validation_email(self):
+        context = {}
+        kwargs = {'context': context}
         site = Site.objects.get_current()
-        subject = '{} account validate'.format(site.domain)
-        template = 'user_management/account_validation_email.txt'
         user = self.model()
 
-        # send_validation_email requires user to have an email
-        user.email = 'dummy@test.com'
+        with patch.object(user, '_get_email_context') as get_context:
+            get_context.return_value = context
+            with patch.object(user, '_get_email_kwargs') as get_kwargs:
+                get_kwargs.return_value = kwargs
+                with patch('user_management.models.mixins.send') as send:
+                    user.send_validation_email()
 
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-        with patch.object(default_token_generator, 'make_token') as make_token:
-            with patch('user_management.models.mixins.send') as send:
-                user.send_validation_email()
-
-        send.assert_called_once_with(
-            to=[user.email],
-            subject=subject,
-            template_name=template,
-            context={'site': site, 'token': make_token(), 'uid': uid},
-        )
+        get_kwargs.assert_called_once_with(context, site.domain)
+        send.assert_called_once_with(**kwargs)
 
     def test_verified_email(self):
         user = self.model(email_verification_required=False)
