@@ -172,7 +172,7 @@ class TestVerifyEmailMixin(TestCase):
         subject_template = '{domain} register'
         expected_subject = subject_template.format(domain=domain)
         user = self.model()
-        user.EMAIL_SUBJECT_TEMPLATE = subject_template
+        user.EMAIL_SUBJECT = subject_template
 
         self.assertEqual(user.get_email_subject(domain), expected_subject)
 

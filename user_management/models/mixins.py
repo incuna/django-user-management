@@ -101,7 +101,7 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
 
     objects = VerifyEmailManager()
 
-    EMAIL_SUBJECT_TEMPLATE = '{domain} account validate'
+    EMAIL_SUBJECT = '{domain} account validate'
     TEXT_EMAIL_TEMPLATE = 'user_management/account_validation_email.txt'
     HTML_EMAIL_TEMPLATE = 'user_management/account_validation_email.html'
 
@@ -127,16 +127,16 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
         return kwargs
 
     def get_email_subject(self, domain):
-        return _(self.EMAIL_SUBJECT_TEMPLATE).format(domain=domain)
+        return _(self.EMAIL_SUBJECT).format(domain=domain)
 
     def send_validation_email(self):
         """
         Send a validation email to the user's email address.
 
         The email subject can be customised by overriding
-        VerifyEmailMixin.EMAIL_SUBJECT_TEMPLATE or
-        VerifyEmailMixin.get_email_subject. To include your site's
-        domain in the subject, include {domain} in the template.
+        VerifyEmailMixin.EMAIL_SUBJECT or VerifyEmailMixin.get_email_subject.
+        To include your site's domain in the subject, include {domain} in
+        VerifyEmailMixin.EMAIL_SUBJECT.
 
         By default send_validation_email sends a multipart email using
         VerifyEmailMixin.TEXT_EMAIL_TEMPLATE and
