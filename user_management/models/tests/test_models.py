@@ -160,6 +160,22 @@ class TestVerifyEmailMixin(TestCase):
         self.assertFalse(user.is_active)
         self.assertTrue(user.email_verification_required)
 
+    def test_get_email_subject(self):
+        domain = 'http://example.com'
+        expected_subject = '{} account validate'.format(domain)
+        user = self.model()
+
+        self.assertEqual(user.get_email_subject(domain), expected_subject)
+
+    def test_get_email_subject_custom_template(self):
+        domain = 'http://example.com'
+        subject_template = '{domain} register'
+        expected_subject = subject_template.format(domain=domain)
+        user = self.model()
+        user.EMAIL_SUBJECT_TEMPLATE = subject_template
+
+        self.assertEqual(user.get_email_subject(domain), expected_subject)
+
     def test_email_context(self):
         site = Site.objects.get_current()
         user = self.model()
@@ -194,12 +210,11 @@ class TestVerifyEmailMixin(TestCase):
     def test_email_kwargs_custom(self):
         context = {}
         domain = 'http://example.com'
-        subject = '{domain} registration'
+        subject = '{} account validate'.format(domain)
         text_template = 'user_management/validation_email.txt'
         html_template = 'user_management/validation_email.html'
 
         user = self.model(email='dummy@example.com')
-        user.EMAIL_SUBJECT_TEMPLATE = subject
         user.TEXT_EMAIL_TEMPLATE = text_template
         user.HTML_EMAIL_TEMPLATE = html_template
 
@@ -209,7 +224,7 @@ class TestVerifyEmailMixin(TestCase):
             'to': [user.email],
             'template_name': text_template,
             'html_template_name': html_template,
-            'subject': subject.format(domain=domain),
+            'subject': subject,
             'context': context,
         }
         self.assertEqual(kwargs, expected_kwargs)

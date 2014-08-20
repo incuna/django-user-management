@@ -117,22 +117,25 @@ class VerifyEmailMixin(BasicUserFieldsMixin):
 
     def email_kwargs(self, context, domain):
         """Prepare the kwargs to be passed to incuna_mail.send"""
-        subject = _(self.EMAIL_SUBJECT_TEMPLATE).format(domain=domain)
         kwargs = {
             'to': [self.email],
             'template_name': self.TEXT_EMAIL_TEMPLATE,
             'html_template_name': self.HTML_EMAIL_TEMPLATE,
-            'subject': subject,
+            'subject': self.get_email_subject(domain),
             'context': context,
         }
         return kwargs
+
+    def get_email_subject(self, domain):
+        return _(self.EMAIL_SUBJECT_TEMPLATE).format(domain=domain)
 
     def send_validation_email(self):
         """
         Send a validation email to the user's email address.
 
         The email subject can be customised by overriding
-        VerifyEmailMixin.EMAIL_SUBJECT_TEMPLATE. To include your site's
+        VerifyEmailMixin.EMAIL_SUBJECT_TEMPLATE or
+        VerifyEmailMixin.get_email_subject. To include your site's
         domain in the subject, include {domain} in the template.
 
         By default send_validation_email sends a multipart email using
