@@ -20,7 +20,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     version=version,
-    description='',
+    description='User management model mixins and api views.',
     long_description='',
     author='Incuna',
     author_email='admin@incuna.com',
