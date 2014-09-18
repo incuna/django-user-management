@@ -1,4 +1,4 @@
-## Upcoming
+## v2.1.0
 
 * Update `create_user` to set last_login with a default.
 
