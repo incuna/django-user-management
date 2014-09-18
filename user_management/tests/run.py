@@ -34,6 +34,7 @@ settings.configure(
     AUTHENTICATION_BACKENDS = (
         'user_management.models.backends.CaseInsensitiveEmailBackend',
     ),
+    MIDDLEWARE_CLASSES = (),
     ROOT_URLCONF='user_management.api.tests.urls',
     REST_FRAMEWORK={
         'DEFAULT_AUTHENTICATION_CLASSES': (
