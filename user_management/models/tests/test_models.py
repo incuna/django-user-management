@@ -130,8 +130,11 @@ class TestUserManager(TestCase):
     def test_set_last_login(self):
         email = 'valid@example.com'
 
+        before = timezone.now()
         user = self.manager.create_user(email)
-        self.assertIsNotNone(user.last_login)
+        after = timezone.now()
+
+        self.assertTrue(before < user.last_login < after)
 
     def test_create_superuser(self):
         email = 'valid@example.com'
