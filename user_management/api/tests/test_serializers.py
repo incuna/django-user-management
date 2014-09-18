@@ -1,8 +1,9 @@
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from rest_framework.reverse import reverse
 
 from .. import serializers
 from user_management.models.tests.factories import UserFactory
+from user_management.models.tests.utils import RequestTestCase
 
 
 class ProfileSerializerTest(TestCase):
@@ -166,12 +167,18 @@ class RegistrationSerializerTest(TestCase):
         self.assertIn('email', serializer.errors)
 
 
-class UserSerializerTest(TestCase):
+class UserSerializerTest(RequestTestCase):
     def test_serialize(self):
         user = UserFactory.create()
-        serializer = serializers.UserSerializer(user)
+        request = self.create_request()
+        context = {'request': request}
+        serializer = serializers.UserSerializer(user, context=context)
 
-        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse(
+            'user_management_api:user_detail',
+            kwargs={'pk': user.pk},
+            request=request,
+        )
 
         expected = {
             'url': url,
