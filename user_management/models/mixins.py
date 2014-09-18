@@ -18,6 +18,7 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email).lower()
         user = self.model(
             email=email,
+            last_login=timezone.now(),
             **extra_fields
         )
         user.set_password(password)
