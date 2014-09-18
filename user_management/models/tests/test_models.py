@@ -127,6 +127,12 @@ class TestUserManager(TestCase):
         user = self.manager.create_user(email)
         self.assertEqual(email.lower(), user.email)
 
+    def test_set_last_login(self):
+        email = 'valid@example.com'
+
+        user = self.manager.create_user(email)
+        self.assertIsNotNone(user.last_login)
+
     def test_create_superuser(self):
         email = 'valid@example.com'
         password = 'password'
