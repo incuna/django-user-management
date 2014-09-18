@@ -1,3 +1,13 @@
+## Upcoming
+
+* Update `create_user` to set last_login with a default.
+
+ **Note: this change has been done for backward compatibility with django > 1.7.0.**
+ `User.last_login` default is removed from django > 1.7.0. For existing
+ project using `django-user-management` project migrations would be run
+ after `django.contrib.auth` migrations. The project migrations will cancel
+ `last_login` `IS NULL`.
+
 ## v2.0.0
 
 **Backwards incompatible** due to incuna-mail update
