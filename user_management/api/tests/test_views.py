@@ -127,9 +127,10 @@ class TestRegisterView(APIRequestTestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         email = mail.outbox[0]
-        self.assertIn('/#/register/verify', email.body)
+        verify_url = 'http://example.com/#/register/verify/'
+        self.assertIn(verify_url, email.body)
         html_email = email.alternatives[0][0]
-        self.assertIn('/#/register/verify', html_email)
+        self.assertIn(verify_url, html_email)
 
         user = User.objects.get()
         self.assertEqual(user.name, self.data['name'])
