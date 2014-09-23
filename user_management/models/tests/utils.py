@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
-from incuna_test_utils.testcases.request import RequestTestCase as RequestTestCaseBase
+from incuna_test_utils.testcases.request import BaseRequestTestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from .factories import UserFactory
@@ -25,5 +25,5 @@ class APIRequestTestCase(TestCase):
         return request
 
 
-class RequestTestCase(RequestTestCaseBase):
+class RequestTestCase(BaseRequestTestCase):
     user_factory = UserFactory
