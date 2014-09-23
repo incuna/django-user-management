@@ -1,4 +1,4 @@
-## Upcoming version
+## v2.1.1
 
 * Add missing plaintext account validation email
 * Add missing `/` to html account validation email
