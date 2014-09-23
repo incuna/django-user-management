@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
@@ -127,10 +129,17 @@ class TestRegisterView(APIRequestTestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         email = mail.outbox[0]
-        verify_url = 'http://example.com/#/register/verify/'
-        self.assertIn(verify_url, email.body)
+        verify_url_regex = re.compile(
+            r'''
+                http://example\.com/\#/register/verify/
+                [0-9A-Za-z_\-]+/  # uid
+                [0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20}/  # token
+            ''',
+            re.VERBOSE,
+        )
+        self.assertRegex(email.body, verify_url_regex)
         html_email = email.alternatives[0][0]
-        self.assertIn(verify_url, html_email)
+        self.assertRegex(html_email, verify_url_regex)
 
         user = User.objects.get()
         self.assertEqual(user.name, self.data['name'])
