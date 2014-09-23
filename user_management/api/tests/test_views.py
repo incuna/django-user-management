@@ -121,12 +121,15 @@ class TestRegisterView(APIRequestTestCase):
         """Unauthenticated Users should be able to register."""
         request = self.create_request('post', auth=False, data=self.data)
 
-        send_email_path = 'user_management.models.mixins.VerifyEmailMixin.send_validation_email'
-        with patch(send_email_path) as send:
-            response = self.view_class.as_view()(request)
+        response = self.view_class.as_view()(request)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        send.assert_called_once_with()
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+        self.assertIn('/#/register/verify', email.body)
+        html_email = email.alternatives[0][0]
+        self.assertIn('/#/register/verify', html_email)
 
         user = User.objects.get()
         self.assertEqual(user.name, self.data['name'])
@@ -143,12 +146,10 @@ class TestRegisterView(APIRequestTestCase):
         """An email should not be sent if email_verification_required is False."""
         request = self.create_request('post', auth=False, data=self.data)
 
-        send_email_path = 'user_management.models.mixins.VerifyEmailMixin.send_validation_email'
-        with patch(send_email_path) as send:
-            response = self.view_class.as_view()(request)
+        response = self.view_class.as_view()(request)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertFalse(send.called)
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_post_with_missing_data(self):
         """Password should not be sent back on failed request."""
