@@ -34,6 +34,11 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
+class ProfileAvatarDelete(generics.DestroyAPIView):
+    model = User
+    serializer_class =
+
+
 class UserAvatar(generics.RetrieveUpdateAPIView):
     """
     Retrieve and update the user's avatar. Pass get parameters to
