@@ -36,7 +36,7 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
 
 class ProfileAvatarDelete(generics.DestroyAPIView):
     model = User
-    serializer_class =
+    serializer_class = serializers.AvatarSerializer
 
 
 class UserAvatar(generics.RetrieveUpdateAPIView):
