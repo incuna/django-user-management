@@ -124,6 +124,34 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertNotEqual(response.data['avatar'], expected_url)
 
 
+class TestProfileAvatarDelete(APIRequestTestCase):
+    view_class = views.ProfileAvatarDelete
+
+    def tearDown(self):
+        SIMPLE_PNG.seek(0)
+
+    def test_delete_without_avatar(self):
+        user = UserFactory.create()
+
+        request = self.create_request('delete', user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_with_avatar(self):
+        user = UserFactory.create(avatar=SIMPLE_PNG)
+
+        request = self.create_request('delete', user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        user = User.objects.get(pk=user.pk)
+        self.assertEqual(user.avatar, None)
+
+
 class TestUserAvatar(APIRequestTestCase):
     view_class = views.UserAvatar
 

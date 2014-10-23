@@ -38,6 +38,9 @@ class ProfileAvatarDelete(generics.DestroyAPIView):
     model = User
     serializer_class = serializers.AvatarSerializer
 
+    def get_object(self):
+        return self.request.user
+
 
 class UserAvatar(generics.RetrieveUpdateAPIView):
     """
