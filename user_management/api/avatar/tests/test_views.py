@@ -134,12 +134,15 @@ class TestProfileAvatar(APIRequestTestCase):
 
     def test_delete_with_avatar(self):
         user = UserFactory.create(avatar=SIMPLE_PNG)
-        user = User.objects.get(pk=user.pk)
         request = self.create_request('delete', user=user)
         view = self.view_class.as_view()
         response = view(request)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        user = User.objects.get(pk=user.pk)
+        print(dir(user.avatar))
+        self.assertFalse(user.avatar)
 
 
 class TestUserAvatar(APIRequestTestCase):
