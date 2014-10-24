@@ -20,7 +20,6 @@ def _simple_png():
     image_file = BytesIO()
     image = Image.new('RGBA', (1, 1))
     image.save(image_file, 'png')
-    image_file._committed = True
     image_file.name = 'test.png'
     image_file.url = '{0}/{1}'.format(
         TEST_SERVER,
