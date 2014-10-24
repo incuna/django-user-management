@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
-from rest_framework import generics, parsers
+from rest_framework import generics, parsers, response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import HTTP_204_NO_CONTENT
 
 from . import serializers
 from user_management.api import permissions
@@ -33,13 +34,12 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
-
-class ProfileAvatarDelete(generics.DestroyAPIView):
-    model = User
-    serializer_class = serializers.AvatarSerializer
-
-    def get_object(self):
-        return self.request.user
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        # user.avatar.delete() not used due test madness it would require
+        user.avatar = None
+        user.save()
+        return response.Response(status=HTTP_204_NO_CONTENT)
 
 
 class UserAvatar(generics.RetrieveUpdateAPIView):

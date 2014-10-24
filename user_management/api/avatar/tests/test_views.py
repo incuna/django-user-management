@@ -20,6 +20,7 @@ def _simple_png():
     image_file = BytesIO()
     image = Image.new('RGBA', (1, 1))
     image.save(image_file, 'png')
+    image_file._committed = True
     image_file.name = 'test.png'
     image_file.url = '{0}/{1}'.format(
         TEST_SERVER,
@@ -123,16 +124,8 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.data['avatar'], expected_url)
 
-
-class TestProfileAvatarDelete(APIRequestTestCase):
-    view_class = views.ProfileAvatarDelete
-
-    def tearDown(self):
-        SIMPLE_PNG.seek(0)
-
     def test_delete_without_avatar(self):
         user = UserFactory.create()
-
         request = self.create_request('delete', user=user)
         view = self.view_class.as_view()
         response = view(request)
@@ -141,15 +134,12 @@ class TestProfileAvatarDelete(APIRequestTestCase):
 
     def test_delete_with_avatar(self):
         user = UserFactory.create(avatar=SIMPLE_PNG)
-
+        user = User.objects.get(pk=user.pk)
         request = self.create_request('delete', user=user)
         view = self.view_class.as_view()
         response = view(request)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        user = User.objects.get(pk=user.pk)
-        self.assertEqual(user.avatar, None)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 class TestUserAvatar(APIRequestTestCase):
