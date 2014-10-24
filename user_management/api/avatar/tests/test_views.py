@@ -141,7 +141,6 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         user = User.objects.get(pk=user.pk)
-        print(dir(user.avatar))
         self.assertFalse(user.avatar)
 
 
