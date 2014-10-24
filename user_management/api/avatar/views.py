@@ -12,8 +12,8 @@ User = get_user_model()
 
 class ProfileAvatar(generics.RetrieveUpdateAPIView):
     """
-    Retrieve and update the authenticated user's avatar. Pass get parameters to
-    retrieve a thumbnail of the avatar.
+    Retrieve, update & delete the authenticated user's avatar. Pass get
+    parameters to retrieve a thumbnail of the avatar.
 
     Thumbnail options are specified as get parameters. Options are:
         width: Specify the width (in pixels) to resize / crop to.
