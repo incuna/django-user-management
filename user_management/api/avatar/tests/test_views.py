@@ -55,7 +55,23 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['avatar'], None)
 
-    def test_put(self):
+    def test_unauthenticated_put(self):
+        user = UserFactory.create()
+        data = {'avatar': SIMPLE_PNG}
+
+        request = APIRequestFactory().put('/', data=data)
+        request.user = user
+
+        view = self.view_class.as_view()
+        with patch('django.core.files.storage.Storage.url') as mocked_url:
+            mocked_url.return_value = 'mocked-url'
+            response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        user = User.objects.get(pk=user.pk)
+        self.assertFalse(user.avatar)
+
+    def test_authenticated_put(self):
         user = UserFactory.create()
         data = {'avatar': SIMPLE_PNG}
 
