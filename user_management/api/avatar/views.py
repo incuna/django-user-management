@@ -31,6 +31,7 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
         avatar?width=100&height=100&crop=1&anchor=tr
     """
     model = User
+    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.AvatarSerializer
     parser_classes = (parsers.MultiPartParser,)
 
