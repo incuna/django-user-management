@@ -1,9 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, parsers, response
-from rest_framework.permissions import(
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 from . import serializers
@@ -34,7 +31,7 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
         avatar?width=100&height=100&crop=1&anchor=tr
     """
     model = User
-    permission_classes = (IsAuthenticated, IsAuthenticatedOrReadOnly)
+    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.AvatarSerializer
     parser_classes = (parsers.MultiPartParser,)
 
