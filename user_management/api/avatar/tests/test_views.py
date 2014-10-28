@@ -56,6 +56,12 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertEqual(response.data['avatar'], None)
 
     def test_unauthenticated_put(self):
+        """
+        Test that unauthenticated users cannot put/post avatars
+
+        The view should respond with a 401 response, confirming the user
+        is unauthorised to put to the view.
+        """
         user = UserFactory.create()
         data = {'avatar': SIMPLE_PNG}
 
