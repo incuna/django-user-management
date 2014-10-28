@@ -20,6 +20,7 @@ def _simple_png():
     image_file = BytesIO()
     image = Image.new('RGBA', (1, 1))
     image.save(image_file, 'png')
+    image_file._committed = True
     image_file.name = 'test.png'
     image_file.url = '{0}/{1}'.format(
         TEST_SERVER,
@@ -42,7 +43,7 @@ class TestProfileAvatar(APIRequestTestCase):
         request = self.create_request(user=user)
         view = self.view_class.as_view()
         response = view(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['avatar'], SIMPLE_PNG.url)
 
     def test_get_no_avatar(self):
@@ -51,7 +52,7 @@ class TestProfileAvatar(APIRequestTestCase):
         request = self.create_request(user=user)
         view = self.view_class.as_view()
         response = view(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['avatar'], None)
 
     def test_put(self):
@@ -66,7 +67,7 @@ class TestProfileAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = 'mocked-url'
             response = view(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=user.pk)
         self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
@@ -90,7 +91,7 @@ class TestProfileAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = expected_url
             response = view(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_get_resize_width(self):
@@ -105,7 +106,7 @@ class TestProfileAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = expected_url
             response = view(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_get_resize_height(self):
@@ -120,8 +121,27 @@ class TestProfileAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = expected_url
             response = view(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.data['avatar'], expected_url)
+
+    def test_delete_without_avatar(self):
+        user = UserFactory.create()
+        request = self.create_request('delete', user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_with_avatar(self):
+        user = UserFactory.create(avatar=SIMPLE_PNG)
+        request = self.create_request('delete', user=user)
+        view = self.view_class.as_view()
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        user = User.objects.get(pk=user.pk)
+        self.assertFalse(user.avatar)
 
 
 class TestUserAvatar(APIRequestTestCase):
@@ -175,7 +195,10 @@ class TestUserAvatar(APIRequestTestCase):
         request = self.create_request('delete', user=self.user)
         view = self.view_class.as_view()
         response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
     def test_post_not_allowed(self):
         """ Tests POST user for staff not allowed"""
@@ -183,7 +206,10 @@ class TestUserAvatar(APIRequestTestCase):
         request = self.create_request('post', user=self.user)
         view = self.view_class.as_view()
         response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
     def test_get(self):
         request = self.create_request(user=self.user)
@@ -195,7 +221,7 @@ class TestUserAvatar(APIRequestTestCase):
         self.other_user.avatar = None
         request = self.create_request(user=self.user)
         response = self.get_response(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['avatar'], None)
 
     def test_get_resize(self):
@@ -208,7 +234,7 @@ class TestUserAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = expected_url
             response = self.get_response(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_get_resize_width(self):
@@ -220,7 +246,7 @@ class TestUserAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = expected_url
             response = self.get_response(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_get_resize_height(self):
@@ -232,7 +258,7 @@ class TestUserAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = expected_url
             response = self.get_response(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_put(self):
@@ -248,7 +274,7 @@ class TestUserAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = 'mocked-url'
             response = view(request, pk=other_user.pk)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=other_user.pk)
         self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
@@ -266,7 +292,7 @@ class TestUserAvatar(APIRequestTestCase):
         with patch('django.core.files.storage.Storage.url') as mocked_url:
             mocked_url.return_value = 'mocked-url'
             response = view(request, pk=other_user.pk)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=other_user.pk)
         self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
