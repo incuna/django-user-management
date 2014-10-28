@@ -61,11 +61,9 @@ class TestProfileAvatar(APIRequestTestCase):
 
         request = APIRequestFactory().put('/', data=data)
         request.user = user
-
         view = self.view_class.as_view()
-        with patch('django.core.files.storage.Storage.url') as mocked_url:
-            mocked_url.return_value = 'mocked-url'
-            response = view(request)
+        response = view(request)
+
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         user = User.objects.get(pk=user.pk)
