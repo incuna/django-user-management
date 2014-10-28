@@ -57,7 +57,7 @@ class TestProfileAvatar(APIRequestTestCase):
 
     def test_unauthenticated_put(self):
         """
-        Test that unauthenticated users cannot put/post avatars
+        Test that unauthenticated users cannot put avatars.
 
         The view should respond with a 401 response, confirming the user
         is unauthorised to put to the view.
