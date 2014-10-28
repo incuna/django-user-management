@@ -60,7 +60,6 @@ class TestProfileAvatar(APIRequestTestCase):
         data = {'avatar': SIMPLE_PNG}
 
         request = APIRequestFactory().put('/', data=data)
-        request.user = user
         view = self.view_class.as_view()
         response = view(request)
 
