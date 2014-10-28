@@ -62,17 +62,12 @@ class TestProfileAvatar(APIRequestTestCase):
         The view should respond with a 401 response, confirming the user
         is unauthorised to put to the view.
         """
-        user = UserFactory.create()
         data = {'avatar': SIMPLE_PNG}
-
         request = APIRequestFactory().put('/', data=data)
         view = self.view_class.as_view()
         response = view(request)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        user = User.objects.get(pk=user.pk)
-        self.assertFalse(user.avatar)
 
     def test_authenticated_put(self):
         user = UserFactory.create()
