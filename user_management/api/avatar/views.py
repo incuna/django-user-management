@@ -15,9 +15,8 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
     Retrieve, update & delete the authenticated user's avatar. Pass get
     parameters to retrieve a thumbnail of the avatar.
 
-    generics.RetrieveUpdateDestroyAPIView not used as none of the original
-    delete method would have been used & it was simpler to add a delete method
-    to this view.
+    We don't inherit from `generics.RetrieveUpdateDestroyAPIView because we
+    need a custom `delete` method with no common functionality.
 
     Thumbnail options are specified as get parameters. Options are:
         width: Specify the width (in pixels) to resize / crop to.
@@ -40,10 +39,10 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
 
     def delete(self, request, *args, **kwargs):
         """
-        This method set the user's avatar field to none.
-        user.avatar.delete() not used as it cause errors in
-        django.inmemorystorage . This meant that user.avatar.delete() could be
-        tested in a satisfactory way. Hence setting user.avatar to none.
+        Delete the user's avatar.
+
+        We set `user.avatar = None` instead of calling `user.avatar.delete()`
+        to avoid test errors with `django.inmemorystorage`.
         """
         user = self.get_object()
         user.avatar = None
