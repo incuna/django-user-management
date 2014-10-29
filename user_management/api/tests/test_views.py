@@ -32,13 +32,21 @@ class GetTokenTest(APIRequestTestCase):
     def test_post(self):
         username = 'Test@example.com'
         password = 'myepicstrongpassword'
-        UserFactory.create(email=username.lower(), password=password, is_active=True)
+        UserFactory.create(
+            email=username.lower(),
+            password=password,
+            is_active=True,
+        )
 
         data = {'username': username, 'password': password}
         request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()
         response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            msg=response.data,
+        )
 
     def test_post_username(self):
         username = 'Test@example.com'
@@ -49,7 +57,11 @@ class GetTokenTest(APIRequestTestCase):
         request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()
         response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            msg=response.data,
+        )
 
     def test_delete(self):
         user = UserFactory.create()
@@ -153,7 +165,9 @@ class TestRegisterView(APIRequestTestCase):
     @patch('user_management.api.serializers.RegistrationSerializer.Meta.model',
            new=BasicUser)
     def test_unauthenticated_user_post_no_verify_email(self):
-        """An email should not be sent if email_verification_required is False."""
+        """
+        An email should not be sent if email_verification_required is False.
+        """
         request = self.create_request('post', auth=False, data=self.data)
 
         response = self.view_class.as_view()(request)
@@ -210,7 +224,11 @@ class TestPasswordResetEmail(APIRequestTestCase):
         email = 'exists@example.com'
         user = UserFactory.create(email=email)
 
-        request = self.create_request('post', data={'email': email}, auth=False)
+        request = self.create_request(
+            'post',
+            data={'email': email},
+            auth=False,
+        )
         view = self.view_class.as_view()
         with patch.object(self.view_class, 'send_email') as send_email:
             response = view(request)
@@ -228,7 +246,11 @@ class TestPasswordResetEmail(APIRequestTestCase):
         email = 'doesnotexist@example.com'
         UserFactory.create(email='exists@example.com')
 
-        request = self.create_request('post', data={'email': email}, auth=False)
+        request = self.create_request(
+            'post',
+            data={'email': email},
+            auth=False,
+        )
         view = self.view_class.as_view()
         with patch.object(self.view_class, 'send_email') as send_email:
             response = view(request)
@@ -261,7 +283,9 @@ class TestPasswordResetEmail(APIRequestTestCase):
         self.assertIn('https://', sent_mail.body)
 
     def test_options(self):
-        """Ensure information about email field is included in options request"""
+        """
+        Ensure information about email field is included in options request.
+        """
         request = self.create_request('options', auth=False)
         view = self.view_class.as_view()
         response = view(request)
@@ -360,7 +384,10 @@ class TestPasswordReset(APIRequestTestCase):
 
         request = self.create_request(
             'put',
-            data={'new_password': new_password, 'new_password2': invalid_password},
+            data={
+                'new_password': new_password,
+                'new_password2': invalid_password,
+            },
             auth=False,
         )
         view = self.view_class.as_view()
@@ -674,7 +701,10 @@ class TestUserList(APIRequestTestCase):
     view_class = views.UserList
 
     def expected_data(self, user):
-        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse(
+            'user_management_api:user_detail',
+            kwargs={'pk': user.pk},
+        )
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -734,7 +764,10 @@ class TestUserDetail(APIRequestTestCase):
         self.user, self.other_user = UserFactory.create_batch(2)
 
     def expected_data(self, user):
-        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse(
+            'user_management_api:user_detail',
+            kwargs={'pk': user.pk},
+        )
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -787,7 +820,11 @@ class TestUserDetail(APIRequestTestCase):
         view = self.view_class.as_view()
 
         response = view(request, pk=self.other_user.pk)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            response.data,
+        )
 
         user = User.objects.get(pk=self.other_user.pk)
         self.assertEqual(user.name, data['name'])
@@ -803,7 +840,11 @@ class TestUserDetail(APIRequestTestCase):
         view = self.view_class.as_view()
 
         response = view(request, pk=self.other_user.pk)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            response.data,
+        )
 
         user = User.objects.get(pk=self.other_user.pk)
         self.assertEqual(user.name, data['name'])
