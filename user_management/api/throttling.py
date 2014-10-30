@@ -17,7 +17,7 @@ class PasswordResetRateThrottle(DefaultRateMixin, ScopedRateThrottle):
     default_rate = '3/hour'
 
     def allow_request(self, request, view):
-        if request.META['REQUEST_METHOD'] == 'OPTIONS':
+        if request.META['REQUEST_METHOD'] != 'POST':
             return True
         else:
             return super(PasswordResetRateThrottle, self).allow_request(
