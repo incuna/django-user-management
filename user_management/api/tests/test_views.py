@@ -357,7 +357,7 @@ class TestPasswordResetEmail(APIRequestTestCase):
         for i in range(default_rate):
             view(request)
 
-        # Assert forth request is not throttled
+        # Assert fourth request is not throttled
         response = view(request)
         self.assertNotEqual(
             response.status_code,
