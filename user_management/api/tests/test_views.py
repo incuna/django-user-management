@@ -214,6 +214,12 @@ class TestRegisterView(APIRequestTestCase):
         self.assertFalse(User.objects.count() > 1)
 
 
+def check_post_rate_limit(self, view, data, expected_status):
+    request = self.create_request('post', data=data, auth=False)
+    response = view(request)
+    self.assertEqual(response.status_code, expected_status)
+
+
 class TestPasswordResetEmail(APIRequestTestCase):
     view_class = views.PasswordResetEmail
 
@@ -244,31 +250,25 @@ class TestPasswordResetEmail(APIRequestTestCase):
         """
         email = 'exists@example.com'
         UserFactory.create(email=email)
-
         view = self.view_class.as_view()
         rate_limit = 3
+
         # Test the the first 3 requests aren't limited.
+        data = {'email': email}
         for i in range(rate_limit):
-            request = self.create_request(
-                'post',
-                data={'email': email},
-                auth=False,
-            )
-            response = view(request)
-            self.assertEqual(
-                response.status_code,
+            check_post_rate_limit(
+                self,
+                view,
+                data,
                 status.HTTP_204_NO_CONTENT,
             )
 
         # Test that the 4th request is throttled.
-        request = self.create_request(
-            'post',
-            data={'email': email},
-            auth=False,
-        )
-        response = view(request)
-        self.assertEqual(
-            response.status_code,
+
+        check_post_rate_limit(
+            self,
+            view,
+            data,
             status.HTTP_429_TOO_MANY_REQUESTS,
         )
 
