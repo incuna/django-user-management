@@ -32,13 +32,21 @@ class GetTokenTest(APIRequestTestCase):
     def test_post(self):
         username = 'Test@example.com'
         password = 'myepicstrongpassword'
-        UserFactory.create(email=username.lower(), password=password, is_active=True)
+        UserFactory.create(
+            email=username.lower(),
+            password=password,
+            is_active=True,
+        )
 
         data = {'username': username, 'password': password}
         request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()
         response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            msg=response.data,
+        )
 
     def test_post_username(self):
         username = 'Test@example.com'
@@ -49,7 +57,11 @@ class GetTokenTest(APIRequestTestCase):
         request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()
         response = view(request)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            msg=response.data,
+        )
 
     def test_delete(self):
         user = UserFactory.create()
@@ -153,7 +165,9 @@ class TestRegisterView(APIRequestTestCase):
     @patch('user_management.api.serializers.RegistrationSerializer.Meta.model',
            new=BasicUser)
     def test_unauthenticated_user_post_no_verify_email(self):
-        """An email should not be sent if email_verification_required is False."""
+        """
+        An email should not be sent if email_verification_required is False.
+        """
         request = self.create_request('post', auth=False, data=self.data)
 
         response = self.view_class.as_view()(request)
@@ -210,13 +224,49 @@ class TestPasswordResetEmail(APIRequestTestCase):
         email = 'exists@example.com'
         user = UserFactory.create(email=email)
 
-        request = self.create_request('post', data={'email': email}, auth=False)
+        request = self.create_request(
+            'post',
+            data={'email': email},
+            auth=False,
+        )
         view = self.view_class.as_view()
         with patch.object(self.view_class, 'send_email') as send_email:
             response = view(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         send_email.assert_called_once_with(user)
+
+    def assert_post_returns_status(self, view, data, expected_status):
+        request = self.create_request('post', data=data, auth=False)
+        response = view(request)
+        self.assertEqual(response.status_code, expected_status)
+
+    def test_post_rate_limit(self):
+        """
+        Ensure the post requests are rate limited.
+
+        The PasswordResetRateThrottle sets a limit of 3/hour requests.
+        """
+        email = 'exists@example.com'
+        UserFactory.create(email=email)
+        view = self.view_class.as_view()
+        rate_limit = 3
+
+        # Test the the first 3 requests aren't limited.
+        data = {'email': email}
+        for i in range(rate_limit):
+            self.assert_post_returns_status(
+                view,
+                data,
+                status.HTTP_204_NO_CONTENT,
+            )
+
+        # Test that the 4th request is throttled.
+        self.assert_post_returns_status(
+            view,
+            data,
+            status.HTTP_429_TOO_MANY_REQUESTS,
+        )
 
     def test_authenticated(self):
         request = self.create_request('post', auth=True)
@@ -228,7 +278,11 @@ class TestPasswordResetEmail(APIRequestTestCase):
         email = 'doesnotexist@example.com'
         UserFactory.create(email='exists@example.com')
 
-        request = self.create_request('post', data={'email': email}, auth=False)
+        request = self.create_request(
+            'post',
+            data={'email': email},
+            auth=False,
+        )
         view = self.view_class.as_view()
         with patch.object(self.view_class, 'send_email') as send_email:
             response = view(request)
@@ -261,7 +315,11 @@ class TestPasswordResetEmail(APIRequestTestCase):
         self.assertIn('https://', sent_mail.body)
 
     def test_options(self):
-        """Ensure information about email field is included in options request"""
+        """
+        Ensure information about email field is included in options request.
+
+        Ensure that the options request isn't rate limited.
+        """
         request = self.create_request('options', auth=False)
         view = self.view_class.as_view()
         response = view(request)
@@ -281,38 +339,25 @@ class TestPasswordResetEmail(APIRequestTestCase):
             expected_post_options,
         )
 
-    def test_default_user_password_reset_throttle(self):
-        default_rate = 3
-        auth_url = reverse('user_management_api:password_reset')
-        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
+    def test_options_delimit(self):
+        """
+        Ensure information about email field is included in options request.
 
-        request = APIRequestFactory().get(auth_url)
+        Ensure that the options request isn't rate limited.
+        """
+        request = self.create_request('options', auth=False)
         view = self.view_class.as_view()
-
-        # make all but one of our allowed requests
-        for i in range(default_rate - 1):
+        default_rate = 3
+        # First three requests
+        for i in range(default_rate):
             view(request)
 
-        response = view(request)  # our last allowed request
-        self.assertNotEqual(response.status_code, expected_status)
-
-        response = view(request)  # our throttled request
-        self.assertEqual(response.status_code, expected_status)
-
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
-    def test_user_password_reset_throttle(self):
-        auth_url = reverse('user_management_api:password_reset')
-        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
-
-        request = APIRequestFactory().get(auth_url)
-
-        response = self.view_class.as_view()(request)
-        self.assertNotEqual(response.status_code, expected_status)
-
-        response = self.view_class.as_view()(request)
-        self.assertEqual(response.status_code, expected_status)
+        # Assert fourth request is not throttled
+        response = view(request)
+        self.assertNotEqual(
+            response.status_code,
+            status.HTTP_429_TOO_MANY_REQUESTS,
+        )
 
 
 class TestPasswordReset(APIRequestTestCase):
@@ -360,7 +405,10 @@ class TestPasswordReset(APIRequestTestCase):
 
         request = self.create_request(
             'put',
-            data={'new_password': new_password, 'new_password2': invalid_password},
+            data={
+                'new_password': new_password,
+                'new_password2': invalid_password,
+            },
             auth=False,
         )
         view = self.view_class.as_view()
@@ -674,7 +722,10 @@ class TestUserList(APIRequestTestCase):
     view_class = views.UserList
 
     def expected_data(self, user):
-        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse(
+            'user_management_api:user_detail',
+            kwargs={'pk': user.pk},
+        )
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -734,7 +785,10 @@ class TestUserDetail(APIRequestTestCase):
         self.user, self.other_user = UserFactory.create_batch(2)
 
     def expected_data(self, user):
-        url = reverse('user_management_api:user_detail', kwargs={'pk': user.pk})
+        url = reverse(
+            'user_management_api:user_detail',
+            kwargs={'pk': user.pk},
+        )
         expected = {
             'url': TEST_SERVER + url,
             'name': user.name,
@@ -787,7 +841,11 @@ class TestUserDetail(APIRequestTestCase):
         view = self.view_class.as_view()
 
         response = view(request, pk=self.other_user.pk)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            response.data,
+        )
 
         user = User.objects.get(pk=self.other_user.pk)
         self.assertEqual(user.name, data['name'])
@@ -803,7 +861,11 @@ class TestUserDetail(APIRequestTestCase):
         view = self.view_class.as_view()
 
         response = view(request, pk=self.other_user.pk)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            response.data,
+        )
 
         user = User.objects.get(pk=self.other_user.pk)
         self.assertEqual(user.name, data['name'])

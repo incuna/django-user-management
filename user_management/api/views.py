@@ -37,7 +37,10 @@ class UserRegister(generics.CreateAPIView):
     permission_classes = [permissions.IsNotAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.DATA, files=request.FILES)
+        serializer = self.get_serializer(
+            data=request.DATA,
+            files=request.FILES,
+        )
         if serializer.is_valid():
             return self.is_valid(serializer)
         return self.is_invalid(serializer)
@@ -123,7 +126,11 @@ class OneTimeUseAPIMixin(object):
         if not default_token_generator.check_token(self.user, token):
             raise Http404()
 
-        return super(OneTimeUseAPIMixin, self).initial(request, *args, **kwargs)
+        return super(OneTimeUseAPIMixin, self).initial(
+            request,
+            *args,
+            **kwargs
+        )
 
 
 class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
