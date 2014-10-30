@@ -236,6 +236,39 @@ class TestPasswordResetEmail(APIRequestTestCase):
 
         send_email.assert_called_once_with(user)
 
+    def test_post_rate_limit(self):
+        """
+        Ensure the post requests are rate limited.
+
+        The PasswordResetRateThrottle sets a limit of 3/hour requests.
+        """
+        email = 'exists@example.com'
+        UserFactory.create(email=email)
+
+        view = self.view_class.as_view()
+        rate_limit = 3
+        # Test the the first 3 requests aren't limited.
+        for i in range(rate_limit):
+            request = self.create_request(
+                'post',
+                data={'email': email},
+                auth=False,
+            )
+            response = view(request)
+            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Test that the 4th request is throttled.
+        request = self.create_request(
+            'post',
+            data={'email': email},
+            auth=False,
+        )
+        response = view(request)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_429_TOO_MANY_REQUESTS,
+        )
+
     def test_authenticated(self):
         request = self.create_request('post', auth=True)
         view = self.view_class.as_view()
@@ -285,6 +318,8 @@ class TestPasswordResetEmail(APIRequestTestCase):
     def test_options(self):
         """
         Ensure information about email field is included in options request.
+
+        Ensure that the options request isn't rate limited.
         """
         request = self.create_request('options', auth=False)
         view = self.view_class.as_view()
@@ -305,38 +340,25 @@ class TestPasswordResetEmail(APIRequestTestCase):
             expected_post_options,
         )
 
-    def test_default_user_password_reset_throttle(self):
-        default_rate = 3
-        auth_url = reverse('user_management_api:password_reset')
-        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
+    def test_options_delimit(self):
+        """
+        Ensure information about email field is included in options request.
 
-        request = APIRequestFactory().get(auth_url)
+        Ensure that the options request isn't rate limited.
+        """
+        request = self.create_request('options', auth=False)
         view = self.view_class.as_view()
-
-        # make all but one of our allowed requests
-        for i in range(default_rate - 1):
+        default_rate = 3
+        # First three requests
+        for i in range(default_rate):
             view(request)
 
-        response = view(request)  # our last allowed request
-        self.assertNotEqual(response.status_code, expected_status)
-
-        response = view(request)  # our throttled request
-        self.assertEqual(response.status_code, expected_status)
-
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
-    def test_user_password_reset_throttle(self):
-        auth_url = reverse('user_management_api:password_reset')
-        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
-
-        request = APIRequestFactory().get(auth_url)
-
-        response = self.view_class.as_view()(request)
-        self.assertNotEqual(response.status_code, expected_status)
-
-        response = self.view_class.as_view()(request)
-        self.assertEqual(response.status_code, expected_status)
+        # Assert forth request is not throttled
+        response = view(request)
+        self.assertNotEqual(
+            response.status_code,
+            status.HTTP_429_TOO_MANY_REQUESTS,
+        )
 
 
 class TestPasswordReset(APIRequestTestCase):
