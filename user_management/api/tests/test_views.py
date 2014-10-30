@@ -264,7 +264,6 @@ class TestPasswordResetEmail(APIRequestTestCase):
             )
 
         # Test that the 4th request is throttled.
-
         check_post_rate_limit(
             self,
             view,
