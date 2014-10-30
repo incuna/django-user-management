@@ -249,17 +249,16 @@ class TestPasswordResetEmail(APIRequestTestCase):
         rate_limit = 3
         # Test the the first 3 requests aren't limited.
         for i in range(rate_limit):
-            with self.subTest(request_index=i):
-                request = self.create_request(
-                    'post',
-                    data={'email': email},
-                    auth=False,
-                )
-                response = view(request)
-                self.assertEqual(
-                    response.status_code,
-                    status.HTTP_204_NO_CONTENT,
-                )
+            request = self.create_request(
+                'post',
+                data={'email': email},
+                auth=False,
+            )
+            response = view(request)
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_204_NO_CONTENT,
+            )
 
         # Test that the 4th request is throttled.
         request = self.create_request(
