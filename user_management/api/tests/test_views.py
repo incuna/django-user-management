@@ -214,12 +214,6 @@ class TestRegisterView(APIRequestTestCase):
         self.assertFalse(User.objects.count() > 1)
 
 
-def check_post_rate_limit(self, view, data, expected_status):
-    request = self.create_request('post', data=data, auth=False)
-    response = view(request)
-    self.assertEqual(response.status_code, expected_status)
-
-
 class TestPasswordResetEmail(APIRequestTestCase):
     view_class = views.PasswordResetEmail
 
@@ -242,6 +236,11 @@ class TestPasswordResetEmail(APIRequestTestCase):
 
         send_email.assert_called_once_with(user)
 
+    def check_post_rate_limit(self, view, data, expected_status):
+        request = self.create_request('post', data=data, auth=False)
+        response = view(request)
+        self.assertEqual(response.status_code, expected_status)
+
     def test_post_rate_limit(self):
         """
         Ensure the post requests are rate limited.
@@ -256,16 +255,10 @@ class TestPasswordResetEmail(APIRequestTestCase):
         # Test the the first 3 requests aren't limited.
         data = {'email': email}
         for i in range(rate_limit):
-            check_post_rate_limit(
-                self,
-                view,
-                data,
-                status.HTTP_204_NO_CONTENT,
-            )
+            self.check_post_rate_limit(view, data, status.HTTP_204_NO_CONTENT)
 
         # Test that the 4th request is throttled.
-        check_post_rate_limit(
-            self,
+        self.check_post_rate_limit(
             view,
             data,
             status.HTTP_429_TOO_MANY_REQUESTS,
