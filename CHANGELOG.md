@@ -1,8 +1,12 @@
+## v3.0.1
+
+* `GetToken` also throttles `POST` requests only.
+
 ## v3.0.0
 
 **Backwards incompatible** due to required authentication when using `ProfileAvatar`
 
-* `PasswordResetEmail` and `GetToken` now only throttled on `POST` requests.
+* `PasswordResetEmail` now only throttled on `POST` requests.
 * Added `DELETE` method to `ProfileAvatar`.
 * `ProfileAvatar` now requires authentication.
 
