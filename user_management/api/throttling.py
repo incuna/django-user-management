@@ -22,6 +22,7 @@ class PostRequestThrottleMixin(object):
 
 class LoginRateThrottle(
         DefaultRateMixin,
+        PostRequestThrottleMixin,
         ScopedRateThrottle):
     default_rate = '10/hour'
 

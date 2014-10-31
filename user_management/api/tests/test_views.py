@@ -79,38 +79,31 @@ class GetTokenTest(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_default_user_auth_throttle(self):
-        default_rate = 10
+    def test_user_auth_throttle_GET_requests(self):
+        """Ensure GET requests are not allowed."""
         auth_url = reverse('user_management_api:auth')
-        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
-
         request = APIRequestFactory().get(auth_url)
-        view = self.view_class.as_view()
+        response = self.view_class.as_view()(request)
 
-        # make all but one of our allowed requests
-        for i in range(default_rate - 1):
-            view(request)
-
-        response = view(request)  # our last allowed request
-        self.assertNotEqual(response.status_code, expected_status)
-
-        response = view(request)  # our throttled request
-        self.assertEqual(response.status_code, expected_status)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
         'logins': '1/minute',
     })
-    def test_user_auth_throttle(self):
-        auth_url = reverse('user_management_api:auth')
-        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
+    def test_user_auth_throttle_POST_requests(self):
+        """Ensure POST requests are throttled correctly."""
+        data = {
+            'username': 'jimmy@example.com',
+            'password': 'password;lol',
+        }
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
 
-        request = APIRequestFactory().get(auth_url)
+        response = view(request)  # no token attached
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        response = self.view_class.as_view()(request)
-        self.assertNotEqual(response.status_code, expected_status)
-
-        response = self.view_class.as_view()(request)
-        self.assertEqual(response.status_code, expected_status)
+        response = view(request)  # request should be throttled now
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
 
 class TestRegisterView(APIRequestTestCase):
