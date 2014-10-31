@@ -80,7 +80,7 @@ class GetTokenTest(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_user_auth_throttle_GET_requests(self):
+    def test_user_auth_method_not_allowed(self):
         """Ensure GET requests are not allowed."""
         auth_url = reverse('user_management_api:auth')
         request = APIRequestFactory().get(auth_url)
@@ -89,7 +89,7 @@ class GetTokenTest(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @patch(THROTTLE_RATE_PATH, new={'logins': '1/minute'})
-    def test_user_auth_throttle_POST_requests(self):
+    def test_user_auth_throttle(self):
         """Ensure POST requests are throttled correctly."""
         data = {
             'username': 'jimmy@example.com',
