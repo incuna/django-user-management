@@ -21,6 +21,7 @@ from user_management.models.tests.utils import APIRequestTestCase
 
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
+THROTTLE_RATE_PATH = 'rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES'
 
 
 class GetTokenTest(APIRequestTestCase):
@@ -87,9 +88,7 @@ class GetTokenTest(APIRequestTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'logins': '1/minute',
-    })
+    @patch(THROTTLE_RATE_PATH, new={'logins': '1/minute'})
     def test_user_auth_throttle_POST_requests(self):
         """Ensure POST requests are throttled correctly."""
         data = {
@@ -231,9 +230,7 @@ class TestPasswordResetEmail(APIRequestTestCase):
 
         send_email.assert_called_once_with(user)
 
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'passwords': '1/minute',
-    })
+    @patch(THROTTLE_RATE_PATH, new={'passwords': '1/minute'})
     def test_post_rate_limit(self):
         """Ensure the POST requests are rate limited."""
         email = 'exists@example.com'
