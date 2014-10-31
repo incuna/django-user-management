@@ -1,3 +1,9 @@
+## Coming soon
+
+* PasswordResetEmail now only throttled on post.
+* Added delete method to ProfileAvatar.
+* ProfileAvatar now requires authentication.
+
 ## v2.1.1
 
 * Add missing plaintext account validation email
