@@ -1,4 +1,6 @@
-## Coming soon
+## v3.0.0
+
+**Backwards incompatible** due to required authentication when using `ProfileAvatar`
 
 * `PasswordResetEmail` now only throttled on `POST`.
 * Added `DELETE` method to `ProfileAvatar`.
