@@ -1,8 +1,8 @@
 ## Coming soon
 
-* PasswordResetEmail now only throttled on post.
-* Added delete method to ProfileAvatar.
-* ProfileAvatar now requires authentication.
+* `PasswordResetEmail` now only throttled on `POST`.
+* Added `DELETE` method to `ProfileAvatar`.
+* `ProfileAvatar` now requires authentication.
 
 ## v2.1.1
 
