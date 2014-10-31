@@ -21,6 +21,7 @@ from user_management.models.tests.utils import APIRequestTestCase
 
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
+THROTTLE_RATE_PATH = 'rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES'
 
 
 class GetTokenTest(APIRequestTestCase):
@@ -79,38 +80,31 @@ class GetTokenTest(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_default_user_auth_throttle(self):
-        default_rate = 10
+    def test_user_auth_method_not_allowed(self):
+        """Ensure GET requests are not allowed."""
         auth_url = reverse('user_management_api:auth')
-        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
-
         request = APIRequestFactory().get(auth_url)
+        response = self.view_class.as_view()(request)
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @patch(THROTTLE_RATE_PATH, new={'logins': '1/minute'})
+    def test_user_auth_throttle(self):
+        """Ensure POST requests are throttled correctly."""
+        data = {
+            'username': 'jimmy@example.com',
+            'password': 'password;lol',
+        }
+        request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()
 
-        # make all but one of our allowed requests
-        for i in range(default_rate - 1):
-            view(request)
+        # no token attached hence HTTP 400
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        response = view(request)  # our last allowed request
-        self.assertNotEqual(response.status_code, expected_status)
-
-        response = view(request)  # our throttled request
-        self.assertEqual(response.status_code, expected_status)
-
-    @patch('rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES', new={
-        'logins': '1/minute',
-    })
-    def test_user_auth_throttle(self):
-        auth_url = reverse('user_management_api:auth')
-        expected_status = status.HTTP_429_TOO_MANY_REQUESTS
-
-        request = APIRequestFactory().get(auth_url)
-
-        response = self.view_class.as_view()(request)
-        self.assertNotEqual(response.status_code, expected_status)
-
-        response = self.view_class.as_view()(request)
-        self.assertEqual(response.status_code, expected_status)
+        # request should be throttled now
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
 
 class TestRegisterView(APIRequestTestCase):
@@ -236,37 +230,22 @@ class TestPasswordResetEmail(APIRequestTestCase):
 
         send_email.assert_called_once_with(user)
 
-    def assert_post_returns_status(self, view, data, expected_status):
-        request = self.create_request('post', data=data, auth=False)
-        response = view(request)
-        self.assertEqual(response.status_code, expected_status)
-
+    @patch(THROTTLE_RATE_PATH, new={'passwords': '1/minute'})
     def test_post_rate_limit(self):
-        """
-        Ensure the post requests are rate limited.
-
-        The PasswordResetRateThrottle sets a limit of 3/hour requests.
-        """
+        """Ensure the POST requests are rate limited."""
         email = 'exists@example.com'
         UserFactory.create(email=email)
-        view = self.view_class.as_view()
-        rate_limit = 3
 
-        # Test the the first 3 requests aren't limited.
         data = {'email': email}
-        for i in range(rate_limit):
-            self.assert_post_returns_status(
-                view,
-                data,
-                status.HTTP_204_NO_CONTENT,
-            )
+        request = self.create_request('post', data=data, auth=False)
+        view = self.view_class.as_view()
 
-        # Test that the 4th request is throttled.
-        self.assert_post_returns_status(
-            view,
-            data,
-            status.HTTP_429_TOO_MANY_REQUESTS,
-        )
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # request is throttled
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
     def test_authenticated(self):
         request = self.create_request('post', auth=True)

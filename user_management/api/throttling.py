@@ -9,17 +9,26 @@ class DefaultRateMixin(object):
             return self.default_rate
 
 
-class LoginRateThrottle(DefaultRateMixin, ScopedRateThrottle):
+class PostRequestThrottleMixin(object):
+    def allow_request(self, request, view):
+        """
+        Throttle POST requests only.
+        """
+        if request.method != 'POST':
+            return True
+
+        return super(PostRequestThrottleMixin, self).allow_request(request, view)
+
+
+class LoginRateThrottle(
+        DefaultRateMixin,
+        PostRequestThrottleMixin,
+        ScopedRateThrottle):
     default_rate = '10/hour'
 
 
-class PasswordResetRateThrottle(DefaultRateMixin, ScopedRateThrottle):
+class PasswordResetRateThrottle(
+        DefaultRateMixin,
+        PostRequestThrottleMixin,
+        ScopedRateThrottle):
     default_rate = '3/hour'
-
-    def allow_request(self, request, view):
-        if request.META['REQUEST_METHOD'] != 'POST':
-            return True
-        return super(PasswordResetRateThrottle, self).allow_request(
-            request,
-            view,
-        )
