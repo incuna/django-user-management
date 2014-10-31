@@ -99,10 +99,12 @@ class GetTokenTest(APIRequestTestCase):
         request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()
 
-        response = view(request)  # no token attached
+        # no token attached hence HTTP 400
+        response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        response = view(request)  # request should be throttled now
+        # request should be throttled now
+        response = view(request)
         self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
 
