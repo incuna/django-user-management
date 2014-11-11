@@ -143,10 +143,12 @@ The default throttle rates are:
     'logins': '10/hour'
     'passwords': '3/hour'
 
-You can customise the throttling rates by setting `DEFAULT_THROTTLE_RATES`
+You can customise the throttling rates by setting `REST_FRAMEWORK.DEFAULT_THROTTLE_RATES`
 in your `settings.py`:
 
-    DEFAULT_THROTTLE_RATES = {
-        'logins': '100/day',
-        'passwords': 100/day',
+    REST_FRAMEWORK = {
+        'DEFAULT_THROTTLE_RATES': {
+            'logins': '100/day',
+            'passwords': 100/day',
+        },
     }
