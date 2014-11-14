@@ -1,6 +1,7 @@
 import factory
 
 from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -15,3 +16,10 @@ class UserFactory(factory.DjangoModelFactory):
         self.set_password(self.raw_password)
         if create:
             self.save()
+
+
+class TokenFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = Token
+
+    key = factory.Sequence('key{}'.format)
+    user = factory.SubFactory(UserFactory)

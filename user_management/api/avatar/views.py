@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, parsers, response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 from . import serializers
-from user_management.api import permissions
+from user_management.api import authentication, permissions
 
 
 User = get_user_model()
@@ -34,9 +35,20 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.AvatarSerializer
     parser_classes = (parsers.MultiPartParser,)
+    authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES + [
+        authentication.FormTokenAuthentication,
+    ]
 
     def get_object(self):
         return self.request.user
+
+    def post(self, *args, **kwargs):
+        """
+        Browsers like to do POST with multipart forms.
+
+        As this is a fallback, we need to allow for that.
+        """
+        return self.update(*args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         """

@@ -1,13 +1,15 @@
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
+from django.core.urlresolvers import reverse
+from django.test.client import Client
 from mock import patch
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from user_management.api.avatar import views
-from user_management.models.tests.factories import UserFactory
+from user_management.models.tests.factories import TokenFactory, UserFactory
 from user_management.models.tests.utils import APIRequestTestCase
 
 
@@ -156,6 +158,30 @@ class TestProfileAvatar(APIRequestTestCase):
 
         user = User.objects.get(pk=user.pk)
         self.assertFalse(user.avatar)
+
+    def test_send_without_token_header(self):
+        """Test support for legacy browsers that cannot support AJAX uploads.
+
+        This shows three things:
+         - users can authenticate by submitting the token in the form data.
+         - users can use a POST fallback.
+         - csrf is not required (the token is equivalent).
+        """
+        client = Client(enforce_csrf_checks=True)
+        token = TokenFactory()
+        user = UserFactory.create(avatar=SIMPLE_PNG, password='poop')
+        self.assertTrue(client.login(username=user.email, password=user.raw_password))
+
+        data = {
+            'avatar': SIMPLE_PNG,
+            'token': token.key,
+        }
+        url = reverse('user_management_api:profile_avatar')
+        response = client.post(url, data=data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertIn('avatar', response.data)
 
 
 class TestUserAvatar(APIRequestTestCase):
