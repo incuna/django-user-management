@@ -168,14 +168,10 @@ class TestProfileAvatar(APIRequestTestCase):
          - csrf is not required (the token is equivalent).
         """
         client = Client(enforce_csrf_checks=True)
-        token = TokenFactory()
-        user = UserFactory.create(avatar=SIMPLE_PNG, password='poop')
-        self.assertTrue(client.login(username=user.email, password=user.raw_password))
+        user = UserFactory.create(avatar=SIMPLE_PNG)
+        token = TokenFactory(user=user)
 
-        data = {
-            'avatar': SIMPLE_PNG,
-            'token': token.key,
-        }
+        data = {'avatar': SIMPLE_PNG, 'token': token.key}
         url = reverse('user_management_api:profile_avatar')
         response = client.post(url, data=data)
 
