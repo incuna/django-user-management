@@ -48,7 +48,7 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
 
         As this is a fallback, we need to allow for that.
         """
-        return self.update(*args, **kwargs)
+        return self.put(*args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         """
