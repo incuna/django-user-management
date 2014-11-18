@@ -1,22 +1,24 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, parsers, response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 from . import serializers
-from user_management.api import permissions
+from user_management.api import authentication, permissions
 
 
 User = get_user_model()
 
 
-class ProfileAvatar(generics.RetrieveUpdateAPIView):
+class AvatarAPIViewBase(generics.RetrieveUpdateAPIView):
     """
-    Retrieve, update & delete the authenticated user's avatar. Pass get
-    parameters to retrieve a thumbnail of the avatar.
+    Base class for avatar views. Probably shouldn't be used directly.
 
-    We don't inherit from `generics.RetrieveUpdateDestroyAPIView because we
-    need a custom `delete` method with no common functionality.
+    Instead, subclass, and at least define the `permission_classes`.
+
+    Can retrieve, update & delete the authenticated user's avatar. Pass GET
+    parameters to retrieve a thumbnail of the avatar.
 
     Thumbnail options are specified as get parameters. Options are:
         width: Specify the width (in pixels) to resize / crop to.
@@ -25,15 +27,35 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
         anchor: Where to anchor the crop [t,r,b,l]
         upscale: Whether to upscale or not [1,0]
 
-    If no options are specified the users avatar is returned.
-
     To crop avatar to 100x100 anchored to the top right:
         avatar?width=100&height=100&crop=1&anchor=tr
+
+    If no options are specified the users avatar is returned.
     """
+    authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES + [
+        authentication.FormTokenAuthentication,
+    ]
     model = User
-    permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.AvatarSerializer
     parser_classes = (parsers.MultiPartParser,)
+    serializer_class = serializers.AvatarSerializer
+
+    def post(self, *args, **kwargs):
+        """
+        Browsers like to do POST with multipart forms.
+
+        As this is a fallback, we need to allow for that.
+        """
+        return self.put(*args, **kwargs)
+
+
+class ProfileAvatar(AvatarAPIViewBase):
+    """
+    Retrieve and update the authenticated user's avatar.
+
+    We don't inherit from `rest_framework.mixins.DestroyModelMixin` because we
+    need a custom DELETE with no common functionality.
+    """
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self):
         return self.request.user
@@ -51,24 +73,11 @@ class ProfileAvatar(generics.RetrieveUpdateAPIView):
         return response.Response(status=HTTP_204_NO_CONTENT)
 
 
-class UserAvatar(generics.RetrieveUpdateAPIView):
+class UserAvatar(AvatarAPIViewBase):
     """
-    Retrieve and update the user's avatar. Pass get parameters to
-    retrieve a thumbnail of the avatar.
+    Retrieve and update the user's avatar based upon `pk` in the url.
 
-    Thumbnail options are specified as get parameters. Options are:
-        width: Specify the width (in pixels) to resize / crop to.
-        height: Specify the height (in pixels) to resize / crop to.
-        crop: Whether to crop or not [1,0]
-        anchor: Where to anchor the crop [t,r,b,l]
-        upscale: Whether to upscale or not [1,0]
-
-    If no options are specified the users avatar is returned.
-
-    To crop avatar to 100x100 anchored to the top right:
-        avatar?width=100&height=100&crop=1&anchor=tr
+    Allow all users access to "safe" HTTP methods, but limit access to "unsafe"
+    methods to users with the `is_staff` flag set.
     """
-    model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
-    parser_classes = (parsers.MultiPartParser,)
-    serializer_class = serializers.AvatarSerializer

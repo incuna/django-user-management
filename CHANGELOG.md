@@ -1,3 +1,9 @@
+## Upcoming
+
+* Allow POST to avatar views.
+* Allow authentication with `token` as a form field on avatar views.
+* Replace `django-inmemorystorage==0.1.1` with `dj-inmemorystorage==1.2.0` in tests.
+
 ## v3.0.1
 
 * `GetToken` also throttles `POST` requests only.

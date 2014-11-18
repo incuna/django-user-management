@@ -1,13 +1,15 @@
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
+from django.core.urlresolvers import reverse
+from django.test.client import Client
 from mock import patch
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from user_management.api.avatar import views
-from user_management.models.tests.factories import UserFactory
+from user_management.models.tests.factories import TokenFactory, UserFactory
 from user_management.models.tests.utils import APIRequestTestCase
 
 
@@ -157,6 +159,26 @@ class TestProfileAvatar(APIRequestTestCase):
         user = User.objects.get(pk=user.pk)
         self.assertFalse(user.avatar)
 
+    def test_send_without_token_header(self):
+        """Test support for legacy browsers that cannot support AJAX uploads.
+
+        This shows three things:
+         - users can authenticate by submitting the token in the form data.
+         - users can use a POST fallback.
+         - csrf is not required (the token is equivalent).
+        """
+        client = Client(enforce_csrf_checks=True)
+        user = UserFactory.create()
+        token = TokenFactory(user=user)
+
+        data = {'avatar': SIMPLE_PNG, 'token': token.key}
+        url = reverse('user_management_api:profile_avatar')
+        response = client.post(url, data=data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertIn('avatar', response.data)
+
 
 class TestUserAvatar(APIRequestTestCase):
     view_class = views.UserAvatar
@@ -207,17 +229,6 @@ class TestUserAvatar(APIRequestTestCase):
         """ Tests DELETE user for staff not allowed"""
         self.user.is_staff = True
         request = self.create_request('delete', user=self.user)
-        view = self.view_class.as_view()
-        response = view(request)
-        self.assertEqual(
-            response.status_code,
-            status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
-
-    def test_post_not_allowed(self):
-        """ Tests POST user for staff not allowed"""
-        self.user.is_staff = True
-        request = self.create_request('post', user=self.user)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
@@ -310,3 +321,24 @@ class TestUserAvatar(APIRequestTestCase):
         SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=other_user.pk)
         self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
+
+    def test_send_without_token_header(self):
+        """Test support for legacy browsers that cannot support AJAX uploads.
+
+        This shows three things:
+         - users can authenticate by submitting the token in the form data.
+         - users can use a POST fallback.
+         - csrf is not required (the token is equivalent).
+        """
+        client = Client(enforce_csrf_checks=True)
+        user = UserFactory.create(is_staff=True)
+        token = TokenFactory(user=user)
+
+        data = {'avatar': SIMPLE_PNG, 'token': token.key}
+        url_kwargs = {'pk': user.pk}
+        url = reverse('user_management_api:user_avatar', kwargs=url_kwargs)
+        response = client.post(url, data=data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertIn('avatar', response.data)
