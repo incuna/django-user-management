@@ -11,3 +11,4 @@ release:
 test:
 	@coverage run ./user_management/tests/run.py
 	@coverage report --show-missing
+	@flake8
