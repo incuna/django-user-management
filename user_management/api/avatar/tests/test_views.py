@@ -168,7 +168,7 @@ class TestProfileAvatar(APIRequestTestCase):
          - csrf is not required (the token is equivalent).
         """
         client = Client(enforce_csrf_checks=True)
-        user = UserFactory.create(avatar=SIMPLE_PNG)
+        user = UserFactory.create()
         token = TokenFactory(user=user)
 
         data = {'avatar': SIMPLE_PNG, 'token': token.key}
@@ -331,7 +331,7 @@ class TestUserAvatar(APIRequestTestCase):
          - csrf is not required (the token is equivalent).
         """
         client = Client(enforce_csrf_checks=True)
-        user = UserFactory.create(avatar=SIMPLE_PNG, is_staff=True)
+        user = UserFactory.create(is_staff=True)
         token = TokenFactory(user=user)
 
         data = {'avatar': SIMPLE_PNG, 'token': token.key}
