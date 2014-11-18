@@ -80,7 +80,18 @@ class UserAvatar(generics.RetrieveUpdateAPIView):
     To crop avatar to 100x100 anchored to the top right:
         avatar?width=100&height=100&crop=1&anchor=tr
     """
+    authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES + [
+        authentication.FormTokenAuthentication,
+    ]
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     parser_classes = (parsers.MultiPartParser,)
     serializer_class = serializers.AvatarSerializer
+
+    def post(self, *args, **kwargs):
+        """
+        Browsers like to do POST with multipart forms.
+
+        As this is a fallback, we need to allow for that.
+        """
+        return self.put(*args, **kwargs)
