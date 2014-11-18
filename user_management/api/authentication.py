@@ -11,12 +11,12 @@ class FormTokenAuthentication(authentication.BaseAuthentication):
         expects us to return None if authentication fails.
         """
         try:
-            token = request.DATA['token']
+            key = request.DATA['token']
         except KeyError:
             return
 
         try:
-            token = Token.objects.get(key=token)
+            token = Token.objects.get(key=key)
         except Token.DoesNotExist:
             return
 
