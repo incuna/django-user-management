@@ -1,4 +1,4 @@
-## Upcoming
+## v3.1.0
 
 * Allow POST to avatar views.
 * Allow authentication with `token` as a form field on avatar views.
