@@ -1,11 +1,14 @@
 language: python
 env:
-  - TOX_ENV=py27-django16
-  - TOX_ENV=py27-django17
-  - TOX_ENV=py33-django16
-  - TOX_ENV=py33-django17
-  - TOX_ENV=py34-django16
-  - TOX_ENV=py34-django17
+  global:
+    - DATABASE_URL='postgres://postgres@localhost/user_management'
+  matrix:
+    - TOX_ENV=py27-django16
+    - TOX_ENV=py27-django17
+    - TOX_ENV=py33-django16
+    - TOX_ENV=py33-django17
+    - TOX_ENV=py34-django16
+    - TOX_ENV=py34-django17
 install:
   - psql -c 'CREATE DATABASE user_management' -U postgres;
   - pip install tox coveralls
