@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse
 from mock import patch
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
@@ -12,9 +12,11 @@ THROTTLE_RATE_PATH = 'rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATE
 
 
 class GetTokenTest(APIRequestTestCase):
-    auth_url = reverse_lazy('user_management_api:auth')
     throttle_expected_status = status.HTTP_429_TOO_MANY_REQUESTS
     view_class = views.GetToken
+
+    def setUp(self):
+        self.auth_url = reverse('user_management_api:auth')
 
     def tearDown(self):
         cache.clear()
