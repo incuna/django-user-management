@@ -1,3 +1,8 @@
+## Upcoming (v3.2.0)
+
+* Add `UsernameLoginRateThrottle` to throttle users based on their username.
+* `GetToken` throttle extended with `UsernameLoginRateThrottle`.
+
 ## v3.1.0
 
 * Allow POST to avatar views.
@@ -6,7 +11,7 @@
 
 ## v3.0.1
 
-* `GetToken` also throttles `POST` requests only.
+* `GetToken` throttles `POST` requests only.
 
 ## v3.0.0
 
