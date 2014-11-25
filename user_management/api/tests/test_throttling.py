@@ -19,6 +19,7 @@ class GetTokenTest(APIRequestTestCase):
         self.auth_url = reverse('user_management_api:auth')
 
     def tearDown(self):
+        # DRF puts a successful (not throttled) request onto a cache
         cache.clear()
 
     @patch(THROTTLE_RATE_PATH, new={'logins': '1/minute'})
@@ -76,6 +77,7 @@ class TestPasswordResetEmail(APIRequestTestCase):
     view_class = views.PasswordResetEmail
 
     def tearDown(self):
+        # DRF puts a successful (not throttled) request onto a cache
         cache.clear()
 
     @patch(THROTTLE_RATE_PATH, new={'passwords': '1/minute'})
