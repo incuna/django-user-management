@@ -27,6 +27,21 @@ class LoginRateThrottle(
     default_rate = '10/hour'
 
 
+class UsernameLoginRateThrottle(LoginRateThrottle):
+    def get_cache_key(self, request, view):
+        if request.user.is_authenticated():
+            return None  # Only throttle unauthenticated requests
+
+        ident = request.POST.get('username')
+        if ident is None:
+            return None  # Only throttle username requests
+
+        return self.cache_format % {
+            'scope': self.scope,
+            'ident': ident.strip().lower(),
+        }
+
+
 class PasswordResetRateThrottle(
         DefaultRateMixin,
         PostRequestThrottleMixin,

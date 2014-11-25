@@ -19,7 +19,10 @@ User = get_user_model()
 
 class GetToken(ObtainAuthToken):
     renderer_classes = (renderers.JSONRenderer, renderers.BrowsableAPIRenderer)
-    throttle_classes = [throttling.LoginRateThrottle]
+    throttle_classes = [
+        throttling.UsernameLoginRateThrottle,
+        throttling.LoginRateThrottle,
+    ]
     throttle_scope = 'logins'
 
     def delete(self, request, *args, **kwargs):
