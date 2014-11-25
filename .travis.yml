@@ -1,19 +1,20 @@
 language: python
-python:
-  - 3.3
-  - 2.7
-script: make test
-notifications:
-  email: false
 env:
   global:
     - DATABASE_URL='postgres://postgres@localhost/user_management'
   matrix:
-    - DJANGO='django>=1.6,<1.7'
-    - DJANGO='django>=1.7,<1.8'
+    - TOX_ENV=py27-django16
+    - TOX_ENV=py27-django17
+    - TOX_ENV=py33-django16
+    - TOX_ENV=py33-django17
+    - TOX_ENV=py34-django16
+    - TOX_ENV=py34-django17
 install:
   - psql -c 'CREATE DATABASE user_management' -U postgres;
-  - pip install -r requirements.txt
-  - pip install $DJANGO coveralls
+  - pip install tox coveralls
+script:
+  - tox -e $TOX_ENV
 after_success:
   coveralls
+notifications:
+  email: false
