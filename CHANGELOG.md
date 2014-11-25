@@ -11,7 +11,7 @@
 
 ## v3.0.1
 
-* `GetToken` also throttles `POST` requests only.
+* `GetToken` throttles `POST` requests only.
 
 ## v3.0.0
 
