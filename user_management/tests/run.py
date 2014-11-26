@@ -41,6 +41,7 @@ settings.configure(
             'rest_framework.authentication.TokenAuthentication',
         ),
     },
+    SENTRY_CLIENT='user_management.utils.sentry.SensitiveDjangoClient',
 )
 
 import django

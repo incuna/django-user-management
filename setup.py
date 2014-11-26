@@ -13,6 +13,9 @@ extras_require = {
     'avatar': [
         'django-imagekit>=3.2',
     ],
+    'utils': [
+        'raven>=5.1.1',
+    ],
 }
 
 setup(
@@ -40,6 +43,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Software Development',
         'Topic :: Utilities',
     ],

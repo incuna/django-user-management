@@ -52,6 +52,10 @@ Install with avatar functionality
 
     pip install django-user-management[avatar]
 
+Install with filtering sensitive data out of Sentry
+
+    pip install django-user-management[utils]
+
 
 Create a custom user model
 
@@ -153,3 +157,13 @@ in your `settings.py`:
             'passwords': 100/day',
         },
     }
+
+
+### Filtering sensitive data
+
+Custom Sentry logging class is available to disallow sensitive data being logged
+by Sentry client.
+
+Activate it in the `settings.py` by adding:
+
+    SENTRY_CLIENT = 'user_management.utils.sentry.SensitiveDjangoClient'
