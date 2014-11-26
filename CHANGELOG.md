@@ -1,4 +1,4 @@
-## Upcoming (v3.3.0)
+## v3.3.0
 
 * Add custom Sentry logging class to disallow sensitive data being logged by Sentry client.
 
