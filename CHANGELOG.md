@@ -1,4 +1,4 @@
-## Upcoming (v3.2.0)
+## v3.2.0
 
 * Add `UsernameLoginRateThrottle` to throttle users based on their username.
 * `GetToken` throttle extended with `UsernameLoginRateThrottle`.
