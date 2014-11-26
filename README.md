@@ -153,3 +153,13 @@ in your `settings.py`:
             'passwords': 100/day',
         },
     }
+
+
+### Filtering sensitive data
+
+Custom Sentry logging class is available to disallow sensitive data being logged
+by Sentry client.
+
+Activate it in the `settings.py` by adding:
+
+    SENTRY_CLIENT = 'user_management.utils.sentry.SensitiveDjangoClient'
