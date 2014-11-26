@@ -52,6 +52,10 @@ Install with avatar functionality
 
     pip install django-user-management[avatar]
 
+Install with filtering sensitive data out of Sentry
+
+    pip install django-user-management[utils]
+
 
 Create a custom user model
 
