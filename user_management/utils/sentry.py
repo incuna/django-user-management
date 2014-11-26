@@ -10,7 +10,7 @@ class SensitiveDjangoClient(DjangoClient):
     """
     def get_data_from_request(self, request):
         request.POST = SafeExceptionReporterFilter().get_post_parameters(request)
-        result = super().get_data_from_request(request)
+        result = super(SensitiveDjangoClient, self).get_data_from_request(request)
 
         # override the request.data with POST data
         # POST data contains no sensitive info in it
