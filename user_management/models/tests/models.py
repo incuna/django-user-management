@@ -1,6 +1,17 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.db import models
 
-from ..mixins import AvatarMixin, BasicUserFieldsMixin, VerifyEmailMixin
+
+from ..mixins import (
+    AvatarMixin,
+    BasicUserFieldsMixin,
+    DateJoinedUserMixin,
+    EmailUserMixin,
+    EmailVerifyUserMixin,
+    IsStaffUserMixin,
+    NameUserMethodsMixin,
+    VerifyEmailMixin,
+)
 
 
 class User(AvatarMixin, VerifyEmailMixin, PermissionsMixin, AbstractBaseUser):
@@ -12,4 +23,27 @@ class BasicUser(BasicUserFieldsMixin, AbstractBaseUser):
 
 
 class VerifyEmailUser(VerifyEmailMixin):
+    pass
+
+
+class CustomBasicUserFieldsMixin(
+        NameUserMethodsMixin,
+        EmailUserMixin,
+        DateJoinedUserMixin,
+        IsStaffUserMixin,
+        ):
+    name = models.TextField()
+
+    USERNAME_FIELD = 'email'
+
+    class Meta:
+        abstract = True
+
+
+class CustomNameUser(
+        AvatarMixin,
+        CustomBasicUserFieldsMixin,
+        EmailVerifyUserMixin,
+        AbstractBaseUser,
+        ):
     pass
