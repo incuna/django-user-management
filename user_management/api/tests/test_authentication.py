@@ -3,7 +3,7 @@ from django.http import QueryDict
 from django.test import TestCase
 
 from ..authentication import FormTokenAuthentication
-from user_management.models.tests.factories import TokenFactory
+from user_management.models.tests.factories import AuthTokenFactory
 
 
 class TestFormTokenAuthentication(TestCase):
@@ -20,7 +20,7 @@ class TestFormTokenAuthentication(TestCase):
         self.assertIsNone(response)
 
     def test_valid_token(self):
-        token = TokenFactory.create()
+        token = AuthTokenFactory.create()
         data = QueryDict('', mutable=True)
         data.update({'token': token.key})
         request = mock.Mock(DATA=data)

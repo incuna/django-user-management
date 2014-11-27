@@ -1,5 +1,10 @@
-from rest_framework import authentication
-from rest_framework.authtoken.models import Token
+import datetime
+
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import authentication, exceptions
+from rest_framework.authentication import TokenAuthentication as DRFTokenAuthentication
+
+from .models import AuthToken
 
 
 class FormTokenAuthentication(authentication.BaseAuthentication):
@@ -16,8 +21,26 @@ class FormTokenAuthentication(authentication.BaseAuthentication):
             return
 
         try:
-            token = Token.objects.get(key=key)
-        except Token.DoesNotExist:
+            token = AuthToken.objects.get(key=key)
+        except AuthToken.DoesNotExist:
             return
 
         return (token.user, token)
+
+
+class TokenAuthentication(DRFTokenAuthentication):
+    model = AuthToken
+
+    def authenticate_credentials(self, key):
+        """Custom authentication to check if auth token has expired."""
+        user, token = super(TokenAuthentication, self).authenticate_credentials(key)
+
+        now = datetime.datetime.now()
+        if token.expires < now:
+            msg = _('Token has expired.')
+            raise exceptions.AuthenticationFailed(msg)
+
+        # Update the token's expiration date
+        token.update_expiry()
+
+        return (user, token)

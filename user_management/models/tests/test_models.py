@@ -48,6 +48,7 @@ class TestUser(TestCase):
             'groups',  # Django permission groups
             'user_permissions',
             'logentry',  # Django admin logs
+            'authtoken',
             'auth_token',  # Rest framework authtoken
         }
 
