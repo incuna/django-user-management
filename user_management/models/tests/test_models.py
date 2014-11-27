@@ -317,5 +317,5 @@ class TestCustomNameUser(TestCase):
         model = self.model(name=expected)
 
         self.assertEqual(model.get_full_name(), expected)
-        field, *rest = self.model._meta.get_field_by_name('name')
+        field = self.model._meta.get_field_by_name('name')[0]
         self.assertIsInstance(field, TextField)
