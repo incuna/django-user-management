@@ -11,9 +11,9 @@ from user_management.models.tests.utils import APIRequestTestCase
 THROTTLE_RATE_PATH = 'rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES'
 
 
-class GetTokenTest(APIRequestTestCase):
+class GetAuthTokenTest(APIRequestTestCase):
     throttle_expected_status = status.HTTP_429_TOO_MANY_REQUESTS
-    view_class = views.GetToken
+    view_class = views.GetAuthToken
 
     def setUp(self):
         self.auth_url = reverse('user_management_api:auth')
