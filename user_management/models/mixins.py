@@ -184,11 +184,6 @@ class EmailVerifyUserMixin(EmailVerifyUserMethodsMixin, models.Model):
         default=True,
         help_text=_('Indicates if the email address needs to be verified.'))
 
-    class Meta:
-        abstract = True
-
-
-class VerifyEmailMixin(EmailVerifyUserMixin, BasicUserFieldsMixin):
     objects = VerifyEmailManager()
 
     class Meta:
@@ -196,7 +191,7 @@ class VerifyEmailMixin(EmailVerifyUserMixin, BasicUserFieldsMixin):
 
     @classmethod
     def check(cls, **kwargs):
-        errors = super(VerifyEmailMixin, cls).check(**kwargs)
+        errors = super(EmailVerifyUserMixin, cls).check(**kwargs)
         errors.extend(cls._check_manager(**kwargs))
         return errors
 
@@ -213,6 +208,11 @@ class VerifyEmailMixin(EmailVerifyUserMixin, BasicUserFieldsMixin):
                 id='user_management.W001',
             ),
         ]
+
+
+class VerifyEmailMixin(EmailVerifyUserMixin, BasicUserFieldsMixin):
+    class Meta:
+        abstract = True
 
 
 class AvatarMixin(models.Model):
