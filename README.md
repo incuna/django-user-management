@@ -195,5 +195,5 @@ You can set custom expiry time for the auth tokens.
 
 Add below constants in the `settings.py`:
 
-    AUTH_TOKEN_MAX_AGE = <7 days> (default: 200 days)
-    AUTH_TOKEN_MAX_INACTIVITY = <17 hours> (default: 12 hours)
+    AUTH_TOKEN_MAX_AGE = <milliseconds_value> (default: 200 days)
+    AUTH_TOKEN_MAX_INACTIVITY = <milliseconds_value> (default: 12 hours)
