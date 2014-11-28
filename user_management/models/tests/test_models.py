@@ -313,9 +313,15 @@ class TestCustomNameUser(TestCase):
             self.assertItemsEqual(fields, expected)
 
     def test_name(self):
-        expected = 'Cú Chulainn'
+        expected = u'Cú Chulainn'
         model = self.model(name=expected)
 
         self.assertEqual(model.get_full_name(), expected)
+        self.assertEqual(unicode(model), expected)
         field = self.model._meta.get_field_by_name('name')[0]
         self.assertIsInstance(field, TextField)
+
+    @skip_if_checks_unavailable
+    def test_manager_check_invalid(self):
+        errors = self.model.check()
+        self.assertEqual(errors, [])

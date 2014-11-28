@@ -42,8 +42,8 @@ class CustomBasicUserFieldsMixin(
 
 class CustomNameUser(
         AvatarMixin,
-        CustomBasicUserFieldsMixin,
         EmailVerifyUserMixin,
+        CustomBasicUserFieldsMixin,
         AbstractBaseUser,
         ):
     pass
