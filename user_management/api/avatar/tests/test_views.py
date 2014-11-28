@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from user_management.api.avatar import views
-from user_management.models.tests.factories import TokenFactory, UserFactory
+from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.utils import APIRequestTestCase
 
 
@@ -169,7 +169,7 @@ class TestProfileAvatar(APIRequestTestCase):
         """
         client = Client(enforce_csrf_checks=True)
         user = UserFactory.create()
-        token = TokenFactory(user=user)
+        token = AuthTokenFactory(user=user)
 
         data = {'avatar': SIMPLE_PNG, 'token': token.key}
         url = reverse('user_management_api:profile_avatar')
@@ -332,7 +332,7 @@ class TestUserAvatar(APIRequestTestCase):
         """
         client = Client(enforce_csrf_checks=True)
         user = UserFactory.create(is_staff=True)
-        token = TokenFactory(user=user)
+        token = AuthTokenFactory(user=user)
 
         data = {'avatar': SIMPLE_PNG, 'token': token.key}
         url_kwargs = {'pk': user.pk}

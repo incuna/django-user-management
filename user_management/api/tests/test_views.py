@@ -1,3 +1,4 @@
+import datetime
 import re
 
 from django.contrib.auth import get_user_model
@@ -10,11 +11,10 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.test import APIRequestFactory
 
-from user_management.api import views
-from user_management.models.tests.factories import UserFactory
+from user_management.api import models, views
+from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.models import BasicUser
 from user_management.models.tests.utils import APIRequestTestCase
 
@@ -23,8 +23,9 @@ User = get_user_model()
 TEST_SERVER = 'http://testserver'
 
 
-class GetTokenTest(APIRequestTestCase):
-    view_class = views.GetToken
+class GetAuthTokenTest(APIRequestTestCase):
+    model = models.AuthToken
+    view_class = views.GetAuthToken
 
     def tearDown(self):
         cache.clear()
@@ -32,52 +33,61 @@ class GetTokenTest(APIRequestTestCase):
     def test_post(self):
         username = 'Test@example.com'
         password = 'myepicstrongpassword'
-        UserFactory.create(
-            email=username.lower(),
-            password=password,
-            is_active=True,
-        )
+        UserFactory.create(email=username.lower(), password=password)
 
         data = {'username': username, 'password': password}
         request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
-            response.status_code,
-            status.HTTP_200_OK,
-            msg=response.data,
-        )
+            response.status_code, status.HTTP_200_OK, msg=response.data)
 
-    def test_post_username(self):
-        username = 'Test@example.com'
-        password = 'myepicstrongpassword'
-        UserFactory.create(email=username, password=password, is_active=True)
-
-        data = {'username': username.lower(), 'password': password}
-        request = self.create_request('post', auth=False, data=data)
-        view = self.view_class.as_view()
-        response = view(request)
-        self.assertEqual(
-            response.status_code,
-            status.HTTP_200_OK,
-            msg=response.data,
-        )
+        # Ensure user has a token now
+        token = self.model.objects.get(user__email=username.lower())
+        self.assertEqual(response.data['token'], token.key)
 
     def test_delete(self):
+        someday = datetime.datetime.now() + datetime.timedelta(days=1)
         user = UserFactory.create()
-        token = Token.objects.create(user=user)
+        token = AuthTokenFactory.create(user=user, expires=someday)
 
-        request = self.create_request('delete', user=user)
+        # Custom auth header containing token
+        auth = 'Token ' + token.key
+        request = self.create_request(
+            'delete',
+            user=user,
+            HTTP_AUTHORIZATION=auth,
+        )
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        with self.assertRaises(Token.DoesNotExist):
-            Token.objects.get(pk=token.pk)
+        with self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(pk=token.pk)
 
     def test_delete_no_token(self):
         request = self.create_request('delete')
         response = self.view_class.as_view()(request)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_invalid_token(self):
+        # token is incomplete
+        auth = 'Token'
+        request = self.create_request(
+            'delete',
+            HTTP_AUTHORIZATION=auth,
+        )
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_spacious_token(self):
+        # token has too many whitespaces
+        auth = 'Token yolo jimmy'
+        request = self.create_request(
+            'delete',
+            HTTP_AUTHORIZATION=auth,
+        )
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_user_auth_method_not_allowed(self):
         """Ensure GET requests are not allowed."""

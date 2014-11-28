@@ -167,3 +167,33 @@ by Sentry client.
 Activate it in the `settings.py` by adding:
 
     SENTRY_CLIENT = 'user_management.utils.sentry.SensitiveDjangoClient'
+
+
+### Expiry of Auth tokens
+
+By default DRF does not offer expiration for authorization tokens nor any form
+of validation for the expired tokens.
+
+`django-user-management` comes in help here and this functionality can be
+easily activated.
+
+Override the authentication class for DRF in `settings.py`:
+
+    REST_FRAMEWORK = {
+        ...
+        'DEFAULT_AUTHENTICATION_CLASSES': 'user_management.api.authentication.TokenAuthentication',
+        ...
+    }
+
+Remember to run the management command (eg via cronjob) to clear expired tokens:
+
+    python manage.py remove_expired_tokens
+
+##### Tokens expiry times
+
+You can set custom expiry time for the auth tokens.
+
+Add below constants in the `settings.py`:
+
+    AUTH_TOKEN_MAX_AGE = <milliseconds_value> (default: 200 days)
+    AUTH_TOKEN_MAX_INACTIVITY = <milliseconds_value> (default: 12 hours)

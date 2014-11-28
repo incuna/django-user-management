@@ -8,7 +8,7 @@ class TestURLs(URLTestCase):
 
     def test_auth_token_url(self):
         self.assert_url_matches_view(
-            view=views.GetToken,
+            view=views.GetAuthToken,
             expected_url='/auth',
             url_name='user_management_api:auth')
 

@@ -7,28 +7,56 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
 from incuna_mail import send
 from rest_framework import generics, renderers, response, status, views
-from rest_framework.authtoken.models import Token
+from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from . import permissions, serializers, throttling
+from . import models, permissions, serializers, throttling
 
 
 User = get_user_model()
 
 
-class GetToken(ObtainAuthToken):
+class GetAuthToken(ObtainAuthToken):
+    model = models.AuthToken
     renderer_classes = (renderers.JSONRenderer, renderers.BrowsableAPIRenderer)
+    serializer_class = serializers.AuthTokenSerializer
     throttle_classes = [
         throttling.UsernameLoginRateThrottle,
         throttling.LoginRateThrottle,
     ]
     throttle_scope = 'logins'
 
+    def post(self, request):
+        """Create auth token. Differs from DRF that it always creates new token
+        but not re-using them."""
+        serializer = self.serializer_class(data=request.DATA)
+        if serializer.is_valid():
+            token = self.model.objects.create(user=serializer.object['user'])
+            token.update_expiry()
+            return response.Response({'token': token.key})
+
+        return response.Response(
+            serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, *args, **kwargs):
+        """Delete auth token when `delete` request was issued."""
+        # Logic repeated from DRF because one cannot easily reuse it
+        auth = get_authorization_header(request).split()
+
+        if not auth or auth[0].lower() != b'token':
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if len(auth) == 1:
+            msg = 'Invalid token header. No credentials provided.'
+            return response.Response(msg, status=status.HTTP_400_BAD_REQUEST)
+        elif len(auth) > 2:
+            msg = 'Invalid token header. Token string should not contain spaces.'
+            return response.Response(msg, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            token = Token.objects.get(user=request.user)
-        except Token.DoesNotExist:
+            token = self.model.objects.get(key=auth[1])
+        except self.model.DoesNotExist:
             pass
         else:
             token.delete()

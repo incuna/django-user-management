@@ -7,7 +7,7 @@ urlpatterns = patterns(
     '',
     url(
         regex=r'^auth/?$',
-        view=views.GetToken.as_view(),
+        view=views.GetAuthToken.as_view(),
         name='auth',
     ),
 )
