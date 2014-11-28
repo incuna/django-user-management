@@ -33,17 +33,9 @@ class AuthTokenSerializer(DRFAuthTokenSerializer):
         username = attrs.get('username')
         password = attrs.get('password')
 
-        if not (username and password):
-            msg = _('Must include "username" and "password"')
-            raise serializers.ValidationError(msg)
-
         user = authenticate(username=username, password=password)
         if not user:
             msg = _('Unable to log in with provided credentials.')
-            raise serializers.ValidationError(msg)
-
-        if not user.is_active:
-            msg = _('User account has not been verified, please check your email.')
             raise serializers.ValidationError(msg)
 
         attrs['user'] = user

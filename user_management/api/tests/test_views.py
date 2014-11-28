@@ -33,8 +33,7 @@ class GetAuthTokenTest(APIRequestTestCase):
     def test_post(self):
         username = 'Test@example.com'
         password = 'myepicstrongpassword'
-        UserFactory.create(
-            email=username.lower(), password=password, is_active=True)
+        UserFactory.create(email=username.lower(), password=password)
 
         data = {'username': username, 'password': password}
         request = self.create_request('post', auth=False, data=data)
@@ -67,6 +66,26 @@ class GetAuthTokenTest(APIRequestTestCase):
 
     def test_delete_no_token(self):
         request = self.create_request('delete')
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_invalid_token(self):
+        # token is incomplete
+        auth = 'Token'
+        request = self.create_request(
+            'delete',
+            HTTP_AUTHORIZATION=auth,
+        )
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_spacious_token(self):
+        # token has too many whitespaces
+        auth = 'Token yolo jimmy'
+        request = self.create_request(
+            'delete',
+            HTTP_AUTHORIZATION=auth,
+        )
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
