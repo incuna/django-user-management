@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 
 import django
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.core import checks
+from django.db.models import TextField
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
@@ -280,3 +283,40 @@ class TestVerifyEmailMixin(TestCase):
         ]
         errors = InvalidUser.check()
         self.assertEqual(errors, expected)
+
+
+class TestCustomNameUser(utils.APIRequestTestCase):
+    model = models.CustomNameUser
+
+    def test_fields(self):
+        """Do we have the fields we expect?"""
+        fields = self.model._meta.get_all_field_names()
+        expected = {
+            # On model
+            'id',
+            'name',
+            'date_joined',
+            'email',
+            'email_verification_required',
+            'is_active',
+            'is_staff',
+            'last_login',
+            'password',
+            'avatar',
+        }
+
+        self.assertCountEqual(fields, expected)
+
+    def test_name(self):
+        expected = u'Cú Chulainn'
+        model = self.model(name=expected)
+
+        self.assertEqual(model.get_full_name(), expected)
+        self.assertEqual(six.text_type(model), expected)
+        field = self.model._meta.get_field_by_name('name')[0]
+        self.assertIsInstance(field, TextField)
+
+    @skip_if_checks_unavailable
+    def test_manager_check_invalid(self):
+        errors = self.model.check()
+        self.assertEqual(errors, [])

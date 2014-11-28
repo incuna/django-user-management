@@ -1,3 +1,7 @@
+## Upcoming
+
+* Split `BasicUserFieldsMixin` and `VerifyEmailMixin` into mixins.
+
 ## v3.4.0
 
 * Auth tokens offer expiration functionality.
