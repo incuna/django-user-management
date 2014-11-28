@@ -285,7 +285,7 @@ class TestVerifyEmailMixin(TestCase):
         self.assertEqual(errors, expected)
 
 
-class TestCustomNameUser(TestCase):
+class TestCustomNameUser(utils.APIRequestTestCase):
     model = models.CustomNameUser
 
     def test_fields(self):
@@ -305,12 +305,7 @@ class TestCustomNameUser(TestCase):
             'avatar',
         }
 
-        try:
-            # python 3 only:
-            self.assertCountEqual(fields, expected)
-        except AttributeError:
-            # python 2 only:
-            self.assertItemsEqual(fields, expected)
+        self.assertCountEqual(fields, expected)
 
     def test_name(self):
         expected = u'Cú Chulainn'
