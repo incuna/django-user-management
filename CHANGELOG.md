@@ -1,3 +1,7 @@
+## v3.4.0
+
+* Auth tokens offer expiration functionality.
+
 ## v3.3.0
 
 * Add custom Sentry logging class to disallow sensitive data being logged by Sentry client.
