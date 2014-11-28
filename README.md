@@ -188,3 +188,12 @@ Override the authentication class for DRF in `settings.py`:
 Remember to run the management command (eg via cronjob) to clear expired tokens:
 
     python manage.py remove_expired_tokens
+
+##### Tokens expiry times
+
+You can set custom expiry time for the auth tokens.
+
+Add below constants in the `settings.py`:
+
+    AUTH_TOKEN_MAX_AGE = <7 days> (default: 200 days)
+    AUTH_TOKEN_MAX_INACTIVITY = <17 hours> (default: 12 hours)
