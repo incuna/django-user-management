@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from user_management.api.avatar import views
-from user_management.models.tests.factories import UserFactory, AuthTokenFactory
+from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.utils import APIRequestTestCase
 
 
