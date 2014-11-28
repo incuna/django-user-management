@@ -26,12 +26,8 @@ class VerifyEmailUser(VerifyEmailMixin):
     pass
 
 
-class CustomBasicUserFieldsMixin(
-        NameUserMethodsMixin,
-        EmailUserMixin,
-        DateJoinedUserMixin,
-        IsStaffUserMixin,
-        ):
+class CustomBasicUserFieldsMixin(NameUserMethodsMixin, EmailUserMixin,
+        DateJoinedUserMixin, IsStaffUserMixin):
     name = models.TextField()
 
     USERNAME_FIELD = 'email'
@@ -40,10 +36,6 @@ class CustomBasicUserFieldsMixin(
         abstract = True
 
 
-class CustomNameUser(
-        AvatarMixin,
-        EmailVerifyUserMixin,
-        CustomBasicUserFieldsMixin,
-        AbstractBaseUser,
-        ):
+class CustomNameUser(AvatarMixin, EmailVerifyUserMixin, CustomBasicUserFieldsMixin,
+        AbstractBaseUser):
     pass
