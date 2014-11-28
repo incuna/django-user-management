@@ -1,15 +1,15 @@
 import datetime
 
 import mock
-from django.test import TestCase
 from django.test.utils import override_settings
 
 from ..management.commands import remove_expired_tokens
 from user_management.api.models import AuthToken
+from user_management.models.tests import utils
 from user_management.models.tests.factories import AuthTokenFactory
 
 
-class TestRemoveExpiredTokensManagementCommand(TestCase):
+class TestRemoveExpiredTokensManagementCommand(utils.APIRequestTestCase):
     def setUp(self):
         self.command = remove_expired_tokens.Command()
         self.command.stdout = mock.MagicMock()
@@ -20,13 +20,9 @@ class TestRemoveExpiredTokensManagementCommand(TestCase):
         token = AuthTokenFactory.create(expires=tomorrow)
 
         self.command.handle()
+
         expected = AuthToken.objects.all()
-        try:
-            # python 3 only:
-            self.assertCountEqual(expected, [token])
-        except AttributeError:
-            # python 2 only:
-            self.assertItemsEqual(expected, [token])
+        self.assertCountEqual(expected, [token])
 
     @override_settings(AUTH_TOKEN_MAX_EXPIRY=7)
     def test_expired_tokens(self):
@@ -42,9 +38,4 @@ class TestRemoveExpiredTokensManagementCommand(TestCase):
         self.command.handle()
         expected = AuthToken.objects.all()
 
-        try:
-            # python 3 only:
-            self.assertCountEqual(expected, [valid_token])
-        except AttributeError:
-            # python 2 only:
-            self.assertItemsEqual(expected, [valid_token])
+        self.assertCountEqual(expected, [valid_token])

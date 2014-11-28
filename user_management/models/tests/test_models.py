@@ -15,6 +15,7 @@ from mock import patch
 from .. import mixins
 from . import models
 from .factories import UserFactory
+from user_management.models.tests import utils
 
 
 skip_if_checks_unavailable = unittest.skipIf(
@@ -23,7 +24,7 @@ skip_if_checks_unavailable = unittest.skipIf(
 )
 
 
-class TestUser(TestCase):
+class TestUser(utils.APIRequestTestCase):
     """Test the "User" model"""
     model = models.User
 
@@ -52,12 +53,7 @@ class TestUser(TestCase):
             'auth_token',  # Rest framework authtoken
         }
 
-        try:
-            # python 3 only:
-            self.assertCountEqual(fields, expected)
-        except AttributeError:
-            # python 2 only:
-            self.assertItemsEqual(fields, expected)
+        self.assertCountEqual(fields, expected)
 
     def test_str(self):
         """Does "User.__str__()" work as expected?"""
