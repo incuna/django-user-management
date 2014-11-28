@@ -52,8 +52,9 @@ class EmailUserMixin(models.Model):
         unique=True,
         max_length=511,
     )
-
     email_verification_required = False
+
+    objects = UserManager()
 
     USERNAME_FIELD = 'email'
 
@@ -68,11 +69,15 @@ class IsStaffUserMixin(models.Model):
         abstract = True
 
 
+@python_2_unicode_compatible
 class NameUserMethodsMixin:
     def get_full_name(self):
         return self.name
 
     def get_short_name(self):
+        return self.name
+
+    def __str__(self):
         return self.name
 
 
@@ -88,20 +93,15 @@ class NameUserMixin(NameUserMethodsMixin, models.Model):
         ordering = ['name']
 
 
-@python_2_unicode_compatible
 class BasicUserFieldsMixin(
         DateJoinedUserMixin,
         EmailUserMixin,
         IsStaffUserMixin,
         NameUserMixin,
         ):
-    objects = UserManager()
 
     class Meta:
         abstract = True
-
-    def __str__(self):
-        return self.name
 
 
 class ActiveUserMixin(models.Model):
