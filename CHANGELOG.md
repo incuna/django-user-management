@@ -1,4 +1,4 @@
-## Upcoming
+## v3.5.0
 
 * Split `BasicUserFieldsMixin` and `VerifyEmailMixin` into mixins.
 
