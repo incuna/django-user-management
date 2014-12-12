@@ -1,11 +1,6 @@
-# django-user-management
-[![Build Status](https://travis-ci.org/incuna/django-user-management.png?branch=merge-version)](https://travis-ci.org/incuna/django-user-management) [![Coverage Status](https://coveralls.io/repos/incuna/django-user-management/badge.png?branch=master)](https://coveralls.io/r/incuna/django-user-management?branch=master) [![Requirements Status](https://requires.io/github/incuna/django-user-management/requirements.svg?branch=master)](https://requires.io/github/incuna/django-user-management/requirements/?branch=master)
+# Views
 
-User management model mixins and api views.
-
-
-
-### To use the api views
+## To use the api views
 Add to your `INSTALLED_APPS` in `settings.py`
 
     INSTALLED_APPS = (
@@ -63,12 +58,12 @@ with a selection from
     )
 
 
-### Throttling protection
+## Throttling protection
 The `/auth/` and `/auth/password_reset/` URLs are protected against throttling
 using the built-in [DRF throttle module](http://www.django-rest-framework.org/api-guide/throttling).
 
 The default throttle rates are:
-    
+
     'logins': '10/hour'
     'passwords': '3/hour'
 
@@ -83,7 +78,7 @@ in your `settings.py`:
     }
 
 
-### Filtering sensitive data
+## Filtering sensitive data
 
 Custom Sentry logging class is available to disallow sensitive data being logged
 by Sentry client.
@@ -93,7 +88,7 @@ Activate it in the `settings.py` by adding:
     SENTRY_CLIENT = 'user_management.utils.sentry.SensitiveDjangoClient'
 
 
-### Expiry of Auth tokens
+## Expiry of Auth tokens
 
 By default DRF does not offer expiration for authorization tokens nor any form
 of validation for the expired tokens.
@@ -113,11 +108,11 @@ Remember to run the management command (eg via cronjob) to clear expired tokens:
 
     python manage.py remove_expired_tokens
 
-##### Tokens expiry times
+### Tokens expiry times
 
 You can set custom expiry time for the auth tokens.
 
 Add below constants in the `settings.py`:
 
-    AUTH_TOKEN_MAX_AGE = <seconds_value> (default: 200 days)
-    AUTH_TOKEN_MAX_INACTIVITY = <seconds_value> (default: 12 hours)
+    AUTH_TOKEN_MAX_AGE = <milliseconds_value> (default: 200 days)
+    AUTH_TOKEN_MAX_INACTIVITY = <milliseconds_value> (default: 12 hours)
