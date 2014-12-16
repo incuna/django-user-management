@@ -3,6 +3,7 @@ import datetime
 import mock
 from django.http import QueryDict
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework import exceptions
 
 from user_management.models.tests.factories import AuthTokenFactory, UserFactory
@@ -34,7 +35,7 @@ class TestFormTokenAuthentication(TestCase):
 
 class TestTokenAuthentication(TestCase):
     def setUp(self):
-        self.now = datetime.datetime.now()
+        self.now = timezone.now()
         self.days = 1
         self.key = 'k$y'
         self.user = UserFactory.create()

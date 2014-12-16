@@ -45,6 +45,7 @@ settings.configure(
         ),
     },
     SENTRY_CLIENT='user_management.utils.sentry.SensitiveDjangoClient',
+    USE_TZ=True,
 )
 
 
