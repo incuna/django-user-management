@@ -1,3 +1,7 @@
+## v3.5.1
+
+* Add timezone support: projects with `USE_TZ=True` will now work correctly
+
 ## v3.5.0
 
 * Split `BasicUserFieldsMixin` and `VerifyEmailMixin` into mixins.
