@@ -2,11 +2,12 @@ import datetime
 
 import mock
 from django.test.utils import override_settings
+from django.utils import timezone
 
-from ..management.commands import remove_expired_tokens
 from user_management.api.models import AuthToken
 from user_management.models.tests import utils
 from user_management.models.tests.factories import AuthTokenFactory
+from ..management.commands import remove_expired_tokens
 
 
 class TestRemoveExpiredTokensManagementCommand(utils.APIRequestTestCase):
@@ -16,7 +17,7 @@ class TestRemoveExpiredTokensManagementCommand(utils.APIRequestTestCase):
 
     def test_no_tokens_removed(self):
         """Tests that non-expired tokens are not removed."""
-        tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
+        tomorrow = timezone.now() + datetime.timedelta(days=1)
         token = AuthTokenFactory.create(expires=tomorrow)
 
         self.command.handle()
@@ -27,7 +28,7 @@ class TestRemoveExpiredTokensManagementCommand(utils.APIRequestTestCase):
     @override_settings(AUTH_TOKEN_MAX_EXPIRY=7)
     def test_expired_tokens(self):
         """Ensure expired token is removed from db while valid one remains."""
-        now = datetime.datetime.now()
+        now = timezone.now()
         tomorrow = now + datetime.timedelta(days=1)
         valid_token = AuthTokenFactory.create(expires=tomorrow)
 

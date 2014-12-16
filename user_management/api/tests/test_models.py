@@ -1,7 +1,7 @@
 from incuna_test_utils.compat import wipe_id_fields_on_django_lt_17
 
-from ..models import AuthToken
 from user_management.models.tests import factories, utils
+from ..models import AuthToken
 
 
 class TestAuthToken(utils.APIRequestTestCase):

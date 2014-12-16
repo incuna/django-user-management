@@ -43,8 +43,16 @@ class AuthTokenSerializer(DRFAuthTokenSerializer):
 
 
 class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8, label=_('Password'))
-    password2 = serializers.CharField(write_only=True, min_length=8, label=_('Repeat password'))
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+        label=_('Password'),
+    )
+    password2 = serializers.CharField(
+        write_only=True,
+        min_length=8,
+        label=_('Repeat password'),
+    )
 
     class Meta:
         fields = ['name', 'email', 'password', 'password2']
@@ -77,7 +85,10 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         fields = ('old_password', 'new_password', 'new_password2')
 
     def restore_object(self, attrs, instance=None):
-        instance = super(PasswordChangeSerializer, self).restore_object(attrs, instance)
+        instance = super(PasswordChangeSerializer, self).restore_object(
+            attrs,
+            instance,
+        )
         instance.set_password(attrs['new_password'])
         return instance
 
@@ -106,7 +117,10 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         fields = ('new_password', 'new_password2')
 
     def restore_object(self, attrs, instance=None):
-        instance = super(PasswordResetSerializer, self).restore_object(attrs, instance)
+        instance = super(PasswordResetSerializer, self).restore_object(
+            attrs,
+            instance,
+        )
         instance.set_password(attrs['new_password'])
         return instance
 

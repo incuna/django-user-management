@@ -93,8 +93,8 @@ class NameUserMixin(NameUserMethodsMixin, models.Model):
         ordering = ['name']
 
 
-class BasicUserFieldsMixin(DateJoinedUserMixin, EmailUserMixin, IsStaffUserMixin,
-        NameUserMixin):
+class BasicUserFieldsMixin(
+        DateJoinedUserMixin, EmailUserMixin, IsStaffUserMixin, NameUserMixin):
     class Meta:
         abstract = True
 

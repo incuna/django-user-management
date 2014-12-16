@@ -1,5 +1,4 @@
-import datetime
-
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import authentication, exceptions
 from rest_framework.authentication import TokenAuthentication as DRFTokenAuthentication
@@ -35,8 +34,7 @@ class TokenAuthentication(DRFTokenAuthentication):
         """Custom authentication to check if auth token has expired."""
         user, token = super(TokenAuthentication, self).authenticate_credentials(key)
 
-        now = datetime.datetime.now()
-        if token.expires < now:
+        if token.expires < timezone.now():
             msg = _('Token has expired.')
             raise exceptions.AuthenticationFailed(msg)
 

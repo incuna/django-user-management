@@ -7,6 +7,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
@@ -47,7 +48,7 @@ class GetAuthTokenTest(APIRequestTestCase):
         self.assertEqual(response.data['token'], token.key)
 
     def test_delete(self):
-        someday = datetime.datetime.now() + datetime.timedelta(days=1)
+        someday = timezone.now() + datetime.timedelta(days=1)
         user = UserFactory.create()
         token = AuthTokenFactory.create(user=user, expires=someday)
 

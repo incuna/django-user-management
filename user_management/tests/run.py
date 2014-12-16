@@ -2,15 +2,17 @@
 """From http://stackoverflow.com/a/12260597/400691"""
 import sys
 
+import dj_database_url
+import django
 from colour_runner.django_runner import ColourRunnerMixin
 from django.conf import settings
-
-import dj_database_url
 
 
 settings.configure(
     DATABASES={
-        'default': dj_database_url.config(default='postgres://localhost/user_management_api'),
+        'default': dj_database_url.config(
+            default='postgres://localhost/user_management_api',
+        ),
     },
     DEFAULT_FILE_STORAGE='inmemorystorage.InMemoryStorage',
     INSTALLED_APPS=(
@@ -42,11 +44,13 @@ settings.configure(
         ),
     },
     SENTRY_CLIENT='user_management.utils.sentry.SensitiveDjangoClient',
+    USE_TZ=True,
 )
 
-import django
+
 if django.VERSION >= (1, 7):
     django.setup()
+
 
 from django.test.runner import DiscoverRunner
 

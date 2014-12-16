@@ -1,8 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from .. import admin_forms
 from . factories import UserFactory
+from .. import admin_forms
 
 
 class UserCreationFormTest(TestCase):

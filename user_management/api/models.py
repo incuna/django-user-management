@@ -17,7 +17,7 @@ DEFAULT_AUTH_TOKEN_MAX_INACTIVITY = 12 * HOUR
 
 
 def update_expiry(created=None):
-    now = datetime.datetime.now()
+    now = timezone.now()
 
     if created is None:
         created = now
