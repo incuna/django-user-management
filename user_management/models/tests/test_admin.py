@@ -1,9 +1,9 @@
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
 
-from ..admin import VerifyUserAdmin
 from .factories import UserFactory
 from .models import User
+from ..admin import VerifyUserAdmin
 
 
 class VerifyUserAdminTest(TestCase):

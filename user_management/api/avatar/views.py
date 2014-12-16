@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_204_NO_CONTENT
 
-from . import serializers
 from user_management.api import authentication, permissions
+from . import serializers
 
 
 User = get_user_model()

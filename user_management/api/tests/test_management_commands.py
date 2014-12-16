@@ -3,10 +3,10 @@ import datetime
 import mock
 from django.test.utils import override_settings
 
-from ..management.commands import remove_expired_tokens
 from user_management.api.models import AuthToken
 from user_management.models.tests import utils
 from user_management.models.tests.factories import AuthTokenFactory
+from ..management.commands import remove_expired_tokens
 
 
 class TestRemoveExpiredTokensManagementCommand(utils.APIRequestTestCase):

@@ -1,9 +1,8 @@
-from django.core.urlresolvers import reverse
 from django.test import TestCase
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
-from .. import serializers
 from user_management.models.tests.factories import UserFactory
+from .. import serializers
 
 
 class AvatarSerializerTest(TestCase):
@@ -56,9 +55,12 @@ class ThumbnailField(TestCase):
         source = 'test'
         kwargs = {'width': 10}
         generator = 'generator'
-        with patch('user_management.api.avatar.serializers.generator_registry.get') as get:
+
+        get_path = 'user_management.api.avatar.serializers.generator_registry.get'
+        image_cache_path = 'user_management.api.avatar.serializers.ImageCacheFile'
+        with patch(get_path) as get:
             get.return_value = generator
-            with patch('user_management.api.avatar.serializers.ImageCacheFile') as ImageCacheFile:
+            with patch(image_cache_path) as ImageCacheFile:
                 field.generate_thumbnail(source, **kwargs)
 
         get.assert_called_once_with(field.generator_id, source=source, **kwargs)

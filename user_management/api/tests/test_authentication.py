@@ -5,8 +5,8 @@ from django.http import QueryDict
 from django.test import TestCase
 from rest_framework import exceptions
 
-from ..authentication import FormTokenAuthentication, TokenAuthentication
 from user_management.models.tests.factories import AuthTokenFactory, UserFactory
+from ..authentication import FormTokenAuthentication, TokenAuthentication
 
 
 class TestFormTokenAuthentication(TestCase):

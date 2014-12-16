@@ -1,9 +1,9 @@
 from django.test import TestCase
 from rest_framework.reverse import reverse
 
-from .. import serializers
 from user_management.models.tests.factories import UserFactory
 from user_management.models.tests.utils import RequestTestCase
+from .. import serializers
 
 
 class ProfileSerializerTest(TestCase):

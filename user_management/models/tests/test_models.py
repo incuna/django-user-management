@@ -9,16 +9,15 @@ from django.core import checks
 from django.db.models import TextField
 from django.db.utils import IntegrityError
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import six, timezone
 from django.utils.encoding import force_bytes
-from django.utils import six
 from django.utils.http import urlsafe_base64_encode
 from mock import patch
 
-from .. import mixins
+from user_management.models.tests import utils
 from . import models
 from .factories import UserFactory
-from user_management.models.tests import utils
+from .. import mixins
 
 
 skip_if_checks_unavailable = unittest.skipIf(

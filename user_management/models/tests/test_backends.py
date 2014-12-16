@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from ..backends import CaseInsensitiveEmailBackend
 from .factories import UserFactory
+from ..backends import CaseInsensitiveEmailBackend
 
 
 class CaseInsensitveEmailBackendTest(TestCase):
