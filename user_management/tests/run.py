@@ -6,7 +6,6 @@ import dj_database_url
 import django
 from colour_runner.django_runner import ColourRunnerMixin
 from django.conf import settings
-from django.test.runner import DiscoverRunner
 
 
 settings.configure(
@@ -51,6 +50,9 @@ settings.configure(
 
 if django.VERSION >= (1, 7):
     django.setup()
+
+
+from django.test.runner import DiscoverRunner
 
 
 class TestRunner(ColourRunnerMixin, DiscoverRunner):
