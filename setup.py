@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 
-version = '3.5.1'
+version = '3.5.2'
 
 
 install_requires = (
