@@ -34,6 +34,14 @@ class UserManager(BaseUserManager):
         user = self.create_user(email, password, **fields)
         return user
 
+    def get_by_natural_key(self, email):
+        """Get user by email with case-insensitive exact match.
+
+        `get_by_natural_key` is used to `authenticate` a user, see:
+        https://github.com/django/django/blob/c5780adeecfbd85a80b5aa7130dd86e78b23e497/django/contrib/auth/backends.py#L16
+        """
+        return self.get(email__iexact=email)
+
 
 class DateJoinedUserMixin(models.Model):
     date_joined = models.DateTimeField(

@@ -158,6 +158,14 @@ class TestUserManager(TestCase):
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
 
+    def test_get_by_natural_key(self):
+        """Assert email is case-insensitive."""
+        email = 'WHATDID@YOU.SAY'
+        existing_user = UserFactory.create(email=email)
+
+        user = self.manager.get_by_natural_key(email.lower())
+        self.assertEqual(user, existing_user)
+
 
 class TestVerifyEmailMixin(TestCase):
     model = models.VerifyEmailUser
