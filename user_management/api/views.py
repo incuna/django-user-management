@@ -124,7 +124,7 @@ class PasswordResetEmail(generics.GenericAPIView):
 
         email = serializer.data['email']
         try:
-            user = User.objects.get(email__iexact=email)
+            user = User.objects.get_by_natural_key(email)
         except User.DoesNotExist:
             pass
         else:
