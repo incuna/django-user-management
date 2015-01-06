@@ -1,3 +1,7 @@
+## Upcoming
+
+* Get user by natural key in `PasswordResetEmail`.
+
 ## v3.5.1
 
 * Add timezone support: projects with `USE_TZ=True` will now work correctly
