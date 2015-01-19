@@ -1,4 +1,4 @@
-## Upcoming
+## v3.5.3
 
 * Get user by natural key in `ValidateEmailMixin`.
 
