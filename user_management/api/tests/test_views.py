@@ -197,7 +197,7 @@ class TestRegisterView(APIRequestTestCase):
 
         self.assertTrue('email' in response.data, msg=response.data)
 
-        self.assertFalse(User.objects.count() > 1)
+        self.assertEqual(User.objects.count(), 1)
 
 
 class TestPasswordResetEmail(APIRequestTestCase):

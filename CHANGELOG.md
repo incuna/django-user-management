@@ -1,3 +1,7 @@
+## Upcoming
+
+* Get user by natural key in `ValidateEmailMixin`.
+
 ## v3.5.2
 
 * Get user by natural key in `PasswordResetEmail`.
