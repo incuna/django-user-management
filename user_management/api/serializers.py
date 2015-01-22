@@ -5,6 +5,8 @@ from rest_framework.authtoken.serializers import (
     AuthTokenSerializer as DRFAuthTokenSerializer
 )
 
+from user_management.utils.validators import validate_password_strength
+
 
 User = get_user_model()
 
@@ -47,6 +49,7 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
         write_only=True,
         min_length=8,
         label=_('Password'),
+        validators=[validate_password_strength],
     )
     password2 = serializers.CharField(
         write_only=True,
@@ -74,11 +77,20 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
 
 class PasswordChangeSerializer(serializers.ModelSerializer):
     old_password = serializers.CharField(
-        write_only=True, label=_('Old password'))
+        write_only=True,
+        label=_('Old password'),
+    )
     new_password = serializers.CharField(
-        write_only=True, min_length=8, label=_('New password'))
+        write_only=True,
+        min_length=8,
+        label=_('New password'),
+        validators=[validate_password_strength],
+    )
     new_password2 = serializers.CharField(
-        write_only=True, min_length=8, label=_('Repeat new password'))
+        write_only=True,
+        min_length=8,
+        label=_('Repeat new password'),
+    )
 
     class Meta:
         model = User
@@ -108,9 +120,16 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
 
 class PasswordResetSerializer(serializers.ModelSerializer):
     new_password = serializers.CharField(
-        write_only=True, min_length=8, label=_('New password'))
+        write_only=True,
+        min_length=8,
+        label=_('New password'),
+        validators=[validate_password_strength],
+    )
     new_password2 = serializers.CharField(
-        write_only=True, min_length=8, label=_('Repeat new password'))
+        write_only=True,
+        min_length=8,
+        label=_('Repeat new password'),
+    )
 
     class Meta:
         model = User

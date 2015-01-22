@@ -1,5 +1,8 @@
+import string
+
 from django.test import TestCase
 from rest_framework.reverse import reverse
+from rest_framework.fields import WritableField
 
 from user_management.models.tests.factories import UserFactory
 from user_management.models.tests.utils import RequestTestCase
@@ -238,3 +241,88 @@ class TestUserSerializerCreate(TestCase):
         serializer = serializers.UserSerializerCreate(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('email', serializer.errors)
+
+
+class SerializerPasswordsTest(TestCase):
+    too_simple = (
+        'Password must have at least ' +
+        'one upper case letter, one lower case letter, and one number.'
+    )
+
+    too_fancy = (
+        'Password only accepts the following symbols ' + string.punctuation
+    )
+
+    serializers = (
+        (serializers.PasswordResetSerializer, 'new_password'),
+        (serializers.PasswordChangeSerializer, 'new_password'),
+        (serializers.RegistrationSerializer, 'password'),
+    )
+
+    def test_missing(self):
+        for serializer_class, field in self.serializers:
+            data = {}
+            with self.subTest(serializer=serializer_class):
+                serializer = serializer_class(data=data)
+                serializer.is_valid()  # Perform validation
+                msg = WritableField.default_error_messages['required']
+                self.assertEqual(serializer.errors[field], [msg])
+
+    def test_too_short(self):
+        for serializer_class, field in self.serializers:
+            data = {field: 'Aa1'}
+            with self.subTest(serializer=serializer_class):
+                serializer = serializer_class(data=data)
+                serializer.is_valid()  # Perform validation
+                msg = 'Ensure this value has at least 8 characters (it has 3).'
+                self.assertEqual(serializer.errors[field], [msg])
+
+    def test_no_upper(self):
+        for serializer_class, field in self.serializers:
+            data = {field: 'aaaa1111'}
+            with self.subTest(serializer=serializer_class):
+                serializer = serializer_class(data=data)
+                serializer.is_valid()  # Perform validation
+                self.assertEqual(serializer.errors[field], [self.too_simple])
+
+    def test_no_lower(self):
+        for serializer_class, field in self.serializers:
+            data = {field: 'AAAA1111'}
+            with self.subTest(serializer=serializer_class):
+                serializer = serializer_class(data=data)
+                serializer.is_valid()  # Perform validation
+                self.assertEqual(serializer.errors[field], [self.too_simple])
+
+    def test_no_number(self):
+        for serializer_class, field in self.serializers:
+            data = {field: 'AAAAaaaa'}
+            with self.subTest(serializer=serializer_class):
+                serializer = serializer_class(data=data)
+                serializer.is_valid()  # Perform validation
+                self.assertEqual(serializer.errors[field], [self.too_simple])
+
+    def test_symbols(self):
+        """Ensure all acceptable symbols are acceptable."""
+        for serializer_class, field in self.serializers:
+            for symbol in string.punctuation:
+                data = {field: 'AAaa111' + symbol}
+                with self.subTest(serializer=serializer_class, symbol=symbol):
+                    serializer = serializer_class(data=data)
+                    serializer.is_valid()  # Perform validation
+                    self.assertFalse(field in serializer.errors)
+
+    def test_non_ascii(self):
+        for serializer_class, field in self.serializers:
+            data = {field: 'AA11aa££'}  # £ is not an ASCII character.
+            with self.subTest(serializer=serializer_class):
+                serializer = serializer_class(data=data)
+                serializer.is_valid()  # Perform validation
+                self.assertEqual(serializer.errors[field], [self.too_fancy])
+
+    def test_ok(self):
+        for serializer_class, field in self.serializers:
+            data = {field: 'AAAaaa11'}
+            with self.subTest(serializer=serializer_class):
+                serializer = serializer_class(data=data)
+                serializer.is_valid()  # Perform validation
+                self.assertFalse(field in serializer.errors)
