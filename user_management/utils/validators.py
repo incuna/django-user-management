@@ -15,7 +15,9 @@ too_simple = _(
     'one upper case letter, one lower case letter, and one number.'
 )
 
-too_fancy = _('Password only accepts the following symbols ' + punctuation)
+too_fancy = _(
+    'Password only accepts the following symbols !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+)
 
 
 def validate_password_strength(value):
