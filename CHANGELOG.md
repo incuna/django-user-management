@@ -1,3 +1,7 @@
+## v4.0.1
+
+* Remove calculation in translatable string
+
 ## v4.0.0
 
 * Enforce complex passwords
