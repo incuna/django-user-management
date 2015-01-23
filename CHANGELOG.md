@@ -1,3 +1,7 @@
+## v4.0.0 (Upcoming)
+
+* Enforce complex passwords
+
 ## v3.5.3
 
 * Get user by natural key in `ValidateEmailMixin`.
