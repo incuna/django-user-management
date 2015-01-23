@@ -1,4 +1,4 @@
-## v4.0.0 (Upcoming)
+## v4.0.0
 
 * Enforce complex passwords
 
