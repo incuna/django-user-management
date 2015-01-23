@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import string
 
 from django.core.exceptions import ValidationError
@@ -43,7 +44,7 @@ class PasswordsTest(TestCase):
             self.assertIsNone(validate_password_strength(password))
 
     def test_non_ascii(self):
-        password = 'AA11aa££'  # £ is not an ASCII character.
+        password = u'AA11aa££'  # £ is not an ASCII character.
         with self.assertRaises(ValidationError) as error:
             validate_password_strength(password)
 

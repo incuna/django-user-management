@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import string
 
 from django.test import TestCase
@@ -317,7 +318,7 @@ class SerializerPasswordsTest(TestCase):
 
     def test_non_ascii(self):
         for serializer_class, field in self.serializers:
-            data = {field: 'AA11aa££'}  # £ is not an ASCII character.
+            data = {field: u'AA11aa££'}  # £ is not an ASCII character.
             msg = self.too_fancy
             self.assert_validation_error(serializer_class, field, data, msg)
 
