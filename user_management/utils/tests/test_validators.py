@@ -40,8 +40,7 @@ class PasswordsTest(TestCase):
         """Ensure all acceptable symbols are acceptable."""
         for symbol in string.punctuation:
             password = 'AAaa111' + symbol
-            with self.subTest(symbol=symbol):
-                self.assertIsNone(validate_password_strength(password))
+            self.assertIsNone(validate_password_strength(password))
 
     def test_non_ascii(self):
         password = 'AA11aa££'  # £ is not an ASCII character.
