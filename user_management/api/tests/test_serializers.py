@@ -1,8 +1,8 @@
 import string
 
 from django.test import TestCase
-from rest_framework.reverse import reverse
 from rest_framework.fields import WritableField
+from rest_framework.reverse import reverse
 
 from user_management.models.tests.factories import UserFactory
 from user_management.models.tests.utils import RequestTestCase
@@ -32,8 +32,8 @@ class ProfileSerializerTest(TestCase):
 
 class PasswordChangeSerializerTest(TestCase):
     def test_deserialize_passwords(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
 
         user = UserFactory.create(password=old_password)
 
@@ -48,8 +48,8 @@ class PasswordChangeSerializerTest(TestCase):
         self.assertTrue(user.check_password(new_password))
 
     def test_deserialize_invalid_old_password(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
 
         user = UserFactory.build(password=old_password)
 
@@ -62,8 +62,8 @@ class PasswordChangeSerializerTest(TestCase):
         self.assertIn('old_password', serializer.errors)
 
     def test_deserialize_invalid_new_password(self):
-        old_password = 'old_password'
-        new_password = '2short'
+        old_password = '0ld_passworD'
+        new_password = '2Short'
 
         user = UserFactory.build(password=old_password)
 
@@ -77,8 +77,8 @@ class PasswordChangeSerializerTest(TestCase):
         self.assertTrue(serializer.object.check_password(old_password))
 
     def test_deserialize_mismatched_passwords(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
         other_password = 'other_new_password'
 
         user = UserFactory.create(password=old_password)
@@ -93,7 +93,7 @@ class PasswordChangeSerializerTest(TestCase):
 
 class PasswordResetSerializerTest(TestCase):
     def test_deserialize_passwords(self):
-        new_password = 'new_password'
+        new_password = 'n3w_Password'
         user = UserFactory.create()
 
         serializer = serializers.PasswordResetSerializer(user, data={
@@ -106,7 +106,7 @@ class PasswordResetSerializerTest(TestCase):
         self.assertTrue(user.check_password(new_password))
 
     def test_deserialize_invalid_new_password(self):
-        new_password = '2short'
+        new_password = '2Short'
         user = UserFactory.build()
 
         serializer = serializers.PasswordResetSerializer(user, data={
@@ -118,7 +118,7 @@ class PasswordResetSerializerTest(TestCase):
         self.assertFalse(serializer.object.check_password(new_password))
 
     def test_deserialize_mismatched_passwords(self):
-        new_password = 'new_password'
+        new_password = 'n3w_Password'
         other_password = 'other_new_password'
         user = UserFactory.create()
 
