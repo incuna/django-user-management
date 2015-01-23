@@ -328,8 +328,8 @@ class TestPasswordReset(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_put(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
         user = UserFactory.create(password=old_password)
 
         token = default_token_generator.make_token(user)
@@ -349,8 +349,8 @@ class TestPasswordReset(APIRequestTestCase):
         self.assertTrue(user.check_password(new_password))
 
     def test_password_mismatch(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
         invalid_password = 'different_new_password'
         user = UserFactory.create(password=old_password)
 
@@ -410,8 +410,8 @@ class TestPasswordChange(APIRequestTestCase):
     view_class = views.PasswordChange
 
     def test_update(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
 
         user = UserFactory.create(password=old_password)
 
@@ -431,8 +431,8 @@ class TestPasswordChange(APIRequestTestCase):
         self.assertTrue(user.check_password(new_password))
 
     def test_update_anonymous(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
 
         request = self.create_request(
             'put',
@@ -448,8 +448,8 @@ class TestPasswordChange(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_wrong_old_password(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
 
         user = UserFactory.create(password=old_password)
 
@@ -469,8 +469,8 @@ class TestPasswordChange(APIRequestTestCase):
         self.assertTrue(user.check_password(old_password))
 
     def test_update_invalid_new_password(self):
-        old_password = 'old_password'
-        new_password = '2short'
+        old_password = '0ld_passworD'
+        new_password = '2Short'
 
         user = UserFactory.create(password=old_password)
 
@@ -490,8 +490,8 @@ class TestPasswordChange(APIRequestTestCase):
         self.assertTrue(user.check_password(old_password))
 
     def test_update_mismatched_passwords(self):
-        old_password = 'old_password'
-        new_password = 'new_password'
+        old_password = '0ld_passworD'
+        new_password = 'n3w_Password'
         invalid_password = 'different_new_password'
 
         user = UserFactory.create(password=old_password)
