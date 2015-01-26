@@ -101,7 +101,11 @@ class TestPasswordResetEmail(APIRequestTestCase):
 class TestResendConfirmationEmail(APIRequestTestCase):
     view_class = views.ResendConfirmationEmail
 
-    @patch(THROTTLE_RATE_PATH, new={'confirmations': '0/minute'})
+    def tearDown(self):
+        # DRF puts a successful (not throttled) request onto a cache
+        cache.clear()
+
+    @patch(THROTTLE_RATE_PATH, new={'confirmations': '1/minute'})
     def test_post_rate_limit(self):
         """Assert POST requests are rate limited."""
         user = UserFactory.create()
@@ -109,6 +113,9 @@ class TestResendConfirmationEmail(APIRequestTestCase):
 
         request = self.create_request('post', data=data, auth=False)
         view = self.view_class.as_view()
+
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
