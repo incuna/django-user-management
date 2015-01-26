@@ -25,6 +25,13 @@ class ValidateEmailMixin(object):
             raise serializers.ValidationError(msg)
 
 
+class EmailSerializerBase(serializers.Serializer):
+    email = serializers.EmailField(max_length=511, label=_('Email address'))
+
+    class Meta:
+        fields = ['email']
+
+
 class AuthTokenSerializer(DRFAuthTokenSerializer):
     """
     Fix DRF's error messages (which ain't very helpful).
@@ -150,11 +157,8 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class PasswordResetEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=511, label=_('Email address'))
-
-    class Meta:
-        fields = ['email']
+class PasswordResetEmailSerializer(EmailSerializerBase):
+    pass
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -162,6 +166,22 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ('name', 'email', 'date_joined')
         read_only_fields = ('email', 'date_joined')
+
+
+class ResendConfirmationEmailSerializer(EmailSerializerBase):
+    def validate_email(self, attrs, source):
+        """Check if user exists and email_verification_required."""
+        email = attrs[source]
+        try:
+            user = User.objects.get_by_natural_key(email)
+        except User.DoesNotExist:
+            msg = _('User does not exists.')
+            raise serializers.ValidationError(msg)
+
+        if not user.email_verification_required:
+            msg = _('User is already confirmed.')
+            raise serializers.ValidationError(msg)
+        return attrs
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
