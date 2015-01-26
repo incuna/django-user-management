@@ -842,10 +842,6 @@ class TestUserDetail(APIRequestTestCase):
 class ResendConfirmationEmailTest(APIRequestTestCase):
     view_class = views.ResendConfirmationEmail
 
-    def setUp(self):
-        """Avoid view to be throttled for tests."""
-        self.view_class.throttle_scope = None
-
     def test_post(self):
         """Assert user can request a new confirmation email."""
         user = UserFactory.create()
