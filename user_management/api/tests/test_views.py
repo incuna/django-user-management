@@ -15,6 +15,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
 from user_management.api import models, views
+from user_management.api.tests.test_throttling import THROTTLE_RATE_PATH
 from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.models import BasicUser
 from user_management.models.tests.utils import APIRequestTestCase
@@ -839,6 +840,7 @@ class TestUserDetail(APIRequestTestCase):
         self.assertEqual(self.user, user)
 
 
+@patch(THROTTLE_RATE_PATH, new={'confirmations': '4/minute'})
 class ResendConfirmationEmailTest(APIRequestTestCase):
     view_class = views.ResendConfirmationEmail
 
