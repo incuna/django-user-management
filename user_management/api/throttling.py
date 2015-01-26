@@ -20,10 +20,12 @@ class PostRequestThrottleMixin(object):
         return super(PostRequestThrottleMixin, self).allow_request(request, view)
 
 
-class LoginRateThrottle(
-        DefaultRateMixin,
-        PostRequestThrottleMixin,
-        ScopedRateThrottle):
+class ScopedRateThrottleBase(
+        DefaultRateMixin, PostRequestThrottleMixin, ScopedRateThrottle):
+    """Base class to define a scoped rate throttle on POST request."""
+
+
+class LoginRateThrottle(ScopedRateThrottleBase):
     default_rate = '10/hour'
 
 
@@ -42,15 +44,9 @@ class UsernameLoginRateThrottle(LoginRateThrottle):
         }
 
 
-class PasswordResetRateThrottle(
-        DefaultRateMixin,
-        PostRequestThrottleMixin,
-        ScopedRateThrottle):
+class PasswordResetRateThrottle(ScopedRateThrottleBase):
     default_rate = '3/hour'
 
 
-class ResendConfirmationEmailRateThrottle(
-        DefaultRateMixin,
-        PostRequestThrottleMixin,
-        ScopedRateThrottle):
+class ResendConfirmationEmailRateThrottle(ScopedRateThrottleBase):
     default_rate = '3/hour'
