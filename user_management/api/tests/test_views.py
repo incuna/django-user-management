@@ -886,4 +886,10 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
+
         self.assertIn(user.email, email.to)
+        expected = 'http://example.com/#/register/verify/'
+        self.assertIn(expected, email.body)
+
+        expected = 'example.com account validate'
+        self.assertEqual(email.subject, expected)
