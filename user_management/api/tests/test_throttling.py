@@ -11,16 +11,18 @@ from user_management.models.tests.utils import APIRequestTestCase
 THROTTLE_RATE_PATH = 'rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES'
 
 
-class GetAuthTokenTest(APIRequestTestCase):
+class ClearCacheMixin:
+    def tearDown(self):
+        # DRF puts a successful (not throttled) request into a cache
+        cache.clear()
+
+
+class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
     throttle_expected_status = status.HTTP_429_TOO_MANY_REQUESTS
     view_class = views.GetAuthToken
 
     def setUp(self):
         self.auth_url = reverse('user_management_api:auth')
-
-    def tearDown(self):
-        # DRF puts a successful (not throttled) request onto a cache
-        cache.clear()
 
     @patch(THROTTLE_RATE_PATH, new={'logins': '1/minute'})
     def test_user_auth_throttle(self):
@@ -73,12 +75,8 @@ class GetAuthTokenTest(APIRequestTestCase):
         self.assertEqual(response.status_code, self.throttle_expected_status)
 
 
-class TestPasswordResetEmail(APIRequestTestCase):
+class TestPasswordResetEmail(ClearCacheMixin, APIRequestTestCase):
     view_class = views.PasswordResetEmail
-
-    def tearDown(self):
-        # DRF puts a successful (not throttled) request onto a cache
-        cache.clear()
 
     @patch(THROTTLE_RATE_PATH, new={'passwords': '1/minute'})
     def test_post_rate_limit(self):
@@ -98,12 +96,8 @@ class TestPasswordResetEmail(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
 
-class TestResendConfirmationEmail(APIRequestTestCase):
+class TestResendConfirmationEmail(ClearCacheMixin, APIRequestTestCase):
     view_class = views.ResendConfirmationEmail
-
-    def tearDown(self):
-        # DRF puts a successful (not throttled) request onto a cache
-        cache.clear()
 
     @patch(THROTTLE_RATE_PATH, new={'confirmations': '1/minute'})
     def test_post_rate_limit(self):
