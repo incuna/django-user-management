@@ -173,12 +173,12 @@ class ResendConfirmationEmailSerializer(EmailSerializerBase):
         """Check if user exists and email_verification_required."""
         email = attrs[source]
         try:
-            user = User.objects.get_by_natural_key(email)
+            self.user = User.objects.get_by_natural_key(email)
         except User.DoesNotExist:
             msg = _('User does not exists.')
             raise serializers.ValidationError(msg)
 
-        if not user.email_verification_required:
+        if not self.user.email_verification_required:
             msg = _('User is already confirmed.')
             raise serializers.ValidationError(msg)
         return attrs

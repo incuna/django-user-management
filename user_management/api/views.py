@@ -221,8 +221,20 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.UserSerializer
 
 
-class ResendConfirmationEmail(PasswordResetEmail):
+class ResendConfirmationEmail(generics.GenericAPIView):
     """Resend a confirmation email."""
+    permission_classes = [permissions.IsNotAuthenticated]
+    serializer_class = serializers.ResendConfirmationEmailSerializer
 
-    def send_email(self, user):
-        user.send_validation_email()
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.DATA)
+
+        if not serializer.is_valid():
+            return response.Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer.user.send_validation_email()
+        msg = _('Email confirmation sent.')
+        return response.Response(msg, status=status.HTTP_204_NO_CONTENT)
