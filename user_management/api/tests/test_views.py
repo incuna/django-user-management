@@ -837,3 +837,30 @@ class TestUserDetail(APIRequestTestCase):
 
         user = User.objects.get()
         self.assertEqual(self.user, user)
+
+
+class ResendConfirmationEmailTest(APIRequestTestCase):
+    view_class = views.ResendConfirmationEmail
+
+    def test_post(self):
+        user = UserFactory.create()
+        data = {'email': user.email}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT,
+            msg=response.data,
+        )
+
+    def test_send_email(self):
+        user = UserFactory.create()
+        data = {'email': user.email}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        view(request)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn(user.email, email.to)

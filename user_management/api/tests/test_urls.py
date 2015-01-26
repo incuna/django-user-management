@@ -65,3 +65,10 @@ class TestURLs(URLTestCase):
             url_name='user_management_api:verify_user',
             url_kwargs={'uidb64': uidb64, 'token': token},
         )
+
+    def test_resend_confirmation_email(self):
+        self.assert_url_matches_view(
+            view=views.ResendConfirmationEmail,
+            expected_url='/resend-confirmation-email',
+            url_name='user_management_api:resend_confirmation_email',
+        )

@@ -219,3 +219,10 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializer
+
+
+class ResendConfirmationEmail(PasswordResetEmail):
+    """Resend a confirmation email."""
+
+    def send_email(self, user):
+        user.send_validation_email()
