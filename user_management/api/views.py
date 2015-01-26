@@ -225,6 +225,8 @@ class ResendConfirmationEmail(generics.GenericAPIView):
     """Resend a confirmation email."""
     permission_classes = [permissions.IsNotAuthenticated]
     serializer_class = serializers.ResendConfirmationEmailSerializer
+    throttle_classes = [throttling.ResendConfirmationEmailRateThrottle]
+    throttle_scope = 'confirmations'
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.DATA)

@@ -96,3 +96,19 @@ class TestPasswordResetEmail(APIRequestTestCase):
         # request is throttled
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+
+
+class TestResendConfirmationEmail(APIRequestTestCase):
+    view_class = views.ResendConfirmationEmail
+
+    @patch(THROTTLE_RATE_PATH, new={'confirmations': '0/minute'})
+    def test_post_rate_limit(self):
+        """Assert POST requests are rate limited."""
+        user = UserFactory.create()
+        data = {'email': user.email}
+
+        request = self.create_request('post', data=data, auth=False)
+        view = self.view_class.as_view()
+
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)

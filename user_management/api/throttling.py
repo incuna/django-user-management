@@ -47,3 +47,10 @@ class PasswordResetRateThrottle(
         PostRequestThrottleMixin,
         ScopedRateThrottle):
     default_rate = '3/hour'
+
+
+class ResendConfirmationEmailRateThrottle(
+        DefaultRateMixin,
+        PostRequestThrottleMixin,
+        ScopedRateThrottle):
+    default_rate = '3/hour'
