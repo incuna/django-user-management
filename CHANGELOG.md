@@ -1,4 +1,4 @@
-## v4.1.0 (Upcoming)
+## v4.1.0
 
 * Add `ResendConfirmationEmail` view.
 
