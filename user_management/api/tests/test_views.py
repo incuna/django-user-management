@@ -15,6 +15,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
 from user_management.api import models, views
+from user_management.api.tests.test_throttling import THROTTLE_RATE_PATH
 from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.models import BasicUser
 from user_management.models.tests.utils import APIRequestTestCase
@@ -837,3 +838,59 @@ class TestUserDetail(APIRequestTestCase):
 
         user = User.objects.get()
         self.assertEqual(self.user, user)
+
+
+@patch(THROTTLE_RATE_PATH, new={'confirmations': '4/minute'})
+class ResendConfirmationEmailTest(APIRequestTestCase):
+    """Assert `ResendConfirmationEmail` behaves properly."""
+    view_class = views.ResendConfirmationEmail
+
+    def test_post(self):
+        """Assert user can request a new confirmation email."""
+        user = UserFactory.create()
+        data = {'email': user.email}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT,
+            msg=response.data,
+        )
+
+    def test_post_unknown_email(self):
+        """Assert unknown email raises an error."""
+        data = {'email': 'theman@theiron.mask'}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('email', response.data)
+
+    def test_post_email_already_verified(self):
+        """Assert email already verified does not trigger another email."""
+        user = UserFactory.create(email_verification_required=False)
+        data = {'email': user.email}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('email', response.data)
+
+    def test_send_email(self):
+        """Assert user can receive a new confirmation email."""
+        user = UserFactory.create()
+        data = {'email': user.email}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        view(request)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+
+        self.assertIn(user.email, email.to)
+        expected = 'http://example.com/#/register/verify/'
+        self.assertIn(expected, email.body)
+
+        expected = 'example.com account validate'
+        self.assertEqual(email.subject, expected)

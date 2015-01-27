@@ -219,3 +219,25 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializer
+
+
+class ResendConfirmationEmail(generics.GenericAPIView):
+    """Resend a confirmation email."""
+    permission_classes = [permissions.IsNotAuthenticated]
+    serializer_class = serializers.ResendConfirmationEmailSerializer
+    throttle_classes = [throttling.ResendConfirmationEmailRateThrottle]
+    throttle_scope = 'confirmations'
+
+    def post(self, request, *args, **kwargs):
+        """Validate `email` and send a request to confirm it."""
+        serializer = self.serializer_class(data=request.DATA)
+
+        if not serializer.is_valid():
+            return response.Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer.user.send_validation_email()
+        msg = _('Email confirmation sent.')
+        return response.Response(msg, status=status.HTTP_204_NO_CONTENT)

@@ -25,6 +25,14 @@ class ValidateEmailMixin(object):
             raise serializers.ValidationError(msg)
 
 
+class EmailSerializerBase(serializers.Serializer):
+    """Serializer defining a read-only `email` field."""
+    email = serializers.EmailField(max_length=511, label=_('Email address'))
+
+    class Meta:
+        fields = ['email']
+
+
 class AuthTokenSerializer(DRFAuthTokenSerializer):
     """
     Fix DRF's error messages (which ain't very helpful).
@@ -150,11 +158,8 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class PasswordResetEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=511, label=_('Email address'))
-
-    class Meta:
-        fields = ['email']
+class PasswordResetEmailSerializer(EmailSerializerBase):
+    """Serializer defining an `email` field to reset password."""
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -162,6 +167,26 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ('name', 'email', 'date_joined')
         read_only_fields = ('email', 'date_joined')
+
+
+class ResendConfirmationEmailSerializer(EmailSerializerBase):
+    """Serializer defining an `email` field to resend a confirmation email."""
+    def validate_email(self, attrs, source):
+        """Validate if email exists and requires a verification.
+
+        `validate_email` will set a `user` attribute on the instance allowing
+        the view to send an email confirmation."""
+        email = attrs[source]
+        try:
+            self.user = User.objects.get_by_natural_key(email)
+        except User.DoesNotExist:
+            msg = _('A user with this email address does not exist.')
+            raise serializers.ValidationError(msg)
+
+        if not self.user.email_verification_required:
+            msg = _('User email address is already verified.')
+            raise serializers.ValidationError(msg)
+        return attrs
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

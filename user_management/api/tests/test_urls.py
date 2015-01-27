@@ -55,3 +55,22 @@ class TestURLs(URLTestCase):
             view=views.UserList,
             expected_url='/users',
             url_name='user_management_api:user_list')
+
+    def test_verify_email(self):
+        """Assert `verify_user` is defined."""
+        uidb64 = '123'
+        token = 'a-token'
+        self.assert_url_matches_view(
+            view=views.VerifyAccountView,
+            expected_url='/verify_email/{}/{}'.format(uidb64, token),
+            url_name='user_management_api:verify_user',
+            url_kwargs={'uidb64': uidb64, 'token': token},
+        )
+
+    def test_resend_confirmation_email(self):
+        """Assert `resend_confirmation_email` is defined."""
+        self.assert_url_matches_view(
+            view=views.ResendConfirmationEmail,
+            expected_url='/resend-confirmation-email',
+            url_name='user_management_api:resend_confirmation_email',
+        )
