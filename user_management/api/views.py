@@ -229,6 +229,7 @@ class ResendConfirmationEmail(generics.GenericAPIView):
     throttle_scope = 'confirmations'
 
     def post(self, request, *args, **kwargs):
+        """Validate `email` and send a request to confirm it."""
         serializer = self.serializer_class(data=request.DATA)
 
         if not serializer.is_valid():

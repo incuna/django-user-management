@@ -26,6 +26,7 @@ class ValidateEmailMixin(object):
 
 
 class EmailSerializerBase(serializers.Serializer):
+    """Serializer defining a read-only `email` field."""
     email = serializers.EmailField(max_length=511, label=_('Email address'))
 
     class Meta:
@@ -158,7 +159,7 @@ class PasswordResetSerializer(serializers.ModelSerializer):
 
 
 class PasswordResetEmailSerializer(EmailSerializerBase):
-    pass
+    """Serializer defining an `email` field to reset password."""
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -169,6 +170,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ResendConfirmationEmailSerializer(EmailSerializerBase):
+    """Serializer defining an `email` field to resend a confirmation email."""
     def validate_email(self, attrs, source):
         """Validate if email exists and requires a verification.
 

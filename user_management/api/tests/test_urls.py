@@ -57,6 +57,7 @@ class TestURLs(URLTestCase):
             url_name='user_management_api:user_list')
 
     def test_verify_email(self):
+        """Assert `verify_user` is defined."""
         uidb64 = '123'
         token = 'a-token'
         self.assert_url_matches_view(
@@ -67,6 +68,7 @@ class TestURLs(URLTestCase):
         )
 
     def test_resend_confirmation_email(self):
+        """Assert `resend_confirmation_email` is defined."""
         self.assert_url_matches_view(
             view=views.ResendConfirmationEmail,
             expected_url='/resend-confirmation-email',

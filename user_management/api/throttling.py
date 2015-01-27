@@ -45,8 +45,10 @@ class UsernameLoginRateThrottle(LoginRateThrottle):
 
 
 class PasswordResetRateThrottle(ScopedRateThrottleBase):
+    """Set `default_rate` for scoped rate POST requests on password reset."""
     default_rate = '3/hour'
 
 
 class ResendConfirmationEmailRateThrottle(ScopedRateThrottleBase):
+    """Set `default_rate` for scoped rate POST requests on `ResendConfirmationEmail`."""
     default_rate = '3/hour'

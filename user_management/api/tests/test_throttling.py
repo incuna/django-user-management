@@ -12,12 +12,15 @@ THROTTLE_RATE_PATH = 'rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATE
 
 
 class ClearCacheMixin:
+    """Clear cache on `tearDown`.
+
+    `django-rest-framework` puts a successful (not throttled) request into a cache."""
     def tearDown(self):
-        # DRF puts a successful (not throttled) request into a cache
         cache.clear()
 
 
 class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
+    """Test `GetAuthToken` is throttled."""
     throttle_expected_status = status.HTTP_429_TOO_MANY_REQUESTS
     view_class = views.GetAuthToken
 
@@ -76,6 +79,7 @@ class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
 
 
 class TestPasswordResetEmail(ClearCacheMixin, APIRequestTestCase):
+    """Test `PasswordResetEmail` is throttled."""
     view_class = views.PasswordResetEmail
 
     @patch(THROTTLE_RATE_PATH, new={'passwords': '1/minute'})
@@ -97,6 +101,7 @@ class TestPasswordResetEmail(ClearCacheMixin, APIRequestTestCase):
 
 
 class TestResendConfirmationEmail(ClearCacheMixin, APIRequestTestCase):
+    """Test `ResendConfirmationEmail` is throttled."""
     view_class = views.ResendConfirmationEmail
 
     @patch(THROTTLE_RATE_PATH, new={'confirmations': '1/minute'})
