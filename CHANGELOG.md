@@ -1,4 +1,4 @@
-## v4.2.0 (Upcoming)
+## v4.2.0
 
 * Return `AuthenticationFailed` `401` instead of `404` `NotFound` for not valid
 `uidb64` and `token`

@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 
-version = '4.1.0'
+version = '4.2.0'
 
 
 install_requires = (
