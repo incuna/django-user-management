@@ -9,6 +9,7 @@ from incuna_mail import send
 from rest_framework import generics, renderers, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from . import models, permissions, serializers, throttling
@@ -144,6 +145,8 @@ class PasswordResetEmail(generics.GenericAPIView):
 
 
 class OneTimeUseAPIMixin(object):
+    message = _('Invalid or expired token.')
+
     def initial(self, request, *args, **kwargs):
         uidb64 = kwargs['uidb64']
         uid = urlsafe_base64_decode(force_text(uidb64))
@@ -151,11 +154,11 @@ class OneTimeUseAPIMixin(object):
         try:
             self.user = User.objects.get(pk=uid)
         except User.DoesNotExist:
-            raise Http404()
+            raise AuthenticationFailed(detail=self.message)
 
         token = kwargs['token']
         if not default_token_generator.check_token(self.user, token):
-            raise Http404()
+            raise AuthenticationFailed(detail=self.message)
 
         return super(OneTimeUseAPIMixin, self).initial(
             request,
