@@ -1,6 +1,6 @@
 ## v4.2.0 (Upcoming)
 
-* Return `PermissionDenied` `403` instead of `404` `NotFound` for not valid
+* Return `AuthenticationFailed` `401` instead of `404` `NotFound` for not valid
 `uidb64` and `token`
 
 ## v4.1.0
