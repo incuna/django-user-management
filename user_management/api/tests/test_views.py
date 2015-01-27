@@ -381,7 +381,7 @@ class TestPasswordReset(APIRequestTestCase):
         request = self.create_request('put', auth=False)
         view = self.view_class.as_view()
         response = view(request, uidb64=invalid_uid)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_put_invalid_token(self):
         user = UserFactory.create()
@@ -402,7 +402,7 @@ class TestPasswordReset(APIRequestTestCase):
         view_name = 'user_management_api:password_reset_confirm'
         url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
         response = self.client.put(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.assertTrue(hasattr(response, 'accepted_renderer'))
 
@@ -551,7 +551,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         request = self.create_request('post')
         view = self.view_class.as_view()
         response = view(request, uidb64=invalid_uid)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_post_invalid_token(self):
         user = UserFactory.create()
@@ -599,7 +599,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         view_name = 'user_management_api:verify_user'
         url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.assertTrue(hasattr(response, 'accepted_renderer'))
 

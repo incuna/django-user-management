@@ -9,6 +9,7 @@ from incuna_mail import send
 from rest_framework import generics, renderers, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from . import models, permissions, serializers, throttling
@@ -151,7 +152,8 @@ class OneTimeUseAPIMixin(object):
         try:
             self.user = User.objects.get(pk=uid)
         except User.DoesNotExist:
-            raise Http404()
+            msg = _('Invalid or expired token.')
+            raise PermissionDenied(detail=msg)
 
         token = kwargs['token']
         if not default_token_generator.check_token(self.user, token):
