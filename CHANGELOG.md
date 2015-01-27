@@ -1,3 +1,7 @@
+## v4.1.0 (Upcoming)
+
+* Add `ResendConfirmationEmail` view.
+
 ## v4.0.1
 
 * Remove calculation in translatable string
