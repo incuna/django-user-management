@@ -170,7 +170,10 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class ResendConfirmationEmailSerializer(EmailSerializerBase):
     def validate_email(self, attrs, source):
-        """Check if user exists and email_verification_required."""
+        """Validate if email exists and requires a verification.
+
+        `validate_email` will set a `user` attribute on the instance allowing
+        the view to send an email confirmation."""
         email = attrs[source]
         try:
             self.user = User.objects.get_by_natural_key(email)
