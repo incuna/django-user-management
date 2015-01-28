@@ -11,4 +11,5 @@ class InvalidExpiredTokenTest(TestCase):
         with self.assertRaises(InvalidExpiredToken) as e:
             raise InvalidExpiredToken
         self.assertEqual(e.exception.status_code, HTTP_400_BAD_REQUEST)
-        self.assertEqual(str(e.exception.detail), 'Invalid or expired token.')
+        message = e.exception.detail.format()
+        self.assertEqual(message, 'Invalid or expired token.')
