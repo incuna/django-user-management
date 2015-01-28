@@ -1,4 +1,4 @@
-## v4.2.1 (Upcoming)
+## v5.0.0 (Upcoming)
 
 * Return 400 instead of 401 when `uidb64` or `token` is expired or not valid.
 
