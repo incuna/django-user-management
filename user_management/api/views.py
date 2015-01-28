@@ -143,8 +143,6 @@ class PasswordResetEmail(generics.GenericAPIView):
 
 
 class OneTimeUseAPIMixin(object):
-    message = _('Invalid or expired token.')
-
     def initial(self, request, *args, **kwargs):
         uidb64 = kwargs['uidb64']
         uid = urlsafe_base64_decode(force_text(uidb64))
@@ -152,11 +150,11 @@ class OneTimeUseAPIMixin(object):
         try:
             self.user = User.objects.get(pk=uid)
         except User.DoesNotExist:
-            raise exceptions.InvalidExpiredToken(detail=self.message)
+            raise exceptions.InvalidExpiredToken()
 
         token = kwargs['token']
         if not default_token_generator.check_token(self.user, token):
-            raise exceptions.InvalidExpiredToken(detail=self.message)
+            raise exceptions.InvalidExpiredToken()
 
         return super(OneTimeUseAPIMixin, self).initial(
             request,
