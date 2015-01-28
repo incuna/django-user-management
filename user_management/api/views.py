@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
-from django.http import Http404
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
@@ -9,10 +8,9 @@ from incuna_mail import send
 from rest_framework import generics, renderers, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from . import models, permissions, serializers, throttling
+from . import exceptions, models, permissions, serializers, throttling
 
 
 User = get_user_model()
@@ -145,8 +143,6 @@ class PasswordResetEmail(generics.GenericAPIView):
 
 
 class OneTimeUseAPIMixin(object):
-    message = _('Invalid or expired token.')
-
     def initial(self, request, *args, **kwargs):
         uidb64 = kwargs['uidb64']
         uid = urlsafe_base64_decode(force_text(uidb64))
@@ -154,11 +150,11 @@ class OneTimeUseAPIMixin(object):
         try:
             self.user = User.objects.get(pk=uid)
         except User.DoesNotExist:
-            raise AuthenticationFailed(detail=self.message)
+            raise exceptions.InvalidExpiredToken()
 
         token = kwargs['token']
         if not default_token_generator.check_token(self.user, token):
-            raise AuthenticationFailed(detail=self.message)
+            raise exceptions.InvalidExpiredToken()
 
         return super(OneTimeUseAPIMixin, self).initial(
             request,

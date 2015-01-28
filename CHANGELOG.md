@@ -1,3 +1,7 @@
+## v5.0.0 (Upcoming)
+
+* Return 400 instead of 401 when `uidb64` or `token` is expired or not valid.
+
 ## v4.2.0
 
 * Return `AuthenticationFailed` `401` instead of `404` `NotFound` for not valid
