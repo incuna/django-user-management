@@ -29,24 +29,73 @@ class GetAuthTokenTest(APIRequestTestCase):
     model = models.AuthToken
     view_class = views.GetAuthToken
 
+    def setUp(self):
+        self.username = 'Test@example.com'
+        self.password = 'myepicstrongpassword'
+        self.data = {'username': self.username, 'password': self.password}
+
     def tearDown(self):
         cache.clear()
 
     def test_post(self):
-        username = 'Test@example.com'
-        password = 'myepicstrongpassword'
-        UserFactory.create(email=username.lower(), password=password)
+        """Assert user can sign in"""
+        UserFactory.create(email=self.username, password=self.password)
 
-        data = {'username': username, 'password': password}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data=self.data)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
             response.status_code, status.HTTP_200_OK, msg=response.data)
 
         # Ensure user has a token now
-        token = self.model.objects.get(user__email=username.lower())
+        token = self.model.objects.get()
         self.assertEqual(response.data['token'], token.key)
+
+    def test_post_non_existing_user(self):
+        """Assert non existing raises an error."""
+        request = self.create_request('post', auth=False, data=self.data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            msg=response.data,
+        )
+        expected = 'Unable to log in with provided credentials.'
+        self.assertIn(expected, response.data['non_field_errors'])
+        self.assertNotIn('token', response.data)
+
+    def test_post_user_not_confirmed(self):
+        """Assert non active users can not log in."""
+        UserFactory.create(email=self.username, password=self.password, is_active=False)
+
+        request = self.create_request('post', auth=False, data=self.data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            msg=response.data,
+        )
+        expected = 'User account is disabled.'
+        self.assertIn(expected, response.data['non_field_errors'])
+        self.assertNotIn('token', response.data)
+
+    def test_post_no_data(self):
+        """Assert sending no data raise an error."""
+        data = {'username': None, 'password': None}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            msg=response.data,
+        )
+        expected = 'This field is required.'
+        self.assertIn(expected, response.data['username'])
+        self.assertIn(expected, response.data['password'])
+        self.assertNotIn('token', response.data)
 
     def test_delete(self):
         someday = timezone.now() + datetime.timedelta(days=1)

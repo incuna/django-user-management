@@ -5,7 +5,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
 from incuna_mail import send
-from rest_framework import generics, renderers, response, status, views
+from rest_framework import generics, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -18,8 +18,6 @@ User = get_user_model()
 
 class GetAuthToken(ObtainAuthToken):
     model = models.AuthToken
-    renderer_classes = (renderers.JSONRenderer, renderers.BrowsableAPIRenderer)
-    serializer_class = serializers.AuthTokenSerializer
     throttle_classes = [
         throttling.UsernameLoginRateThrottle,
         throttling.LoginRateThrottle,
