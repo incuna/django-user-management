@@ -29,32 +29,30 @@ class GetAuthTokenTest(APIRequestTestCase):
     model = models.AuthToken
     view_class = views.GetAuthToken
 
+    def setUp(self):
+        self.username = 'Test@example.com'
+        self.password = 'myepicstrongpassword'
+        self.data = {'username': self.username, 'password': self.password}
+
     def tearDown(self):
         cache.clear()
 
     def test_post(self):
-        username = 'Test@example.com'
-        password = 'myepicstrongpassword'
-        UserFactory.create(email=username.lower(), password=password)
+        UserFactory.create(email=self.username, password=self.password)
 
-        data = {'username': username, 'password': password}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data=self.data)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
             response.status_code, status.HTTP_200_OK, msg=response.data)
 
         # Ensure user has a token now
-        token = self.model.objects.get(user__email=username.lower())
+        token = self.model.objects.get()
         self.assertEqual(response.data['token'], token.key)
 
     def test_post_non_existing_user(self):
         """Assert non existing raises an error."""
-        username = 'Test@example.com'
-        password = 'myepicstrongpassword'
-
-        data = {'username': username, 'password': password}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data=self.data)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
@@ -68,12 +66,9 @@ class GetAuthTokenTest(APIRequestTestCase):
 
     def test_post_user_not_confirmed(self):
         """Assert non active users can not log in."""
-        username = 'Test@example.com'
-        password = 'myepicstrongpassword'
-        UserFactory.create(email=username.lower(), password=password, is_active=False)
+        UserFactory.create(email=self.username, password=self.password, is_active=False)
 
-        data = {'username': username, 'password': password}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data=self.data)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
