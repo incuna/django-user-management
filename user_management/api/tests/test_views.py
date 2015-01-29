@@ -38,6 +38,7 @@ class GetAuthTokenTest(APIRequestTestCase):
         cache.clear()
 
     def test_post(self):
+        """Assert user can sign in"""
         UserFactory.create(email=self.username, password=self.password)
 
         request = self.create_request('post', auth=False, data=self.data)
