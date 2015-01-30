@@ -1,4 +1,4 @@
-## Upcoming
+## v6.0.0
 
 * Raise an error when user is not active at login
 
