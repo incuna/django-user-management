@@ -1,11 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from incuna_test_utils.compat import Python2AssertMixin
 
 from . factories import UserFactory
 from .. import admin_forms
 
 
-class UserCreationFormTest(TestCase):
+class UserCreationFormTest(Python2AssertMixin, TestCase):
     """Assert UserCreationForm` behaves properly."""
     form = admin_forms.UserCreationForm
 
@@ -71,7 +72,7 @@ class UserCreationFormTest(TestCase):
         self.assertEqual(user.email, data['email'])
 
 
-class UserChangeFormTest(TestCase):
+class UserChangeFormTest(Python2AssertMixin, TestCase):
     """Assert `UserChangeForm` behaves properly."""
     form = admin_forms.UserChangeForm
 
