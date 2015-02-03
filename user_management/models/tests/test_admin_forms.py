@@ -6,15 +6,18 @@ from .. import admin_forms
 
 
 class UserCreationFormTest(TestCase):
+    """Assert UserCreationForm` behaves properly."""
+    form = admin_forms.UserCreationForm
+
     def test_fields(self):
         """Assert `fields`."""
-        fields = admin_forms.UserCreationForm.base_fields.keys()
+        fields = self.form.base_fields.keys()
         expected = ('email', 'password1', 'password2')
         self.assertCountEqual(fields, expected)
 
     def test_required_fields(self):
         """Assert required `fields` are correct."""
-        form = admin_forms.UserCreationForm({})
+        form = self.form({})
         expected = 'This field is required.'
         self.assertIn(expected, form.errors['email'])
         self.assertIn(expected, form.errors['password1'])
@@ -23,7 +26,7 @@ class UserCreationFormTest(TestCase):
     def test_clean_email(self):
         email = 'Test@example.com'
 
-        form = admin_forms.UserCreationForm()
+        form = self.form()
         form.cleaned_data = {'email': email}
 
         self.assertEqual(form.clean_email(), email.lower())
@@ -31,7 +34,7 @@ class UserCreationFormTest(TestCase):
     def test_clean_duplicate_email(self):
         user = UserFactory.create()
 
-        form = admin_forms.UserCreationForm()
+        form = self.form()
         form.cleaned_data = {'email': user.email}
 
         with self.assertRaises(ValidationError):
@@ -40,7 +43,7 @@ class UserCreationFormTest(TestCase):
     def test_clean(self):
         data = {'password1': 'pass123', 'password2': 'pass123'}
 
-        form = admin_forms.UserCreationForm()
+        form = self.form()
         form.cleaned_data = data
 
         self.assertEqual(form.clean(), data)
@@ -48,7 +51,7 @@ class UserCreationFormTest(TestCase):
     def test_clean_mismatched(self):
         data = {'password1': 'pass123', 'password2': 'pass321'}
 
-        form = admin_forms.UserCreationForm()
+        form = self.form()
         form.cleaned_data = data
 
         with self.assertRaises(ValidationError):
@@ -61,7 +64,7 @@ class UserCreationFormTest(TestCase):
             'password2': 'pass123',
         }
 
-        form = admin_forms.UserCreationForm(data)
+        form = self.form(data)
         self.assertTrue(form.is_valid(), form.errors.items())
 
         user = form.save()
@@ -69,9 +72,12 @@ class UserCreationFormTest(TestCase):
 
 
 class UserChangeFormTest(TestCase):
+    """Assert `UserChangeForm` behaves properly."""
+    form = admin_forms.UserChangeForm
+
     def test_fields(self):
         """Assert `fields`."""
-        fields = admin_forms.UserChangeForm.base_fields.keys()
+        fields = self.form.base_fields.keys()
         expected = (
             'avatar',
             'email',
@@ -92,6 +98,5 @@ class UserChangeFormTest(TestCase):
         data = {'password': password}
         user = UserFactory.build()
 
-        form = admin_forms.UserChangeForm(data, instance=user)
-
+        form = self.form(data, instance=user)
         self.assertNotEqual(form.clean_password(), password)
