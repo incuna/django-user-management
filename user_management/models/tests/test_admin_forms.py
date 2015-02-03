@@ -6,6 +6,20 @@ from .. import admin_forms
 
 
 class UserCreationFormTest(TestCase):
+    def test_fields(self):
+        """Assert `fields`."""
+        fields = admin_forms.UserCreationForm.base_fields.keys()
+        expected = ('email', 'password1', 'password2')
+        self.assertCountEqual(fields, expected)
+
+    def test_required_fields(self):
+        """Assert required `fields` are correct."""
+        form = admin_forms.UserCreationForm({})
+        expected = 'This field is required.'
+        self.assertIn(expected, form.errors['email'])
+        self.assertIn(expected, form.errors['password1'])
+        self.assertIn(expected, form.errors['password2'])
+
     def test_clean_email(self):
         email = 'Test@example.com'
 
@@ -55,6 +69,24 @@ class UserCreationFormTest(TestCase):
 
 
 class UserChangeFormTest(TestCase):
+    def test_fields(self):
+        """Assert `fields`."""
+        fields = admin_forms.UserChangeForm.base_fields.keys()
+        expected = (
+            'avatar',
+            'email',
+            'email_verification_required',
+            'groups',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'name',
+            'password',
+            'user_permissions',
+        )
+        self.assertCountEqual(fields, expected)
+
     def test_clean_password(self):
         password = 'pass123'
         data = {'password': password}
