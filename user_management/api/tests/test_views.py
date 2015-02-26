@@ -140,6 +140,13 @@ class GetAuthTokenTest(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_unknown_token(self):
+        """An unknown token is accepted silently."""
+        auth = 'Token unknown'
+        request = self.create_request('delete', HTTP_AUTHORIZATION=auth)
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_user_auth_method_not_allowed(self):
         """Ensure GET requests are not allowed."""
         auth_url = reverse('user_management_api:auth')
