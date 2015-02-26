@@ -77,6 +77,13 @@ class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, self.throttle_expected_status)
 
+    def test_authenticated_user_not_throttled(self):
+        """An already authenticated user is not throttled."""
+        request = self.create_request('post', data={})
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertNotEqual(response.status_code, self.throttle_expected_status)
+
 
 class TestPasswordResetEmail(ClearCacheMixin, APIRequestTestCase):
     """Test `PasswordResetEmail` is throttled."""
