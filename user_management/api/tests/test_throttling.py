@@ -7,6 +7,7 @@ from rest_framework.test import APIRequestFactory
 from user_management.api import views
 from user_management.models.tests.factories import UserFactory
 from user_management.models.tests.utils import APIRequestTestCase
+from .. import throttling
 
 THROTTLE_RATE_PATH = 'rest_framework.throttling.ScopedRateThrottle.THROTTLE_RATES'
 
@@ -77,10 +78,21 @@ class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, self.throttle_expected_status)
 
+    @patch(THROTTLE_RATE_PATH, new={'logins': '1/minute'})
     def test_authenticated_user_not_throttled(self):
-        """An already authenticated user is not throttled."""
+        """An authenticated user is not throttled by UsernameLoginRateThrottle."""
         request = self.create_request('post', data={})
-        view = self.view_class.as_view()
+
+        class View(self.view_class):
+            throttle_classes = [throttling.UsernameLoginRateThrottle]
+
+        view = View.as_view()
+
+        # We are not throttled here
+        response = view(request)
+        self.assertNotEqual(response.status_code, self.throttle_expected_status)
+
+        # Or here
         response = view(request)
         self.assertNotEqual(response.status_code, self.throttle_expected_status)
 
