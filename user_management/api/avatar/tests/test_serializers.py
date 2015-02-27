@@ -77,11 +77,18 @@ class ThumbnailField(TestCase):
         image = field.to_native(mocked_image)
         self.assertEqual(image, None)
 
-    @expectedFailure
+    def mock_parent(self, context):
+        parent = MagicMock()
+        parent._context = context
+        parent.parent = None
+        return parent
+
     def test_to_native_no_request(self):
         """Calling to_native with no request returns the image url."""
         field = serializers.ThumbnailField()
-        field.context = {'request': None}
+
+        field.parent = self.mock_parent({'request': None})
+
         expected = '/url/'
         mocked_image = MagicMock(
             name='image.png',
@@ -90,7 +97,6 @@ class ThumbnailField(TestCase):
         image = field.to_native(mocked_image)
         self.assertEqual(image, expected)
 
-    @expectedFailure
     def test_to_native_no_kwargs(self):
         """Calling to_native with no QUERY_PARAMS returns the absolute image url."""
         field = serializers.ThumbnailField()
@@ -98,7 +104,8 @@ class ThumbnailField(TestCase):
         expected = 'test.com/url/'
         request.build_absolute_uri.return_value = expected
 
-        field.context = {'request': request}
+        field.parent = self.mock_parent({'request': request})
+
         field.get_generator_kwargs = MagicMock(return_value={})
         mocked_image = MagicMock(
             name='image.png',
@@ -108,13 +115,12 @@ class ThumbnailField(TestCase):
         self.assertEqual(image, expected)
         request.build_absolute_uri.assert_called_once_with(mocked_image.url)
 
-    @expectedFailure
     def test_to_native_calls_generate_thumbnail(self):
         """Calling to_native with QUERY_PARAMS calls generate_thumbnail."""
         field = serializers.ThumbnailField()
 
         request = MagicMock()
-        field.context = {'request': request}
+        field.parent = self.mock_parent({'request': request})
 
         kwargs = {'width': 100}
         field.get_generator_kwargs = MagicMock(return_value=kwargs)
