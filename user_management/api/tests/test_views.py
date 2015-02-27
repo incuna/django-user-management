@@ -1,5 +1,6 @@
 import datetime
 import re
+from collections import OrderedDict
 from unittest import expectedFailure
 
 from django.contrib.auth import get_user_model
@@ -318,6 +319,8 @@ class TestPasswordResetEmail(APIRequestTestCase):
         self.assertIn('auth/password_reset/confirm/', sent_mail.body)
         self.assertIn('https://', sent_mail.body)
 
+    # max_length is incorrectly missing from options, fixed in:
+    # https://github.com/tomchristie/django-rest-framework/commit/c8609ba652e1752e690c9e27e02b3531589d0c2c
     @expectedFailure
     def test_options(self):
         """
@@ -330,15 +333,15 @@ class TestPasswordResetEmail(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        expected_post_options = {
-            'email': {
-                'type': 'email',
-                'required': True,
-                'read_only': False,
-                'label': 'Email address',
-                'max_length': 511,
-            },
-        }
+        expected_post_options = OrderedDict((
+            ('email', OrderedDict((
+                ('type', 'email'),
+                ('required', True),
+                ('read_only', False),
+                ('label', 'Email address'),
+                ('max_length', 511),
+            ))),
+        ))
         self.assertEqual(
             response.data['actions']['POST'],
             expected_post_options,
