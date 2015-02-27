@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from incuna_mail import send
 from rest_framework import generics, response, status, views
 from rest_framework.authentication import get_authorization_header
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -27,9 +28,9 @@ class GetAuthToken(ObtainAuthToken):
     def post(self, request):
         """Create auth token. Differs from DRF that it always creates new token
         but not re-using them."""
-        serializer = self.serializer_class(data=request.DATA)
+        serializer = AuthTokenSerializer(data=request.DATA)
         if serializer.is_valid():
-            token = self.model.objects.create(user=serializer.object['user'])
+            token = self.model.objects.create(user=serializer.validated_data['user'])
             token.update_expiry()
             return response.Response({'token': token.key})
 

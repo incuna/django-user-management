@@ -39,7 +39,6 @@ class GetAuthTokenTest(APIRequestTestCase):
     def tearDown(self):
         cache.clear()
 
-    @expectedFailure
     def test_post(self):
         """Assert user can sign in"""
         UserFactory.create(email=self.username, password=self.password)
@@ -54,7 +53,6 @@ class GetAuthTokenTest(APIRequestTestCase):
         token = self.model.objects.get()
         self.assertEqual(response.data['token'], token.key)
 
-    @expectedFailure
     def test_post_non_existing_user(self):
         """Assert non existing raises an error."""
         request = self.create_request('post', auth=False, data=self.data)
@@ -69,7 +67,6 @@ class GetAuthTokenTest(APIRequestTestCase):
         self.assertIn(expected, response.data['non_field_errors'])
         self.assertNotIn('token', response.data)
 
-    @expectedFailure
     def test_post_user_not_confirmed(self):
         """Assert non active users can not log in."""
         UserFactory.create(email=self.username, password=self.password, is_active=False)
@@ -86,11 +83,9 @@ class GetAuthTokenTest(APIRequestTestCase):
         self.assertIn(expected, response.data['non_field_errors'])
         self.assertNotIn('token', response.data)
 
-    @expectedFailure
     def test_post_no_data(self):
         """Assert sending no data raise an error."""
-        data = {'username': None, 'password': None}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data={})
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
