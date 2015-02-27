@@ -1,19 +1,7 @@
-from unittest import expectedFailure
-
 from django.test import TestCase
 from mock import MagicMock, patch
 
-from user_management.models.tests.factories import UserFactory
 from .. import serializers
-
-
-class AvatarSerializerTest(TestCase):
-    @expectedFailure
-    def test_deserialize(self):
-        user = UserFactory.build()
-        data = {'avatar': ''}
-        serializer = serializers.AvatarSerializer(user, data=data)
-        self.assertTrue(serializer.is_valid())
 
 
 class ThumbnailField(TestCase):
