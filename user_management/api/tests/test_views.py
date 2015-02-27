@@ -168,7 +168,6 @@ class TestRegisterView(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    @expectedFailure
     def test_unauthenticated_user_post(self):
         """Unauthenticated Users should be able to register."""
         request = self.create_request('post', auth=False, data=self.data)
@@ -200,9 +199,7 @@ class TestRegisterView(APIRequestTestCase):
         # Password should validate
         self.assertTrue(check_password(self.data['password'], user.password))
 
-    @patch('user_management.api.serializers.RegistrationSerializer.Meta.model',
-           new=BasicUser)
-    @expectedFailure
+    @patch('user_management.api.serializers.User', new=BasicUser)
     def test_unauthenticated_user_post_no_verify_email(self):
         """
         An email should not be sent if email_verification_required is False.
@@ -214,7 +211,6 @@ class TestRegisterView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(len(mail.outbox), 0)
 
-    @expectedFailure
     def test_post_with_missing_data(self):
         """Password should not be sent back on failed request."""
         self.data.pop('name')
@@ -226,7 +222,6 @@ class TestRegisterView(APIRequestTestCase):
         self.assertFalse('password' in response.data)
         self.assertFalse(User.objects.count())
 
-    @expectedFailure
     def test_post_password_mismatch(self):
         """Password and password2 should be the same."""
         self.data['password2'] = 'something_different'
@@ -237,7 +232,6 @@ class TestRegisterView(APIRequestTestCase):
 
         self.assertFalse(User.objects.count())
 
-    @expectedFailure
     def test_duplicate_email(self):
         """Emails should be unique regardless of case."""
         # First create a user with the same email.

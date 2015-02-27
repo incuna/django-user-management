@@ -8,7 +8,13 @@ from user_management.utils.validators import validate_password_strength
 User = get_user_model()
 
 
-unique_email_validator = validators.UniqueValidator(
+class UniqueEmailValidator(validators.UniqueValidator):
+    def filter_queryset(self, value, queryset):
+        """Check lower-cased email is unique."""
+        return super().filter_queryset(value.lower(), queryset)
+
+
+unique_email_validator = UniqueEmailValidator(
     queryset=User.objects.all(),
     message=_('That email address has already been registered.'),
 )
@@ -53,7 +59,11 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        return User.objects.create(**validated_data)
+        password = validated_data.pop('password')
+        user = User.objects.create(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class PasswordChangeSerializer(serializers.ModelSerializer):
