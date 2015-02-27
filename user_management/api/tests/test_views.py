@@ -20,6 +20,7 @@ from user_management.api.tests.test_throttling import THROTTLE_RATE_PATH
 from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.models import BasicUser
 from user_management.models.tests.utils import APIRequestTestCase
+from user_management.tests.utils import iso_8601
 
 
 User = get_user_model()
@@ -674,11 +675,10 @@ class TestProfileDetail(APIRequestTestCase):
         expected = {
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         return expected
 
-    @expectedFailure
     def test_get(self):
         user = UserFactory.build()
 
@@ -696,7 +696,6 @@ class TestProfileDetail(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @expectedFailure
     def test_put(self):
         user = UserFactory.create()
         data = {
@@ -714,7 +713,6 @@ class TestProfileDetail(APIRequestTestCase):
 
         self.assertEqual(response.data, expected)
 
-    @expectedFailure
     def test_patch(self):
         user = UserFactory.create()
         data = {
@@ -751,7 +749,7 @@ class TestUserList(APIRequestTestCase):
             'url': TEST_SERVER + url,
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         return expected
 
@@ -815,7 +813,7 @@ class TestUserDetail(APIRequestTestCase):
             'url': TEST_SERVER + url,
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         return expected
 

@@ -9,11 +9,11 @@ from rest_framework.serializers import ValidationError
 
 from user_management.models.tests.factories import UserFactory
 from user_management.models.tests.utils import RequestTestCase
+from user_management.tests.utils import iso_8601
 from .. import serializers
 
 
 class ProfileSerializerTest(TestCase):
-    @expectedFailure
     def test_serialize(self):
         user = UserFactory.build()
         serializer = serializers.ProfileSerializer(user)
@@ -21,7 +21,7 @@ class ProfileSerializerTest(TestCase):
         expected = {
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         self.assertEqual(serializer.data, expected)
 
@@ -182,7 +182,6 @@ class RegistrationSerializerTest(TestCase):
 
 
 class UserSerializerTest(RequestTestCase):
-    @expectedFailure
     def test_serialize(self):
         user = UserFactory.create()
         request = self.create_request()
@@ -199,7 +198,7 @@ class UserSerializerTest(RequestTestCase):
             'url': url,
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         self.assertEqual(serializer.data, expected)
 
