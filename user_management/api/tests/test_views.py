@@ -411,7 +411,6 @@ class TestPasswordReset(APIRequestTestCase):
         user = User.objects.get(pk=user.pk)
         self.assertTrue(user.check_password(new_password))
 
-    @expectedFailure
     def test_password_mismatch(self):
         old_password = '0ld_passworD'
         new_password = 'n3w_Password'

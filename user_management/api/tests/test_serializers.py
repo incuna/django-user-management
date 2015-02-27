@@ -96,7 +96,6 @@ class PasswordChangeSerializerTest(TestCase):
 
 
 class PasswordResetSerializerTest(TestCase):
-    @expectedFailure
     def test_deserialize_passwords(self):
         new_password = 'n3w_Password'
         user = UserFactory.create()
@@ -110,7 +109,6 @@ class PasswordResetSerializerTest(TestCase):
         serializer.save()
         self.assertTrue(user.check_password(new_password))
 
-    @expectedFailure
     def test_deserialize_invalid_new_password(self):
         new_password = '2Short'
         user = UserFactory.build()
@@ -121,9 +119,7 @@ class PasswordResetSerializerTest(TestCase):
         })
         self.assertFalse(serializer.is_valid())
         self.assertIn('new_password', serializer.errors)
-        self.assertFalse(serializer.object.check_password(new_password))
 
-    @expectedFailure
     def test_deserialize_mismatched_passwords(self):
         new_password = 'n3w_Password'
         other_password = 'other_new_password'

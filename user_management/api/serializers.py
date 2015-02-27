@@ -114,12 +114,9 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         model = User
         fields = ('new_password', 'new_password2')
 
-    def restore_object(self, attrs, instance=None):
-        instance = super(PasswordResetSerializer, self).restore_object(
-            attrs,
-            instance,
-        )
-        instance.set_password(attrs['new_password'])
+    def update(self, instance, validated_data):
+        """Set the new password for the user."""
+        instance.set_password(validated_data['new_password'])
         return instance
 
     def validate(self, attrs):
