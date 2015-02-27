@@ -94,6 +94,7 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'old_password': msg})
 
         instance.set_password(validated_data['new_password'])
+        instance.save()
         return instance
 
     def validate(self, attrs):

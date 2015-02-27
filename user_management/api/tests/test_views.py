@@ -463,7 +463,6 @@ class TestPasswordReset(APIRequestTestCase):
 class TestPasswordChange(APIRequestTestCase):
     view_class = views.PasswordChange
 
-    @expectedFailure
     def test_update(self):
         old_password = '0ld_passworD'
         new_password = 'n3w_Password'
