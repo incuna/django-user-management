@@ -11,7 +11,8 @@ User = get_user_model()
 class UniqueEmailValidator(validators.UniqueValidator):
     def filter_queryset(self, value, queryset):
         """Check lower-cased email is unique."""
-        return super(UniqueEmailValidator, self).filter_queryset(
+        return validators.UniqueValidator.filter_queryset(
+            self,
             value.lower(),
             queryset,
         )
