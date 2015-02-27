@@ -5,6 +5,7 @@ from unittest import expectedFailure
 from django.test import TestCase
 from rest_framework.fields import Field
 from rest_framework.reverse import reverse
+from rest_framework.serializers import ValidationError
 
 from user_management.models.tests.factories import UserFactory
 from user_management.models.tests.utils import RequestTestCase
@@ -34,7 +35,6 @@ class ProfileSerializerTest(TestCase):
 
 
 class PasswordChangeSerializerTest(TestCase):
-    @expectedFailure
     def test_deserialize_passwords(self):
         old_password = '0ld_passworD'
         new_password = 'n3w_Password'
@@ -51,22 +51,21 @@ class PasswordChangeSerializerTest(TestCase):
         serializer.save()
         self.assertTrue(user.check_password(new_password))
 
-    @expectedFailure
     def test_deserialize_invalid_old_password(self):
         old_password = '0ld_passworD'
         new_password = 'n3w_Password'
 
         user = UserFactory.build(password=old_password)
 
-        serializer = serializers.PasswordChangeSerializer(user, data={
+        serializer = serializers.PasswordChangeSerializer()
+        data = {
             'old_password': 'invalid_password',
             'new_password': new_password,
             'new_password2': new_password,
-        })
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('old_password', serializer.errors)
+        }
+        with self.assertRaises(ValidationError):
+            serializer.update(user, data)
 
-    @expectedFailure
     def test_deserialize_invalid_new_password(self):
         old_password = '0ld_passworD'
         new_password = '2Short'
@@ -80,9 +79,7 @@ class PasswordChangeSerializerTest(TestCase):
         })
         self.assertFalse(serializer.is_valid())
         self.assertIn('new_password', serializer.errors)
-        self.assertTrue(serializer.object.check_password(old_password))
 
-    @expectedFailure
     def test_deserialize_mismatched_passwords(self):
         old_password = '0ld_passworD'
         new_password = 'n3w_Password'

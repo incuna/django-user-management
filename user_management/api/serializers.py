@@ -81,19 +81,14 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         model = User
         fields = ('old_password', 'new_password', 'new_password2')
 
-    def restore_object(self, attrs, instance=None):
-        instance = super(PasswordChangeSerializer, self).restore_object(
-            attrs,
-            instance,
-        )
-        instance.set_password(attrs['new_password'])
-        return instance
-
-    def validate_old_password(self, value):
-        if not self.object.check_password(value):
+    def update(self, instance, validated_data):
+        """Check the old password is valid and set the new password."""
+        if not instance.check_password(validated_data['old_password']):
             msg = _('Invalid password.')
-            raise serializers.ValidationError(msg)
-        return value
+            raise serializers.ValidationError({'old_password': msg})
+
+        instance.set_password(validated_data['new_password'])
+        return instance
 
     def validate(self, attrs):
         if attrs.get('new_password') != attrs['new_password2']:

@@ -511,7 +511,6 @@ class TestPasswordChange(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @expectedFailure
     def test_update_wrong_old_password(self):
         old_password = '0ld_passworD'
         new_password = 'n3w_Password'
@@ -533,7 +532,6 @@ class TestPasswordChange(APIRequestTestCase):
         user = User.objects.get(pk=user.pk)
         self.assertTrue(user.check_password(old_password))
 
-    @expectedFailure
     def test_update_invalid_new_password(self):
         old_password = '0ld_passworD'
         new_password = '2Short'
@@ -555,7 +553,6 @@ class TestPasswordChange(APIRequestTestCase):
         user = User.objects.get(pk=user.pk)
         self.assertTrue(user.check_password(old_password))
 
-    @expectedFailure
     def test_update_mismatched_passwords(self):
         old_password = '0ld_passworD'
         new_password = 'n3w_Password'
