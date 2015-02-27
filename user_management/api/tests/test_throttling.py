@@ -110,7 +110,6 @@ class TestResendConfirmationEmail(ClearCacheMixin, APIRequestTestCase):
     view_class = views.ResendConfirmationEmail
 
     @patch(THROTTLE_RATE_PATH, new={'confirmations': '1/minute'})
-    @expectedFailure
     def test_post_rate_limit(self):
         """Assert POST requests are rate limited."""
         user = UserFactory.create()

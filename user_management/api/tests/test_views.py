@@ -782,7 +782,6 @@ class TestUserList(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @expectedFailure
     def test_post(self):
         """Users should be able to create."""
         data = {
@@ -920,7 +919,6 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
     """Assert `ResendConfirmationEmail` behaves properly."""
     view_class = views.ResendConfirmationEmail
 
-    @expectedFailure
     def test_post(self):
         """Assert user can request a new confirmation email."""
         user = UserFactory.create()
@@ -934,7 +932,6 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
             msg=response.data,
         )
 
-    @expectedFailure
     def test_post_unknown_email(self):
         """Assert unknown email raises an error."""
         data = {'email': 'theman@theiron.mask'}
@@ -944,7 +941,6 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('email', response.data)
 
-    @expectedFailure
     def test_post_email_already_verified(self):
         """Assert email already verified does not trigger another email."""
         user = UserFactory.create(email_verification_required=False)
@@ -955,7 +951,6 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('email', response.data)
 
-    @expectedFailure
     def test_send_email(self):
         """Assert user can receive a new confirmation email."""
         user = UserFactory.create()

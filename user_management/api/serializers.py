@@ -9,14 +9,13 @@ User = get_user_model()
 
 
 class ValidateEmailMixin(object):
-    def validate_email(self, attrs, source):
-        email = attrs.get(source).lower()
+    def validate_email(self, value):
+        email = value.lower()
 
         try:
             User.objects.get_by_natural_key(email)
         except User.DoesNotExist:
-            attrs[source] = email
-            return attrs
+            return email
         else:
             msg = _('That email address has already been registered.')
             raise serializers.ValidationError(msg)
@@ -47,11 +46,11 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
         fields = ['name', 'email', 'password', 'password2']
         model = User
 
-    def validate_password2(self, attrs, source):
-        password2 = attrs.pop(source)
+    def validate(self, attrs):
+        password2 = attrs.pop('password2')
         if password2 != attrs.get('password'):
             msg = _('Your passwords do not match.')
-            raise serializers.ValidationError(msg)
+            raise serializers.ValidationError({'password2': msg})
         return attrs
 
     def restore_object(self, attrs, instance=None):
@@ -90,17 +89,16 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         instance.set_password(attrs['new_password'])
         return instance
 
-    def validate_old_password(self, attrs, source):
-        value = attrs[source]
+    def validate_old_password(self, value):
         if not self.object.check_password(value):
             msg = _('Invalid password.')
             raise serializers.ValidationError(msg)
-        return attrs
+        return value
 
-    def validate_new_password2(self, attrs, source):
-        if attrs.get('new_password') != attrs[source]:
+    def validate(self, attrs):
+        if attrs.get('new_password') != attrs['new_password2']:
             msg = _('Your new passwords do not match.')
-            raise serializers.ValidationError(msg)
+            raise serializers.ValidationError({'new_password2': msg})
         return attrs
 
 
@@ -129,10 +127,10 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         instance.set_password(attrs['new_password'])
         return instance
 
-    def validate_new_password2(self, attrs, source):
-        if attrs.get('new_password') != attrs[source]:
+    def validate(self, attrs):
+        if attrs.get('new_password') != attrs['new_password2']:
             msg = _('Your new passwords do not match.')
-            raise serializers.ValidationError(msg)
+            raise serializers.ValidationError({'new_password2': msg})
         return attrs
 
 
@@ -149,12 +147,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class ResendConfirmationEmailSerializer(EmailSerializerBase):
     """Serializer defining an `email` field to resend a confirmation email."""
-    def validate_email(self, attrs, source):
-        """Validate if email exists and requires a verification.
+    def validate_email(self, email):
+        """
+        Validate if email exists and requires a verification.
 
         `validate_email` will set a `user` attribute on the instance allowing
-        the view to send an email confirmation."""
-        email = attrs[source]
+        the view to send an email confirmation.
+        """
         try:
             self.user = User.objects.get_by_natural_key(email)
         except User.DoesNotExist:
@@ -164,7 +163,7 @@ class ResendConfirmationEmailSerializer(EmailSerializerBase):
         if not self.user.email_verification_required:
             msg = _('User email address is already verified.')
             raise serializers.ValidationError(msg)
-        return attrs
+        return email
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

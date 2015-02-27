@@ -353,7 +353,6 @@ class SerializerPasswordsTest(TestCase):
 
 
 class ResendConfirmationEmailSerializerTest(TestCase):
-    @expectedFailure
     def test_serialize(self):
         """Assert user can request a new email confirmation."""
         user = UserFactory.create()
@@ -361,14 +360,12 @@ class ResendConfirmationEmailSerializerTest(TestCase):
         serializer = serializers.ResendConfirmationEmailSerializer(data=data)
         self.assertTrue(serializer.is_valid(), msg=serializer.errors)
 
-    @expectedFailure
     def test_user_does_not_exist(self):
         """Assert user should exist before sending email confirmation."""
         data = {'email': 'a-non-existing@user.com'}
         serializer = serializers.ResendConfirmationEmailSerializer(data=data)
         self.assertFalse(serializer.is_valid())
 
-    @expectedFailure
     def test_user_already_validated(self):
         """Assert confirmation email is not send if user was already verified."""
         user = UserFactory.create(email_verification_required=False)
