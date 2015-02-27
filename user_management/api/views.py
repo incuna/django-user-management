@@ -211,7 +211,7 @@ class UserList(generics.ListCreateAPIView):
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    model = User
+    queryset = User.objects.all()
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializer
 

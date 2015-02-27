@@ -811,7 +811,6 @@ class TestUserDetail(APIRequestTestCase):
         response = view(request, pk=self.other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    @expectedFailure
     def test_get(self):
         request = self.create_request(user=self.user)
         view = self.view_class.as_view()
@@ -839,7 +838,6 @@ class TestUserDetail(APIRequestTestCase):
     def test_delete_unauthorised(self):
         self.check_method_forbidden('delete')
 
-    @expectedFailure
     def test_put(self):
         """ Tests PUT existing user for staff """
         self.user.is_staff = True
@@ -860,7 +858,6 @@ class TestUserDetail(APIRequestTestCase):
         user = User.objects.get(pk=self.other_user.pk)
         self.assertEqual(user.name, data['name'])
 
-    @expectedFailure
     def test_patch(self):
         """ Tests PATCH new user for staff """
         self.user.is_staff = True
@@ -881,7 +878,6 @@ class TestUserDetail(APIRequestTestCase):
         user = User.objects.get(pk=self.other_user.pk)
         self.assertEqual(user.name, data['name'])
 
-    @expectedFailure
     def test_delete(self):
         """ Tests DELETE user for staff """
         self.user.is_staff = True
