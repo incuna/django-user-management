@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 from user_management.utils.validators import validate_password_strength
 
@@ -8,17 +8,15 @@ from user_management.utils.validators import validate_password_strength
 User = get_user_model()
 
 
+unique_email_validator = validators.UniqueValidator(
+    queryset=User.objects.all(),
+    message=_('That email address has already been registered.'),
+)
+
+
 class ValidateEmailMixin(object):
     def validate_email(self, value):
-        email = value.lower()
-
-        try:
-            User.objects.get_by_natural_key(email)
-        except User.DoesNotExist:
-            return email
-        else:
-            msg = _('That email address has already been registered.')
-            raise serializers.ValidationError(msg)
+        return value.lower()
 
 
 class EmailSerializerBase(serializers.Serializer):
@@ -30,6 +28,7 @@ class EmailSerializerBase(serializers.Serializer):
 
 
 class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[unique_email_validator])
     password = serializers.CharField(
         write_only=True,
         min_length=8,
@@ -164,5 +163,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializerCreate(ValidateEmailMixin, UserSerializer):
+    email = serializers.EmailField(validators=[unique_email_validator])
+
     class Meta(UserSerializer.Meta):
         read_only_fields = ('date_joined',)

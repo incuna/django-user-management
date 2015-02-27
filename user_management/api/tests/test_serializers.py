@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import string
-from unittest import expectedFailure
 
 from django.test import TestCase
 from rest_framework.fields import Field
@@ -201,7 +200,6 @@ class UserSerializerTest(RequestTestCase):
         serializer = serializers.UserSerializer(user, data=data)
         self.assertTrue(serializer.is_valid())
 
-    @expectedFailure
     def test_deserialize_create_email_in_use(self):
         other_user = UserFactory.create()
         data = {
@@ -216,7 +214,6 @@ class UserSerializerTest(RequestTestCase):
             serializer._errors['email'],
             ['That email address has already been registered.'])
 
-    @expectedFailure
     def test_deserialize_update_email_in_use(self):
         user = UserFactory.create()
         other_user = UserFactory.create()
@@ -245,6 +242,21 @@ class TestUserSerializerCreate(TestCase):
         serializer = serializers.UserSerializerCreate(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('email', serializer.errors)
+
+    def test_deserialize_email_in_use(self):
+        other_user = UserFactory.create()
+        data = {
+            'name': "Robert'); DROP TABLE Students;--'",
+            'email': other_user.email,
+            'password': 'Sup3RSecre7paSSw0rD',
+            'password2': 'Sup3RSecre7paSSw0rD',
+        }
+        serializer = serializers.UserSerializerCreate(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer._errors['email'],
+            ['That email address has already been registered.'],
+        )
 
 
 class SerializerPasswordsTest(TestCase):
