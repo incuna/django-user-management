@@ -10,5 +10,5 @@ release:
 
 test:
 	@coverage run ./user_management/tests/run.py
-	@coverage report --show-missing
+	@coverage report --show-missing --fail-under=100
 	@flake8
