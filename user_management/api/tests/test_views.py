@@ -748,7 +748,6 @@ class TestUserList(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @expectedFailure
     def test_get(self):
         user = UserFactory.create()
 

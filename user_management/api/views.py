@@ -205,7 +205,7 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
 
 
 class UserList(generics.ListCreateAPIView):
-    model = User
+    queryset = User.objects.all()
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializerCreate
 
