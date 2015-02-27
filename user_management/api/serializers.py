@@ -53,11 +53,8 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
             raise serializers.ValidationError({'password2': msg})
         return attrs
 
-    def restore_object(self, attrs, instance=None):
-        password = attrs.pop('password')
-        instance = super(RegistrationSerializer, self).restore_object(attrs, instance)
-        instance.set_password(password)
-        return instance
+    def create(self, validated_data):
+        return User.objects.create(**validated_data)
 
 
 class PasswordChangeSerializer(serializers.ModelSerializer):

@@ -142,33 +142,28 @@ class RegistrationSerializerTest(TestCase):
             'password2': 'Sup3RSecre7paSSw0rD',
         }
 
-    @expectedFailure
     def test_deserialize(self):
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertTrue(serializer.is_valid())
 
-        user = serializer.object
-        self.assertEqual(user.name, self.data['name'])
-        self.assertEqual(user.email, self.data['email'].lower())
-        self.assertTrue(user.check_password(self.data['password']))
+        validated_data = serializer.validated_data
+        self.assertEqual(validated_data['name'], self.data['name'])
+        self.assertEqual(validated_data['email'], self.data['email'].lower())
+        self.assertEqual(validated_data['password'], self.data['password'])
 
-    @expectedFailure
     def test_deserialize_invalid_new_password(self):
         self.data['password'] = '2short'
 
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('password', serializer.errors)
-        self.assertIs(serializer.object, None)
 
-    @expectedFailure
     def test_deserialize_mismatched_passwords(self):
         self.data['password2'] = 'different_password'
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('password2', serializer.errors)
 
-    @expectedFailure
     def test_deserialize_no_email(self):
         self.data['email'] = None
 
@@ -287,42 +282,36 @@ class SerializerPasswordsTest(TestCase):
         on_present = '{} unexpectedly in {}.errors'.format(field, serializer)
         self.assertFalse(field in serializer.errors, on_present)
 
-    @expectedFailure
     def test_missing(self):
         data = {}
         for serializer_class, field in self.serializers:
             msg = Field.default_error_messages['required']
             self.assert_validation_error(serializer_class, field, data, msg)
 
-    @expectedFailure
     def test_too_short(self):
         for serializer_class, field in self.serializers:
             data = {field: 'Aa1'}
-            msg = 'Ensure this value has at least 8 characters (it has 3).'
+            msg = 'Ensure this field has at least 8 characters.'
             self.assert_validation_error(serializer_class, field, data, msg)
 
-    @expectedFailure
     def test_no_upper(self):
         for serializer_class, field in self.serializers:
             data = {field: 'aaaa1111'}
             msg = self.too_simple
             self.assert_validation_error(serializer_class, field, data, msg)
 
-    @expectedFailure
     def test_no_lower(self):
         for serializer_class, field in self.serializers:
             data = {field: 'AAAA1111'}
             msg = self.too_simple
             self.assert_validation_error(serializer_class, field, data, msg)
 
-    @expectedFailure
     def test_no_number(self):
         for serializer_class, field in self.serializers:
             data = {field: 'AAAAaaaa'}
             msg = self.too_simple
             self.assert_validation_error(serializer_class, field, data, msg)
 
-    @expectedFailure
     def test_symbols(self):
         """Ensure all acceptable symbols are acceptable."""
         for serializer_class, field in self.serializers:
@@ -330,14 +319,12 @@ class SerializerPasswordsTest(TestCase):
                 data = {field: 'AAaa111' + symbol}
                 self.assert_no_validation_error(serializer_class, field, data)
 
-    @expectedFailure
     def test_non_ascii(self):
         for serializer_class, field in self.serializers:
             data = {field: u'AA11aa££'}  # £ is not an ASCII character.
             msg = self.too_fancy
             self.assert_validation_error(serializer_class, field, data, msg)
 
-    @expectedFailure
     def test_ok(self):
         for serializer_class, field in self.serializers:
             data = {field: 'AAAaaa11'}
