@@ -381,7 +381,6 @@ class TestPasswordReset(APIRequestTestCase):
         response = view(request, uidb64=uid, token=token)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @expectedFailure
     def test_put(self):
         old_password = '0ld_passworD'
         new_password = 'n3w_Password'

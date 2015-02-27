@@ -123,6 +123,7 @@ class PasswordResetSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Set the new password for the user."""
         instance.set_password(validated_data['new_password'])
+        instance.save()
         return instance
 
     def validate(self, attrs):
