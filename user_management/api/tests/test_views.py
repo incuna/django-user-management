@@ -728,6 +728,16 @@ class TestProfileDetail(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_delete(self):
+        """Assert a user can delete its profile."""
+        request = self.create_request('delete')
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get()
+
 
 class TestUserList(APIRequestTestCase):
     view_class = views.UserList
