@@ -1,3 +1,7 @@
+## v6.1.0 (upcoming)
+
+* Add `delete` to `ProfileDetail` view
+
 ## v6.0.0
 
 * Raise an error when user is not active at login
