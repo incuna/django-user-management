@@ -1,6 +1,13 @@
-## v6.1.0 (upcoming)
+## v7.0.0 (upcoming)
 
 * Add `delete` to `ProfileDetail` view
+
+### Notes
+
+* When an object is referencing the user model with a foreign key it is possible
+to define the bahavior with `on_delete`.
+
+see https://docs.djangoproject.com/en/1.7/ref/models/fields/#django.db.models.ForeignKey.on_delete
 
 ## v6.0.0
 
