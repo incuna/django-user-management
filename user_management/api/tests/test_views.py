@@ -142,6 +142,13 @@ class GetAuthTokenTest(APIRequestTestCase):
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_unknown_token(self):
+        """An unknown token is accepted silently."""
+        auth = 'Token unknown'
+        request = self.create_request('delete', HTTP_AUTHORIZATION=auth)
+        response = self.view_class.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_user_auth_method_not_allowed(self):
         """Ensure GET requests are not allowed."""
         auth_url = reverse('user_management_api:auth')
@@ -724,6 +731,16 @@ class TestProfileDetail(APIRequestTestCase):
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete(self):
+        """Assert a user can delete its profile."""
+        request = self.create_request('delete')
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get()
 
 
 class TestUserList(APIRequestTestCase):

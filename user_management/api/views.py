@@ -195,7 +195,7 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
         )
 
 
-class ProfileDetail(generics.RetrieveUpdateAPIView):
+class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer

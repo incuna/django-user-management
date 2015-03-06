@@ -30,13 +30,13 @@ settings.configure(
         'user_management.api',
         'user_management.models.tests',
     ),
-    PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',),
-    SITE_ID = 1,
-    AUTH_USER_MODEL = 'tests.User',
-    AUTHENTICATION_BACKENDS = (
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.MD5PasswordHasher',),
+    SITE_ID=1,
+    AUTH_USER_MODEL='tests.User',
+    AUTHENTICATION_BACKENDS=(
         'user_management.models.backends.CaseInsensitiveEmailBackend',
     ),
-    MIDDLEWARE_CLASSES = (),
+    MIDDLEWARE_CLASSES=(),
     ROOT_URLCONF='user_management.api.tests.urls',
     REST_FRAMEWORK={
         'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -52,7 +52,8 @@ if django.VERSION >= (1, 7):
     django.setup()
 
 
-from django.test.runner import DiscoverRunner
+# DiscoverRunner requires `django.setup()` to have been called
+from django.test.runner import DiscoverRunner  # noqa
 
 
 class TestRunner(ColourRunnerMixin, DiscoverRunner):
