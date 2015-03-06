@@ -1,6 +1,6 @@
 ## v7.0.1 (Upcoming)
 
-* Fix `UserChangeForm` admin form to use `exclude` instead of `fields`.
+* Fix `UserChangeForm` admin form `fields` to only include fields used in `UserAdmin.fieldsets`.
 
 ## v7.0.0
 
