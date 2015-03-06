@@ -1,4 +1,4 @@
-## v7.0.0 (upcoming)
+## v7.0.0
 
 * Add `delete` to `ProfileDetail` view
 
