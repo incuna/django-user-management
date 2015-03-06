@@ -1,3 +1,7 @@
+## v7.0.1 (Upcoming)
+
+* Fix `UserChangeForm` admin form to use `exclude` instead of `fields`.
+
 ## v7.0.0
 
 * Add `delete` to `ProfileDetail` view

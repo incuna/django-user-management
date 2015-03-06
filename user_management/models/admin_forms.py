@@ -69,19 +69,7 @@ class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField()
 
     class Meta:
-        fields = (
-            'avatar',
-            'email',
-            'email_verification_required',
-            'groups',
-            'is_active',
-            'is_staff',
-            'is_superuser',
-            'last_login',
-            'name',
-            'password',
-            'user_permissions',
-        )
+        exclude = ()
         model = User
 
     def clean_password(self):
