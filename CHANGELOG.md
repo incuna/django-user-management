@@ -1,4 +1,8 @@
-## v7.0.0 (upcoming)
+## v7.0.1
+
+* Fix `UserChangeForm` admin form `fields` to only include fields used in `UserAdmin.fieldsets`.
+
+## v7.0.0
 
 * Add `delete` to `ProfileDetail` view
 
