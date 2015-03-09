@@ -1,4 +1,4 @@
-## v7.0.1 (Upcoming)
+## v7.0.1
 
 * Fix `UserChangeForm` admin form `fields` to only include fields used in `UserAdmin.fieldsets`.
 
