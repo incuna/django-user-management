@@ -80,9 +80,7 @@ class UserChangeFormTest(Python2AssertMixin, TestCase):
         """Assert `fields`."""
         fields = self.form.base_fields.keys()
         expected = (
-            'avatar',
             'email',
-            'email_verification_required',
             'groups',
             'is_active',
             'is_staff',

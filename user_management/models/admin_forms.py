@@ -70,9 +70,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         fields = (
-            'avatar',
             'email',
-            'email_verification_required',
             'groups',
             'is_active',
             'is_staff',
