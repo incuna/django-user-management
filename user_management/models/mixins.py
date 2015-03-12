@@ -7,7 +7,8 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes, python_2_unicode_compatible
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
-from incuna_mail import send
+
+from user_management.utils.notifications import Notification
 
 
 class UserManager(BaseUserManager):
@@ -128,56 +129,44 @@ class VerifyEmailManager(UserManager):
 
 
 class EmailVerifyUserMethodsMixin:
-    EMAIL_SUBJECT = '{domain} account validate'
-    TEXT_EMAIL_TEMPLATE = 'user_management/account_validation_email.txt'
-    HTML_EMAIL_TEMPLATE = 'user_management/account_validation_email.html'
-
     def email_context(self, site):
         return {
+            'protocol': 'https',
             'uid': urlsafe_base64_encode(force_bytes(self.pk)),
             'token': default_token_generator.make_token(self),
             'site': site,
         }
 
-    def email_kwargs(self, context, domain):
-        """Prepare the kwargs to be passed to incuna_mail.send"""
-        return {
-            'to': [self.email],
-            'template_name': self.TEXT_EMAIL_TEMPLATE,
-            'html_template_name': self.HTML_EMAIL_TEMPLATE,
-            'subject': self.get_email_subject(domain),
-            'context': context,
-        }
-
-    def get_email_subject(self, domain):
-        return _(self.EMAIL_SUBJECT).format(domain=domain)
-
     def send_validation_email(self):
-        """
-        Send a validation email to the user's email address.
-
-        The email subject can be customised by overriding
-        VerifyEmailMixin.EMAIL_SUBJECT or VerifyEmailMixin.get_email_subject.
-        To include your site's domain in the subject, include {domain} in
-        VerifyEmailMixin.EMAIL_SUBJECT.
-
-        By default send_validation_email sends a multipart email using
-        VerifyEmailMixin.TEXT_EMAIL_TEMPLATE and
-        VerifyEmailMixin.HTML_EMAIL_TEMPLATE. To send a text-only email
-        set VerifyEmailMixin.HTML_EMAIL_TEMPLATE to None.
-
-        You can also customise the context available in the email templates
-        by extending VerifyEmailMixin.email_context.
-
-        If you want more control over the sending of the email you can
-        extend VerifyEmailMixin.email_kwargs.
-        """
+        """Send a validation email to the user's email address."""
         if not self.email_verification_required:
             raise ValueError(_('Cannot validate already active user.'))
 
         site = Site.objects.get_current()
-        context = self.email_context(site)
-        send(**self.email_kwargs(context, site.domain))
+        email_subject = _('{domain} account validate'.format(domain=site.domain))
+
+        notification = Notification(
+            user=self,
+            text_email_template='user_management/account_validation_email.txt',
+            html_email_template='user_management/account_validation_email.html',
+            email_subject=email_subject,
+            context=self.email_context(site),
+        )
+        notification.notify()
+
+    def send_password_reset(self):
+        """Send a password reset to the user's email address."""
+        site = Site.objects.get_current()
+        email_subject = _('{domain} password reset'.format(domain=site.domain))
+
+        notification = Notification(
+            user=self,
+            text_email_template='user_management/password_reset_email.txt',
+            html_email_template='user_management/password_reset_email.html',
+            email_subject=email_subject,
+            context=self.email_context(site),
+        )
+        notification.notify()
 
 
 class EmailVerifyUserMixin(EmailVerifyUserMethodsMixin, models.Model):

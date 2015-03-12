@@ -22,7 +22,7 @@ class BasicUser(BasicUserFieldsMixin, AbstractBaseUser):
     pass
 
 
-class VerifyEmailUser(VerifyEmailMixin):
+class VerifyEmailUser(VerifyEmailMixin, AbstractBaseUser):
     pass
 
 

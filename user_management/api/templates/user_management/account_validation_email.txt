@@ -4,7 +4,7 @@ register an account at {{ site.name }}.
 
 Please click the following link to complete your registration:
 {% endblocktrans %}
-http://{{ site.domain }}/#/register/verify/{{ uid }}/{{ token }}/
+https://{{ site.domain }}/#/register/verify/{{ uid }}/{{ token }}/
 
 {% endautoescape %}
 {% endspaceless %}
