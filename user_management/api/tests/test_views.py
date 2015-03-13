@@ -25,7 +25,7 @@ from user_management.models.tests.utils import APIRequestTestCase
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
 SEND_METHOD = 'user_management.utils.notifications.incuna_mail.send'
-EMAIL_CONTEXT = 'user_management.models.mixins.EmailVerifyUserMethodsMixin.email_context'
+EMAIL_CONTEXT = 'user_management.utils.notifications.email_context'
 
 
 class GetAuthTokenTest(APIRequestTestCase):

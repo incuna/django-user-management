@@ -1,11 +1,9 @@
 from django.contrib.auth.models import BaseUserManager
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import force_bytes, python_2_unicode_compatible
-from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from user_management.utils.notifications import (
@@ -140,38 +138,24 @@ class EmailVerifyUserMethodsMixin:
     password_reset_notification = PasswordResetNotification
     validation_notification = ValidationNotification
 
-    def email_context(self, site):
-        return {
-            'protocol': 'https',
-            'uid': urlsafe_base64_encode(force_bytes(self.pk)),
-            'token': default_token_generator.make_token(self),
-            'site': site,
-        }
-
     def send_validation_email(self):
         """Send a validation email to the user's email address."""
         if not self.email_verification_required:
             raise ValueError(_('Cannot validate already active user.'))
 
         site = Site.objects.get_current()
-        email_subject = _('{domain} account validate'.format(domain=site.domain))
-
         notification = self.validation_notification(
             user=self,
-            email_subject=email_subject,
-            context=self.email_context(site),
+            site=site,
         )
         notification.notify()
 
     def send_password_reset(self):
         """Send a password reset to the user's email address."""
         site = Site.objects.get_current()
-        email_subject = _('{domain} password reset'.format(domain=site.domain))
-
         notification = self.password_reset_notification(
             user=self,
-            email_subject=email_subject,
-            context=self.email_context(site),
+            site=site,
         )
         notification.notify()
 

@@ -12,14 +12,16 @@ from django.test import TestCase
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from mock import patch
+from mock import Mock, patch
 
 from user_management.models.tests import utils
+from user_management.utils.notifications import email_context
 from . import models
 from .factories import UserFactory
 from .. import mixins
 
 
+EMAIL_CONTEXT = 'user_management.utils.notifications.email_context'
 SEND_METHOD = 'user_management.utils.notifications.incuna_mail.send'
 
 skip_if_checks_unavailable = unittest.skipIf(
@@ -179,18 +181,20 @@ class TestVerifyEmailMixin(TestCase):
         self.assertTrue(user.email_verification_required)
 
     def test_email_context(self):
-        site = Site.objects.get_current()
         user = self.model()
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
+        notification = Mock()
+        notification.user = user
+
         with patch.object(default_token_generator, 'make_token') as make_token:
-            context = user.email_context(site)
+            context = email_context(notification)
 
         expected_context = {
             'protocol': 'https',
             'uid': uid,
             'token': make_token(),
-            'site': site,
+            'site': notification.site,
         }
         self.assertEqual(context, expected_context)
 
@@ -199,7 +203,7 @@ class TestVerifyEmailMixin(TestCase):
         site = Site.objects.get_current()
         user = self.model(email='email@email.email')
 
-        with patch.object(user, 'email_context') as get_context:
+        with patch(EMAIL_CONTEXT) as get_context:
             get_context.return_value = context
             with patch(SEND_METHOD) as send:
                 user.send_validation_email()
@@ -291,7 +295,7 @@ class TestCustomPasswordResetNotification(TestCase):
         site = Site.objects.get_current()
         user = self.model(email='email@email.email')
 
-        with patch.object(user, 'email_context') as get_context:
+        with patch(EMAIL_CONTEXT) as get_context:
             get_context.return_value = context
             with patch(SEND_METHOD) as send:
                 user.send_password_reset()
