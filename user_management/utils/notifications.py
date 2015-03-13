@@ -1,5 +1,5 @@
 import incuna_mail
-from pigeon.notification import Notification as NotificationBase
+from pigeon.notification import Notification
 
 
 def email_handler(notification):
@@ -13,5 +13,18 @@ def email_handler(notification):
     )
 
 
-class Notification(NotificationBase):
+class NotificationBase(Notification):
+    """Base notification class defining an `email_handler`."""
     handlers = (email_handler,)
+
+
+class PasswordResetNotification(NotificationBase):
+    """`PasswordResetNotification` defining text and html email templates."""
+    text_email_template = 'user_management/password_reset_email.txt'
+    html_email_template = 'user_management/password_reset_email.html'
+
+
+class ValidationNotification(NotificationBase):
+    """`ValidationNotification` defining text and html email templates."""
+    text_email_template = 'user_management/account_validation_email.txt'
+    html_email_template = 'user_management/account_validation_email.html'

@@ -8,7 +8,10 @@ from django.utils.encoding import force_bytes, python_2_unicode_compatible
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
 
-from user_management.utils.notifications import Notification
+from user_management.utils.notifications import (
+    PasswordResetNotification,
+    ValidationNotification,
+)
 
 
 class UserManager(BaseUserManager):
@@ -145,10 +148,8 @@ class EmailVerifyUserMethodsMixin:
         site = Site.objects.get_current()
         email_subject = _('{domain} account validate'.format(domain=site.domain))
 
-        notification = Notification(
+        notification = ValidationNotification(
             user=self,
-            text_email_template='user_management/account_validation_email.txt',
-            html_email_template='user_management/account_validation_email.html',
             email_subject=email_subject,
             context=self.email_context(site),
         )
@@ -159,10 +160,8 @@ class EmailVerifyUserMethodsMixin:
         site = Site.objects.get_current()
         email_subject = _('{domain} password reset'.format(domain=site.domain))
 
-        notification = Notification(
+        notification = PasswordResetNotification(
             user=self,
-            text_email_template='user_management/password_reset_email.txt',
-            html_email_template='user_management/password_reset_email.html',
             email_subject=email_subject,
             context=self.email_context(site),
         )
