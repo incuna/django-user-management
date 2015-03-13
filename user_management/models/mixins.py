@@ -132,6 +132,14 @@ class VerifyEmailManager(UserManager):
 
 
 class EmailVerifyUserMethodsMixin:
+    """Define how validation and password reset emails are sent.
+
+    `password_reset_notification` and `validation_notification` can be overriden to
+    provide custom settings to send emails.
+    """
+    password_reset_notification = PasswordResetNotification
+    validation_notification = ValidationNotification
+
     def email_context(self, site):
         return {
             'protocol': 'https',
@@ -148,7 +156,7 @@ class EmailVerifyUserMethodsMixin:
         site = Site.objects.get_current()
         email_subject = _('{domain} account validate'.format(domain=site.domain))
 
-        notification = ValidationNotification(
+        notification = self.validation_notification(
             user=self,
             email_subject=email_subject,
             context=self.email_context(site),
@@ -160,7 +168,7 @@ class EmailVerifyUserMethodsMixin:
         site = Site.objects.get_current()
         email_subject = _('{domain} password reset'.format(domain=site.domain))
 
-        notification = PasswordResetNotification(
+        notification = self.password_reset_notification(
             user=self,
             email_subject=email_subject,
             context=self.email_context(site),

@@ -19,12 +19,12 @@ class NotificationBase(Notification):
 
 
 class PasswordResetNotification(NotificationBase):
-    """`PasswordResetNotification` defining text and html email templates."""
+    """`PasswordResetNotification` defines text and html email templates."""
     text_email_template = 'user_management/password_reset_email.txt'
     html_email_template = 'user_management/password_reset_email.html'
 
 
 class ValidationNotification(NotificationBase):
-    """`ValidationNotification` defining text and html email templates."""
+    """`ValidationNotification` defines text and html email templates."""
     text_email_template = 'user_management/account_validation_email.txt'
     html_email_template = 'user_management/account_validation_email.html'

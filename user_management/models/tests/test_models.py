@@ -279,3 +279,28 @@ class TestCustomNameUser(utils.APIRequestTestCase):
     def test_manager_check_invalid(self):
         errors = self.model.check()
         self.assertEqual(errors, [])
+
+
+class TestCustomPasswordResetNotification(TestCase):
+    """Assert we can customise the notification to send a password reset."""
+    model = models.CustomVerifyEmailUser
+
+    def test_send_password_reset_email(self):
+        """Assert `text_email_template` and `html_template_name` can be customised."""
+        context = {}
+        site = Site.objects.get_current()
+        user = self.model(email='email@email.email')
+
+        with patch.object(user, 'email_context') as get_context:
+            get_context.return_value = context
+            with patch(SEND_METHOD) as send:
+                user.send_password_reset()
+
+        expected = {
+            'to': user.email,
+            'template_name': 'my_cystom_email.txt',
+            'html_template_name': None,
+            'subject': '{} password reset'.format(site.domain),
+            'context': context
+        }
+        send.assert_called_once_with(**expected)

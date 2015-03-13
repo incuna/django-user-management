@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
 
+from .notifications import CustomPasswordResetNotification
 from ..mixins import (
     AvatarMixin,
     BasicUserFieldsMixin,
@@ -24,6 +25,11 @@ class BasicUser(BasicUserFieldsMixin, AbstractBaseUser):
 
 class VerifyEmailUser(VerifyEmailMixin, AbstractBaseUser):
     pass
+
+
+class CustomVerifyEmailUser(VerifyEmailMixin, AbstractBaseUser):
+    """Customise the notification class to send a password reset."""
+    password_reset_notification = CustomPasswordResetNotification
 
 
 class CustomBasicUserFieldsMixin(
