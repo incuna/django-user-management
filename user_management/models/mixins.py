@@ -130,7 +130,8 @@ class VerifyEmailManager(UserManager):
 
 
 class EmailVerifyUserMethodsMixin:
-    """Define how validation and password reset emails are sent.
+    """
+    Define how validation and password reset emails are sent.
 
     `password_reset_notification` and `validation_notification` can be overriden to
     provide custom settings to send emails.
