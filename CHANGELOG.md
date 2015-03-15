@@ -9,7 +9,7 @@
 ### Notes
 
 * When an object is referencing the user model with a foreign key it is possible
-to define the bahavior with `on_delete`.
+to define the behavior with `on_delete`.
 
 see https://docs.djangoproject.com/en/1.7/ref/models/fields/#django.db.models.ForeignKey.on_delete
 
