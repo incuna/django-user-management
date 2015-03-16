@@ -179,18 +179,21 @@ class TestVerifyEmailMixin(TestCase):
 
     def test_email_context(self):
         """Assert `email_context` returns the correct data."""
+        mocked_user = Mock()
+        mocked_site = Mock()
+
         class DummyNotification:
-            user = Mock()
-            site = Mock()
+            user = mocked_user
+            site = mocked_site
 
         notification = DummyNotification()
         context = email_context(notification)
 
         expected_context = {
             'protocol': 'https',
-            'uid': notification.user.generate_uid(),
-            'token': notification.user.generate_token(),
-            'site': notification.site,
+            'uid': mocked_user.generate_uid(),
+            'token': mocked_user.generate_token(),
+            'site': mocked_site,
         }
         self.assertEqual(context, expected_context)
 
