@@ -1,4 +1,4 @@
-## v8.0.0 (Upcoming)
+## v8.0.0
 
 Use `incuna-pigeon` for notifications.
 
