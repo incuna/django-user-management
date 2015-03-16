@@ -6,10 +6,7 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from user_management.utils.notifications import (
-    PasswordResetNotification,
-    ValidationNotification,
-)
+from user_management.utils import notifications
 
 
 class UserManager(BaseUserManager):
@@ -136,8 +133,8 @@ class EmailVerifyUserMethodsMixin:
     `password_reset_notification` and `validation_notification` can be overriden to
     provide custom settings to send emails.
     """
-    password_reset_notification = PasswordResetNotification
-    validation_notification = ValidationNotification
+    password_reset_notification = notifications.PasswordResetNotification
+    validation_notification = notifications.ValidationNotification
 
     def send_validation_email(self):
         """Send a validation email to the user's email address."""
@@ -145,20 +142,12 @@ class EmailVerifyUserMethodsMixin:
             raise ValueError(_('Cannot validate already active user.'))
 
         site = Site.objects.get_current()
-        notification = self.validation_notification(
-            user=self,
-            site=site,
-        )
-        notification.notify()
+        self.validation_notification(user=self, site=site).notify()
 
     def send_password_reset(self):
         """Send a password reset to the user's email address."""
         site = Site.objects.get_current()
-        notification = self.password_reset_notification(
-            user=self,
-            site=site,
-        )
-        notification.notify()
+        self.password_reset_notification(user=self, site=site).notify()
 
 
 class EmailVerifyUserMixin(EmailVerifyUserMethodsMixin, models.Model):
