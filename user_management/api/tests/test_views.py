@@ -4,6 +4,7 @@ import re
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
@@ -23,6 +24,8 @@ from user_management.models.tests.utils import APIRequestTestCase
 
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
+SEND_METHOD = 'user_management.utils.notifications.incuna_mail.send'
+EMAIL_CONTEXT = 'user_management.utils.notifications.email_context'
 
 
 class GetAuthTokenTest(APIRequestTestCase):
@@ -186,7 +189,7 @@ class TestRegisterView(APIRequestTestCase):
         email = mail.outbox[0]
         verify_url_regex = re.compile(
             r'''
-                http://example\.com/\#/register/verify/
+                https://example\.com/\#/register/verify/
                 [0-9A-Za-z_\-]+/  # uid
                 [0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20}/  # token
             ''',
@@ -266,6 +269,8 @@ class TestPasswordResetEmail(APIRequestTestCase):
     def test_existent_email(self):
         email = 'exists@example.com'
         user = UserFactory.create(email=email)
+        context = {}
+        site = Site.objects.get_current()
 
         request = self.create_request(
             'post',
@@ -273,11 +278,20 @@ class TestPasswordResetEmail(APIRequestTestCase):
             auth=False,
         )
         view = self.view_class.as_view()
-        with patch.object(self.view_class, 'send_email') as send_email:
-            response = view(request)
+        with patch(EMAIL_CONTEXT) as get_context:
+            get_context.return_value = context
+            with patch(SEND_METHOD) as send_email:
+                response = view(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        send_email.assert_called_once_with(user)
+        expected = {
+            'to': user.email,
+            'template_name': 'user_management/password_reset_email.txt',
+            'html_template_name': 'user_management/password_reset_email.html',
+            'subject': '{} password reset'.format(site.domain),
+            'context': context,
+        }
+        send_email.assert_called_once_with(**expected)
 
     def test_authenticated(self):
         request = self.create_request('post', auth=True)
@@ -295,7 +309,7 @@ class TestPasswordResetEmail(APIRequestTestCase):
             auth=False,
         )
         view = self.view_class.as_view()
-        with patch.object(self.view_class, 'send_email') as send_email:
+        with patch(SEND_METHOD) as send_email:
             response = view(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -307,15 +321,18 @@ class TestPasswordResetEmail(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_send_email(self):
-        email = 'test@example.com'
-        user = UserFactory.create(
-            email=email,
-            # Don't send the verification email
-            email_verification_required=False,
-        )
+    def test_email_content(self):
+        """Assert email content is output correctly."""
+        email = 'exists@example.com'
+        user = UserFactory.create(email=email)
 
-        self.view_class().send_email(user)
+        request = self.create_request(
+            'post',
+            data={'email': email},
+            auth=False,
+        )
+        view = self.view_class.as_view()
+        view(request)
 
         self.assertEqual(len(mail.outbox), 1)
 
@@ -955,7 +972,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
         email = mail.outbox[0]
 
         self.assertIn(user.email, email.to)
-        expected = 'http://example.com/#/register/verify/'
+        expected = 'https://example.com/#/register/verify/'
         self.assertIn(expected, email.body)
 
         expected = 'example.com account validate'

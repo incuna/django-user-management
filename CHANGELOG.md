@@ -1,3 +1,7 @@
+## v8.0.0 (Upcoming)
+
+Use `incuna-pigeon` for notifications.
+
 ## v7.0.1
 
 * Fix `UserChangeForm` admin form `fields` to only include fields used in `UserAdmin.fieldsets`.
