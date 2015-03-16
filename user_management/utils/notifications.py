@@ -1,7 +1,4 @@
 import incuna_mail
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
 from pigeon.notification import Notification
 
@@ -9,8 +6,8 @@ from pigeon.notification import Notification
 def email_context(notification):
     return {
         'protocol': 'https',
-        'uid': urlsafe_base64_encode(force_bytes(notification.user.pk)),
-        'token': default_token_generator.make_token(notification.user),
+        'uid': notification.user.generate_uid(),
+        'token': notification.user.generate_token(),
         'site': notification.site,
     }
 

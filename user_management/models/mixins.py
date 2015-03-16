@@ -1,9 +1,11 @@
 from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import force_bytes, python_2_unicode_compatible
+from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
 
 from user_management.utils import notifications
@@ -135,6 +137,14 @@ class EmailVerifyUserMethodsMixin:
     """
     password_reset_notification = notifications.PasswordResetNotification
     validation_notification = notifications.ValidationNotification
+
+    def generate_token(self):
+        """Generate user token for account validation."""
+        return default_token_generator.make_token(self)
+
+    def generate_uid(self):
+        """Generate user uid for account validation."""
+        return urlsafe_base64_encode(force_bytes(self.pk))
 
     def send_validation_email(self):
         """Send a validation email to the user's email address."""
