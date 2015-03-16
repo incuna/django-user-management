@@ -302,7 +302,7 @@ class TestCustomPasswordResetNotification(TestCase):
 
         expected = {
             'to': user.email,
-            'template_name': 'my_cystom_email.txt',
+            'template_name': 'my_custom_email.txt',
             'html_template_name': None,
             'subject': '{} password reset'.format(site.domain),
             'context': context
