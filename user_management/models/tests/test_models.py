@@ -3,15 +3,12 @@
 import unittest
 
 import django
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db.models import TextField
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import six, timezone
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from mock import Mock, patch
 
 from user_management.models.tests import utils
@@ -181,19 +178,18 @@ class TestVerifyEmailMixin(TestCase):
         self.assertTrue(user.email_verification_required)
 
     def test_email_context(self):
-        user = self.model()
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        """Assert `email_context` returns the correct data."""
+        class DummyNotification:
+            user = Mock()
+            site = Mock()
 
-        notification = Mock()
-        notification.user = user
-
-        with patch.object(default_token_generator, 'make_token') as make_token:
-            context = email_context(notification)
+        notification = DummyNotification()
+        context = email_context(notification)
 
         expected_context = {
             'protocol': 'https',
-            'uid': uid,
-            'token': make_token(),
+            'uid': notification.user.generate_uid(),
+            'token': notification.user.generate_token(),
             'site': notification.site,
         }
         self.assertEqual(context, expected_context)
