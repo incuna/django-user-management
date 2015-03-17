@@ -7,22 +7,23 @@
 
 ## Install with pip
 
-Install the package
+Install the package:
 
     pip install django-user-management
 
-Install with avatar functionality
+Install with avatar functionality:
 
     pip install django-user-management[avatar]
 
-Install with filtering sensitive data out of Sentry
+Install with filtering sensitive data out of Sentry:
 
     pip install django-user-management[utils]
 
 
 ## User model
 
-Create a custom user model
+To create a custom user model using the `django-user-management` functionality, declare
+your user class like this:
 
     from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
     from user_management.models.mixins import ActiveUserMixin
@@ -31,8 +32,7 @@ Create a custom user model
     class User(ActiveUserMixin, PermissionsMixin, AbstractBaseUser):
         pass
 
-If you want to use the `VerifyEmailMixin` then substitute it for `ActiveUserMixin`
+If you want to use the `VerifyEmailMixin`, substitute it for `ActiveUserMixin`.
 
-
-Make sure your custom user model in added to `INSTALLED_APPS` and set 
-`AUTH_USER_MODEL` to your custom user model.
+Make sure the app containing your custom user model is added to `settings.INSTALLED_APPS`,
+and set `settings.AUTH_USER_MODEL` to be the path to your custom user model.

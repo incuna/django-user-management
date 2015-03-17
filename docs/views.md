@@ -1,7 +1,8 @@
 # Views
 
-## To use the api views
-Add to your `INSTALLED_APPS` in `settings.py`
+## To use the API views
+
+Add to your `INSTALLED_APPS` in `settings.py`:
 
     INSTALLED_APPS = (
         ...
@@ -9,7 +10,7 @@ Add to your `INSTALLED_APPS` in `settings.py`
         ...
     )
 
-Set your `DEFAULT_AUTHENTICATION_CLASSES`, for example:
+Ensure your `DEFAULT_AUTHENTICATION_CLASSES` include the following:
 
     REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': {
@@ -18,49 +19,50 @@ Set your `DEFAULT_AUTHENTICATION_CLASSES`, for example:
         },
     }
 
-Add the urls to your `ROOT_URLCONF`
+Add the URLs to your `ROOT_URLCONF`:
 
-    urlpatterns = patterns(''
+    urlpatterns = [
         ...
         url('', include('user_management.api.urls', namespace='user_management_api')),
         ...
-    )
+    ]
 
-If you are using the `VerifyEmailMixin` then also include
-`user_management.api.urls.verify_email`
+If you are using the `VerifyEmailMixin`, then you'll also need to include
+`user_management.api.urls.verify_email`:
 
-    urlpatterns = patterns(''
+    urlpatterns = [
         ...
         url('', include('user_management.api.urls.verify_email')),
         ...
-    )
+    ]
 
-If you are using the `AvatarMixin` then also include
-`user_management.api.avatar.urls.avatar`
+If you are using the `AvatarMixin`, then you'll also need to include
+`user_management.api.avatar.urls.avatar`:
 
-    urlpatterns = patterns(''
+    urlpatterns = [
         ...
         url('', include('user_management.api.avatar.urls.avatar')),
         ...
-    )
+    ]
 
 
-If you need more fine-grained control you can replace `user_management.api.urls`
-with a selection from
+If you need more fine-grained control, you can replace `user_management.api.urls`
+with a selection from:
 
-    urlpatterns = patterns(''
+    urlpatterns = [
         ...
         url('', include('user_management.api.urls.auth')),
         url('', include('user_management.api.urls.password_reset')),
         url('', include('user_management.api.urls.profile')),
         url('', include('user_management.api.urls.register')),
         ...
-    )
+    ]
 
 
 ## Throttling protection
-The `/auth/` and `/auth/password_reset/` URLs are protected against throttling
-using the built-in [DRF throttle module](http://www.django-rest-framework.org/api-guide/throttling).
+
+The `/auth/` and `/auth/password_reset/` URLs are protected against throttling using the
+built-in [DRF throttle module](http://www.django-rest-framework.org/api-guide/throttling).
 
 The default throttle rates are:
 
@@ -80,23 +82,20 @@ in your `settings.py`:
 
 ## Filtering sensitive data
 
-Custom Sentry logging class is available to disallow sensitive data being logged
-by Sentry client.
+A custom Sentry logging class is available to prevent sensitive data from being logged
+by the Sentry client.
 
-Activate it in the `settings.py` by adding:
+Activate it in `settings.py` by adding:
 
     SENTRY_CLIENT = 'user_management.utils.sentry.SensitiveDjangoClient'
 
 
-## Expiry of Auth tokens
+## Expiry of authentication tokens
 
-By default DRF does not offer expiration for authorization tokens nor any form
-of validation for the expired tokens.
+By default, DRF does not offer expiration for authentication tokens, nor any form
+of validation for the expired tokens. `django-user-management` is here to help!
 
-`django-user-management` comes in help here and this functionality can be
-easily activated.
-
-Override the authentication class for DRF in `settings.py`:
+To use this functionality, override the authentication class for DRF in `settings.py`:
 
     REST_FRAMEWORK = {
         ...
@@ -104,15 +103,13 @@ Override the authentication class for DRF in `settings.py`:
         ...
     }
 
-Remember to run the management command (eg via cronjob) to clear expired tokens:
+There's a management command that can be run regularly (e.g. via cronjob) to clear expired tokens:
 
     python manage.py remove_expired_tokens
 
-### Tokens expiry times
+### Token expiry times
 
-You can set custom expiry time for the auth tokens.
-
-Add below constants in the `settings.py`:
+You can set a custom expiry time for the auth tokens by adding the below to `settings.py`:
 
     AUTH_TOKEN_MAX_AGE = <seconds_value> (default: 200 days)
     AUTH_TOKEN_MAX_INACTIVITY = <seconds_value> (default: 12 hours)

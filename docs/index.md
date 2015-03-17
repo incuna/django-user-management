@@ -3,4 +3,7 @@
 Documentation generated with [mkdocs.org](http://mkdocs.org).
 
 
-User management model mixins and api views.
+`django-user-management` contains user management model mixins and API views. The mixins
+provide common user-related functionality such as custom avatars and email verification
+during the registration process. The API views provide endpoints to support this
+functionality.
