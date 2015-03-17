@@ -16,9 +16,9 @@ By default all mixins are optional. Our mixins allow to create, identify users
 (from their emails instead of their username) as well as sending password reset
 and account validation emails.
 
-`user_management` API views and serializers can be grouped into four sections:
+`user_management` API views and serializers can be grouped into five sections:
 * `auth`: authenticate and destroy a user session
 * `password_reset`: send and confirm a request to reset a password
 * `profile`: retrieve/update/delete the current user profile
 * `register`: create an account and send an email to validate it
-* `users` give a list and a detail (retrieve, update, destroy) views about users
+* `users`: give a list and a detail (retrieve, update, destroy) views about users
