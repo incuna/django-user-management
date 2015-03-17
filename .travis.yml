@@ -12,6 +12,7 @@ env:
     - TOX_ENV=py27-djangopre
     - TOX_ENV=py34-djangopre
 matrix:
+  fast_finish: true
   allow_failures:
     - env: TOX_ENV=py27-djangopre
     - env: TOX_ENV=py34-djangopre
