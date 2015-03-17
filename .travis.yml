@@ -9,6 +9,12 @@ env:
     - TOX_ENV=py33-django17
     - TOX_ENV=py34-django16
     - TOX_ENV=py34-django17
+    - TOX_ENV=py27-djangopre
+    - TOX_ENV=py34-djangopre
+matrix:
+  allow_failures:
+    - env: TOX_ENV=py27-djangopre
+    - env: TOX_ENV=py34-djangopre
 install:
   - psql -c 'CREATE DATABASE user_management' -U postgres;
   - pip install tox coveralls
