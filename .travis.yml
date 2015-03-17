@@ -8,7 +8,7 @@ env:
     - TOX_ENV=py33-django16
     - TOX_ENV=py33-django17
     - TOX_ENV=py34-django16
-    - TOX_ENV=py34-django17
+    - TOX_ENV=py34-django17 DEPLOY_RELEASE=true
 install:
   - psql -c 'CREATE DATABASE user_management' -U postgres;
   - pip install tox coveralls
@@ -22,6 +22,7 @@ deploy:
   provider: pypi
   user: incuna
   on:
+    condition: $DEPLOY_RELEASE = true
     tags: true
   password:
     secure: DBkb54BXJe8FZ9Zp91VWOgDE3UjQ3ZHwPXJxLuSZWoUrluHbyE7ANdD3mbS+M97Ux7kfxRHpl1lSxZUe2ppMdl4Sl4hm5iVvdZkTc1ErmeJTDExMnK9E+4FDFj4UXTtGYQ1atTtE2cR8Dpbf0j3MchjiKBROOytNEUbYQfGnxEU=
