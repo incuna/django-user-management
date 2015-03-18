@@ -2,12 +2,16 @@
 import string
 
 from django.test import TestCase
+from mock import patch
 from rest_framework.fields import WritableField
 from rest_framework.reverse import reverse
 
 from user_management.models.tests.factories import UserFactory
 from user_management.models.tests.utils import RequestTestCase
 from .. import serializers
+
+
+VALIDATE_OLD_PASSWORD = 'user_management.api.serializers.PasswordChangeSerializer.validate_old_password'
 
 
 class ProfileSerializerTest(TestCase):
@@ -262,7 +266,8 @@ class SerializerPasswordsTest(TestCase):
 
     def assert_validation_error(self, serializer_class, field, data, expected):
         serializer = serializer_class(data=data)
-        serializer.is_valid()  # Perform validation
+        with patch(VALIDATE_OLD_PASSWORD):
+            serializer.is_valid()  # Perform validation
         on_missing = '{} not in {}.errors'.format(field, serializer)
         self.assertTrue(field in serializer.errors, on_missing)
         error = serializer.errors[field]
@@ -275,7 +280,8 @@ class SerializerPasswordsTest(TestCase):
 
     def assert_no_validation_error(self, serializer_class, field, data):
         serializer = serializer_class(data=data)
-        serializer.is_valid()  # Perform validation
+        with patch(VALIDATE_OLD_PASSWORD):
+            serializer.is_valid()  # Perform validation
         on_present = '{} unexpectedly in {}.errors'.format(field, serializer)
         self.assertFalse(field in serializer.errors, on_present)
 
@@ -286,26 +292,34 @@ class SerializerPasswordsTest(TestCase):
             self.assert_validation_error(serializer_class, field, data, msg)
 
     def test_too_short(self):
+        value = 'Aa1'
         for serializer_class, field in self.serializers:
-            data = {field: 'Aa1'}
+            fields = serializer_class.Meta.fields
+            data = dict.fromkeys(fields, value)
             msg = 'Ensure this value has at least 8 characters (it has 3).'
             self.assert_validation_error(serializer_class, field, data, msg)
 
     def test_no_upper(self):
+        value = 'aaaa1111'
         for serializer_class, field in self.serializers:
-            data = {field: 'aaaa1111'}
+            fields = serializer_class.Meta.fields
+            data = dict.fromkeys(fields, value)
             msg = self.too_simple
             self.assert_validation_error(serializer_class, field, data, msg)
 
     def test_no_lower(self):
+        value = 'AAAA1111'
         for serializer_class, field in self.serializers:
-            data = {field: 'AAAA1111'}
+            fields = serializer_class.Meta.fields
+            data = dict.fromkeys(fields, value)
             msg = self.too_simple
             self.assert_validation_error(serializer_class, field, data, msg)
 
     def test_no_number(self):
         for serializer_class, field in self.serializers:
-            data = {field: 'AAAAaaaa'}
+            value = 'AAAAaaaa'
+            fields = serializer_class.Meta.fields
+            data = dict.fromkeys(fields, value)
             msg = self.too_simple
             self.assert_validation_error(serializer_class, field, data, msg)
 
@@ -313,18 +327,24 @@ class SerializerPasswordsTest(TestCase):
         """Ensure all acceptable symbols are acceptable."""
         for serializer_class, field in self.serializers:
             for symbol in string.punctuation:
-                data = {field: 'AAaa111' + symbol}
+                value = 'AAaa111' + symbol
+                fields = serializer_class.Meta.fields
+                data = dict.fromkeys(fields, value)
                 self.assert_no_validation_error(serializer_class, field, data)
 
     def test_non_ascii(self):
+        value = u'AA11aa££'  # £ is not an ASCII character.
         for serializer_class, field in self.serializers:
-            data = {field: u'AA11aa££'}  # £ is not an ASCII character.
+            fields = serializer_class.Meta.fields
+            data = dict.fromkeys(fields, value)
             msg = self.too_fancy
             self.assert_validation_error(serializer_class, field, data, msg)
 
     def test_ok(self):
+        value = 'AAAaaa11'
         for serializer_class, field in self.serializers:
-            data = {field: 'AAAaaa11'}
+            fields = serializer_class.Meta.fields
+            data = dict.fromkeys(fields, value)
             self.assert_no_validation_error(serializer_class, field, data)
 
 

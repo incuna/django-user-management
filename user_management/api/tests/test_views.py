@@ -20,6 +20,7 @@ from user_management.api.tests.test_throttling import THROTTLE_RATE_PATH
 from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.models import BasicUser
 from user_management.models.tests.utils import APIRequestTestCase
+from user_management.utils.validators import too_simple
 
 
 User = get_user_model()
@@ -447,6 +448,29 @@ class TestPasswordReset(APIRequestTestCase):
         user = User.objects.get(pk=user.pk)
         self.assertTrue(user.check_password(old_password))
 
+    def test_password_strength(self):
+        """Assert validation error for password strenght."""
+        new_password = 'weakpass'
+        user = UserFactory.create()
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        request = self.create_request(
+            'put',
+            data={
+                'new_password': new_password,
+                'new_password2': new_password,
+            },
+            auth=False,
+        )
+        view = self.view_class.as_view()
+        response = view(request, uidb64=uid, token=token)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertIn(too_simple, response.data['new_password'])
+        self.assertNotIn('new_password2', response.data)
+
     def test_put_invalid_user(self):
         # There should never be a user with pk 0
         invalid_uid = urlsafe_base64_encode(b'0')
@@ -581,9 +605,33 @@ class TestPasswordChange(APIRequestTestCase):
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Your new passwords do not match.', response.data['new_password2'])
 
         user = User.objects.get(pk=user.pk)
         self.assertTrue(user.check_password(old_password))
+
+    def test_password_strength(self):
+        """Assert validation error for password strenght."""
+        old_password = '0ld_passworD'
+        new_password = 'weakpass'
+
+        user = UserFactory.create(password=old_password)
+
+        request = self.create_request(
+            'put',
+            user=user,
+            data={
+                'old_password': old_password,
+                'new_password': new_password,
+                'new_password2': new_password,
+            },
+        )
+        view = self.view_class.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertIn(too_simple, response.data['new_password'])
+        self.assertNotIn('new_password2', response.data)
 
 
 class TestVerifyAccountView(APIRequestTestCase):

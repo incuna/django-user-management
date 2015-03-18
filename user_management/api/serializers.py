@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -20,6 +21,33 @@ class ValidateEmailMixin(object):
         else:
             msg = _('That email address has already been registered.')
             raise serializers.ValidationError(msg)
+
+
+class ValidateNewPasswordMixin(object):
+    """
+    Validate `new_password` and `new_password2.
+
+    Check first password mismatch
+    then password strength
+    """
+    PASSWORD_MISMATCH = _('Your new passwords do not match.')
+
+    def validate(self, attrs):
+        _errors = {}
+        password = attrs['new_password']
+        password2 = attrs['new_password2']
+        if password != password2:
+            _errors['new_password2'] = self.PASSWORD_MISMATCH
+
+        try:
+            validate_password_strength(password)
+        except ValidationError as exc:
+            _errors['new_password'] = exc.message
+
+        if _errors:
+            raise ValidationError(_errors)
+
+        return attrs
 
 
 class EmailSerializerBase(serializers.Serializer):
@@ -61,7 +89,7 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
         return instance
 
 
-class PasswordChangeSerializer(serializers.ModelSerializer):
+class PasswordChangeSerializer(ValidateNewPasswordMixin, serializers.ModelSerializer):
     old_password = serializers.CharField(
         write_only=True,
         label=_('Old password'),
@@ -70,7 +98,6 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         write_only=True,
         min_length=8,
         label=_('New password'),
-        validators=[validate_password_strength],
     )
     new_password2 = serializers.CharField(
         write_only=True,
@@ -97,19 +124,12 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return attrs
 
-    def validate_new_password2(self, attrs, source):
-        if attrs.get('new_password') != attrs[source]:
-            msg = _('Your new passwords do not match.')
-            raise serializers.ValidationError(msg)
-        return attrs
 
-
-class PasswordResetSerializer(serializers.ModelSerializer):
+class PasswordResetSerializer(ValidateNewPasswordMixin, serializers.ModelSerializer):
     new_password = serializers.CharField(
         write_only=True,
         min_length=8,
         label=_('New password'),
-        validators=[validate_password_strength],
     )
     new_password2 = serializers.CharField(
         write_only=True,
@@ -128,12 +148,6 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         )
         instance.set_password(attrs['new_password'])
         return instance
-
-    def validate_new_password2(self, attrs, source):
-        if attrs.get('new_password') != attrs[source]:
-            msg = _('Your new passwords do not match.')
-            raise serializers.ValidationError(msg)
-        return attrs
 
 
 class PasswordResetEmailSerializer(EmailSerializerBase):
