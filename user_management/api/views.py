@@ -169,10 +169,15 @@ class OneTimeUseAPIMixin(object):
 
 class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
     """
-    Password reset verification and update.
+    Password reset update view.
 
-    `GET` and `UPDATE` view to check an user with the given `uid` and `token`
-    and allow to send a new password.
+    This view is generally called when a user has followed an email link to
+    reset a password.
+
+    This view will check first if the `uid` and `token` are valid.
+
+    `PasswordReset` is called with an `UPDATE` containing the new password
+    (`new_password` and `new_password2`).
     """
     permission_classes = [permissions.IsNotAuthenticated]
     model = User
@@ -184,7 +189,7 @@ class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
 
 class PasswordChange(generics.UpdateAPIView):
     """
-    Password update.
+    Password update view.
 
     Give ability to `PUT` (update) a password when authenticated by submitting current
     password.
@@ -199,7 +204,7 @@ class PasswordChange(generics.UpdateAPIView):
 
 class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
     """
-    Verify account.
+    Verify account view.
 
     Verify a newly created account by checking the `uid` and `token` in a `POST` request.
     """
@@ -222,7 +227,7 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
 
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    User profile.
+    User profile detail view.
 
     `GET`, `UPDATE` and `DELETE` current logged-in user.
     """
