@@ -15,6 +15,15 @@ User = get_user_model()
 
 
 class GetAuthToken(ObtainAuthToken):
+    """
+    Authentication by token.
+
+    Define `POST` (create) method to authenticate a user from its `email` and
+    `password` and return a `token` if successful.
+    The `token` would be valid for a value defined in `settings.AUTH_TOKEN_MAX_AGE`.
+
+    `DELETE` method remove the current `token` from the database.
+    """
     model = models.AuthToken
     throttle_classes = [
         throttling.UsernameLoginRateThrottle,
@@ -59,6 +68,11 @@ class GetAuthToken(ObtainAuthToken):
 
 
 class UserRegister(generics.CreateAPIView):
+    """
+    User registration.
+
+    Register a user and send an email to validate the new account.
+    """
     serializer_class = serializers.RegistrationSerializer
     permission_classes = [permissions.IsNotAuthenticated]
 
@@ -95,6 +109,12 @@ class UserRegister(generics.CreateAPIView):
 
 
 class PasswordResetEmail(generics.GenericAPIView):
+    """
+    Password reset request.
+
+    Accept an `email` and send an email to reset a password if the user is found.
+    If the user is not found no error is raised.
+    """
     permission_classes = [permissions.IsNotAuthenticated]
     template_name = 'user_management/password_reset_email.html'
     serializer_class = serializers.PasswordResetEmailSerializer
@@ -122,6 +142,11 @@ class PasswordResetEmail(generics.GenericAPIView):
 
 
 class OneTimeUseAPIMixin(object):
+    """
+    Check `uid` and `token`.
+
+    Set user as a class attribute or raise an `InvalidExpiredToken`.
+    """
     def initial(self, request, *args, **kwargs):
         uidb64 = kwargs['uidb64']
         uid = urlsafe_base64_decode(force_text(uidb64))
@@ -143,6 +168,12 @@ class OneTimeUseAPIMixin(object):
 
 
 class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
+    """
+    Password reset verification and update.
+
+    `GET` and `UPDATE` view to check an user with the given `uid` and `token`
+    and allow to send a new password.
+    """
     permission_classes = [permissions.IsNotAuthenticated]
     model = User
     serializer_class = serializers.PasswordResetSerializer
@@ -152,6 +183,12 @@ class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
 
 
 class PasswordChange(generics.UpdateAPIView):
+    """
+    Password update.
+
+    Give ability to `PUT` (update) a password when authenticated by submitting current
+    password.
+    """
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.PasswordChangeSerializer
@@ -161,6 +198,11 @@ class PasswordChange(generics.UpdateAPIView):
 
 
 class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
+    """
+    Verify account.
+
+    Verify a newly created account by checking the `uid` and `token` in a `POST` request.
+    """
     permission_classes = [AllowAny]
     ok_message = _('Your account has been verified.')
 
@@ -179,6 +221,11 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
 
 
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    User profile.
+
+    `GET`, `UPDATE` and `DELETE` current logged-in user.
+    """
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
@@ -188,19 +235,33 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserList(generics.ListCreateAPIView):
+    """
+    User list and create view.
+
+    Allow to `GET` a list users and to `POST` new user for admin user only.
+    """
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializerCreate
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    User detail view.
+
+    `GET`, `UPDATE` or `DESTROY` a specific user.
+    """
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializer
 
 
 class ResendConfirmationEmail(generics.GenericAPIView):
-    """Resend a confirmation email."""
+    """Resend a confirmation email.
+
+    `POST` request to resend a confirmation email for existing user. Useful when
+    the token has expired.
+    """
     permission_classes = [permissions.IsNotAuthenticated]
     serializer_class = serializers.ResendConfirmationEmailSerializer
     throttle_classes = [throttling.ResendConfirmationEmailRateThrottle]
