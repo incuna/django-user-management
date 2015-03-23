@@ -37,3 +37,11 @@ Users:
 Verify email:
 
 - url: `/verify_email/<uid>/<token>`
+
+Profile avatar:
+
+- url: `/profile/avatar`
+
+User avatar:
+
+- url: `/users/<pk>/avatar`
