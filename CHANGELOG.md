@@ -1,6 +1,10 @@
+## v8.0.1
+
+* Fix translation for notifications.
+
 ## v8.0.0
 
-Use `incuna-pigeon` for notifications.
+* Use `incuna-pigeon` for notifications.
 
 ## v7.0.1
 
