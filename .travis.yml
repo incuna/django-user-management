@@ -18,7 +18,7 @@ matrix:
     - env: TOX_ENV=py34-djangopre
 install:
   - psql -c 'CREATE DATABASE user_management' -U postgres;
-  - pip install tox==1.9.0 coveralls
+  - pip install tox!=1.9.1 coveralls
 script:
   - tox -e $TOX_ENV
 after_success:
