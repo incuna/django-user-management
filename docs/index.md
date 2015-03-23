@@ -10,6 +10,15 @@ functionality.
 
 ## API endpoints
 
+Including `user_management.api.urls` will give the following API endpoints:
+ - `auth`
+ - `password_reset`
+ - `profile`
+ - `register`
+
+If you need more control, urls are splitted across several files and can be included
+[individually](docs/views.md).
+
 Auth:
 
 - url: `/auth`
