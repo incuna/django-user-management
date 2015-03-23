@@ -25,14 +25,14 @@ def email_handler(notification):
 
 def password_reset_email_handler(notification):
     """Password reset email handler."""
-    subject = _('{domain} password reset'.format(domain=notification.site.domain))
+    subject = _('{domain} password reset').format(domain=notification.site.domain)
     notification.email_subject = subject
     email_handler(notification)
 
 
 def validation_email_handler(notification):
     """Validation email handler."""
-    subject = _('{domain} account validate'.format(domain=notification.site.domain))
+    subject = _('{domain} account validate').format(domain=notification.site.domain)
     notification.email_subject = subject
     email_handler(notification)
 
