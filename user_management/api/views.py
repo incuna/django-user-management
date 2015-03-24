@@ -16,13 +16,14 @@ User = get_user_model()
 
 class GetAuthToken(ObtainAuthToken):
     """
-    Authentication by token.
+    Obtain an authentication token.
 
-    Define `POST` (create) method to authenticate a user from its `email` and
+    Define a `POST` (create) method to authenticate a user from useing their `email` and
     `password` and return a `token` if successful.
-    The `token` would be valid for a value defined in `settings.AUTH_TOKEN_MAX_AGE`.
+    The `token` remains valid until `settings.AUTH_TOKEN_MAX_AGE` time has passed.
 
-    `DELETE` method remove the current `token` from the database.
+
+    `DELETE` method removes the current `token` from the database.
     """
     model = models.AuthToken
     throttle_classes = [
@@ -69,7 +70,7 @@ class GetAuthToken(ObtainAuthToken):
 
 class UserRegister(generics.CreateAPIView):
     """
-    User registration.
+    Register a new `User`.
 
     Register a user and send an email to validate the new account.
     """
@@ -110,9 +111,9 @@ class UserRegister(generics.CreateAPIView):
 
 class PasswordResetEmail(generics.GenericAPIView):
     """
-    Password reset request.
+    Send a password reset email to a user on request.
 
-    Accept an `email` and send an email to reset a password if the user is found.
+    A user can request a password request email by providing their email address.
     If the user is not found no error is raised.
     """
     permission_classes = [permissions.IsNotAuthenticated]
@@ -143,7 +144,8 @@ class PasswordResetEmail(generics.GenericAPIView):
 
 class OneTimeUseAPIMixin(object):
     """
-    Check `uid` and `token`.
+    Use a `uid` and a `token` to allow one-time access to a view.
+
 
     Set user as a class attribute or raise an `InvalidExpiredToken`.
     """
@@ -169,7 +171,7 @@ class OneTimeUseAPIMixin(object):
 
 class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
     """
-    Password reset update view.
+    Reset a user's password.
 
     This view is generally called when a user has followed an email link to
     reset a password.
@@ -189,7 +191,7 @@ class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
 
 class PasswordChange(generics.UpdateAPIView):
     """
-    Password update view.
+    Change a user's password.
 
     Give ability to `PUT` (update) a password when authenticated by submitting current
     password.
@@ -204,7 +206,7 @@ class PasswordChange(generics.UpdateAPIView):
 
 class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
     """
-    Verify account view.
+    Verify a new user's email address.
 
     Verify a newly created account by checking the `uid` and `token` in a `POST` request.
     """
@@ -227,7 +229,7 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
 
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    User profile detail view.
+    Allow a user to view and edit their profile information.
 
     `GET`, `UPDATE` and `DELETE` current logged-in user.
     """
@@ -241,7 +243,7 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class UserList(generics.ListCreateAPIView):
     """
-    User list and create view.
+    Return information about all users and allow creation of new users.
 
     Allow to `GET` a list users and to `POST` new user for admin user only.
     """
@@ -252,9 +254,9 @@ class UserList(generics.ListCreateAPIView):
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    User detail view.
+    Display information about a user.
 
-    `GET`, `UPDATE` or `DESTROY` a specific user.
+    Allow admin users to update or delete user information.
     """
     model = User
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
