@@ -22,7 +22,6 @@ class GetAuthToken(ObtainAuthToken):
     `password` and return a `token` if successful.
     The `token` remains valid until `settings.AUTH_TOKEN_MAX_AGE` time has passed.
 
-
     `DELETE` method removes the current `token` from the database.
     """
     model = models.AuthToken
@@ -146,7 +145,6 @@ class PasswordResetEmail(generics.GenericAPIView):
 class OneTimeUseAPIMixin(object):
     """
     Use a `uid` and a `token` to allow one-time access to a view.
-
 
     Set user as a class attribute or raise an `InvalidExpiredToken`.
     """
