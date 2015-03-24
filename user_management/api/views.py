@@ -263,7 +263,8 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ResendConfirmationEmail(generics.GenericAPIView):
-    """Resend a confirmation email.
+    """
+    Resend a confirmation email.
 
     `POST` request to resend a confirmation email for existing user. Useful when
     the token has expired.
