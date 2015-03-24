@@ -8,6 +8,7 @@ factory_boy==2.4.1
 flake8==2.3.0
 flake8-import-order==0.5.1
 incuna-test-utils==6.0.0
+mkdocs==0.11.1
 mock==1.0.1
 pillow==2.7.0
 psycopg2==2.6

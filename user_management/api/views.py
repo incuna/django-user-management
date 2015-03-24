@@ -1,10 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.models import Site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
-from incuna_mail import send
 from rest_framework import generics, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -101,14 +99,6 @@ class PasswordResetEmail(generics.GenericAPIView):
     throttle_classes = [throttling.PasswordResetRateThrottle]
     throttle_scope = 'passwords'
 
-    def email_context(self, site, user):
-        return {
-            'protocol': 'https',
-            'site': site,
-            'token': default_token_generator.make_token(user),
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        }
-
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.DATA)
         if not serializer.is_valid():
@@ -123,19 +113,10 @@ class PasswordResetEmail(generics.GenericAPIView):
         except User.DoesNotExist:
             pass
         else:
-            self.send_email(user)
+            user.send_password_reset()
 
         msg = _('Password reset request successful. Please check your email.')
         return response.Response(msg, status=status.HTTP_204_NO_CONTENT)
-
-    def send_email(self, user):
-        site = Site.objects.get_current()
-        send(
-            to=[user.email],
-            template_name=self.template_name,
-            subject=_('{domain} password reset').format(domain=site.domain),
-            context=self.email_context(site, user),
-        )
 
 
 class OneTimeUseAPIMixin(object):

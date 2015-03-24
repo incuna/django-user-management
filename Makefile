@@ -2,13 +2,13 @@ SHELL := /bin/bash
 
 help:
 	@echo "Usage:"
-	@echo " make release | Release to pypi."
 	@echo " make test    | Run the tests."
-
-release:
-	python setup.py register sdist bdist_wheel upload
+	@echo " make run-doc | Run the docs locally."
 
 test:
 	@coverage run ./user_management/tests/run.py
 	@coverage report --show-missing --fail-under=100
 	@flake8
+
+run-doc:
+	@mkdocs serve
