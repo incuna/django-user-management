@@ -72,7 +72,8 @@ class UserRegister(generics.CreateAPIView):
     """
     Register a new `User`.
 
-    Register a user and send an email to validate the new account.
+    An email to validate the new account is sent if `email_verification_required`
+    is set to `True`.
     """
     serializer_class = serializers.RegistrationSerializer
     permission_classes = [permissions.IsNotAuthenticated]
