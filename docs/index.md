@@ -16,8 +16,8 @@ Including `user_management.api.urls` will give the following API endpoints:
  - `profile`
  - `register`
 
-If you need more control, urls are splitted across several files and can be included
-[individually](docs/views.md).
+If you need more control, urls are split across several files and can be included
+[individually](docs/views).
 
 Auth:
 
