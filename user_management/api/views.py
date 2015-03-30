@@ -18,7 +18,7 @@ class GetAuthToken(ObtainAuthToken):
     """
     Obtain an authentication token.
 
-    Define a `POST` (create) method to authenticate a user from useing their `email` and
+    Define a `POST` (create) method to authenticate a user using their `email` and
     `password` and return a `token` if successful.
     The `token` remains valid until `settings.AUTH_TOKEN_MAX_AGE` time has passed.
 
