@@ -1,4 +1,4 @@
-## v8.1.0 (Upcoming)
+## v8.1.0
 
 * Add docstrings for views.
 
