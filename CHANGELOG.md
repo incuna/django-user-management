@@ -1,3 +1,9 @@
+## v8.1.0 (Upcoming)
+
+* Add docstrings for views.
+
+Docstrings will be displayed in `django-rest-framework` browsable API.
+
 ## v8.0.1
 
 * Fix translation for notifications.
