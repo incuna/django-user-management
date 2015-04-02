@@ -71,8 +71,8 @@ class UserRegister(generics.CreateAPIView):
     """
     Register a new `User`.
 
-    An email to validate the new account is sent if `email_verification_required`
-    is set to `True`.
+    An email to validate the new account is sent if `email_verified`
+    is set to `False`.
     """
     serializer_class = serializers.RegistrationSerializer
     permission_classes = [permissions.IsNotAuthenticated]
@@ -94,7 +94,7 @@ class UserRegister(generics.CreateAPIView):
 
     def is_valid(self, serializer):
         serializer.save()
-        if serializer.object.email_verification_required:
+        if not serializer.object.email_verified:
             serializer.object.send_validation_email()
             ok_message = _(
                 'Your account has been created and an activation link sent ' +
@@ -213,10 +213,10 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
     ok_message = _('Your account has been verified.')
 
     def post(self, request, *args, **kwargs):
-        if not self.user.email_verification_required:
+        if self.user.email_verified:
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
-        self.user.email_verification_required = False
+        self.user.email_verified = True
         self.user.is_active = True
         self.user.save()
 

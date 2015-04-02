@@ -44,7 +44,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 class VerifyUserAdmin(UserAdmin):
-    readonly_fields = ('date_joined', 'email_verification_required')
+    readonly_fields = ('date_joined', 'email_verified')
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super(VerifyUserAdmin, self).get_fieldsets(request, obj)
@@ -62,6 +62,6 @@ class VerifyUserAdmin(UserAdmin):
             # removed and fieldsets will be correct so return it
             return fieldsets
 
-        fields[index] = ('is_active', 'email_verification_required')
+        fields[index] = ('is_active', 'email_verified')
         fieldsets_dict['Permissions']['fields'] = tuple(fields)
         return tuple(fieldsets_dict.items())

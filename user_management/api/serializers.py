@@ -161,7 +161,7 @@ class ResendConfirmationEmailSerializer(EmailSerializerBase):
             msg = _('A user with this email address does not exist.')
             raise serializers.ValidationError(msg)
 
-        if not self.user.email_verification_required:
+        if self.user.email_verified:
             msg = _('User email address is already verified.')
             raise serializers.ValidationError(msg)
         return attrs

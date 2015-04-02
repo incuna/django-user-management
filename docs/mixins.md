@@ -9,7 +9,7 @@ mixin with a `name`, `email`, `date_joined`, `is_staff`, and `is_active`.
 
 `user_management.models.mixins.VerifyEmailMixin` extends ActiveUserMixin to
 provide functionality to verify the email. It includes an additional
-`email_verification_required` field.
+`email_verified` field.
 
 By default, users will be created with `is_active = False`. A verification email
 will be sent including a link to verify the email and activate the account.
