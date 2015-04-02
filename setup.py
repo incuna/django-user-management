@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 
-version = '8.1.0'
+version = '9.0.0'
 
 
 install_requires = (

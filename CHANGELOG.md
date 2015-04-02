@@ -1,4 +1,4 @@
-## v9.0.0 (Upcoming)
+## v9.0.0
 
 * Replace `email_verification_required` flag with `email_verified` flag.
  * Note that `email_verified == not email_verification_required`.
