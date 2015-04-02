@@ -212,7 +212,7 @@ class TestRegisterView(APIRequestTestCase):
            new=BasicUser)
     def test_unauthenticated_user_post_no_verify_email(self):
         """
-        An email should not be sent if email_verification_required is False.
+        An email should not be sent if email_verified is True.
         """
         request = self.create_request('post', auth=False, data=self.data)
 
@@ -600,7 +600,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertFalse(updated_user.email_verification_required)
+        self.assertTrue(updated_user.email_verified)
         self.assertTrue(updated_user.is_active)
 
     def test_post_unauthenticated(self):
@@ -614,7 +614,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertFalse(updated_user.email_verification_required)
+        self.assertTrue(updated_user.email_verified)
         self.assertTrue(updated_user.is_active)
 
     def test_post_invalid_user(self):
@@ -638,7 +638,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_verified_email(self):
-        user = UserFactory.create(email_verification_required=False)
+        user = UserFactory.create(email_verified=True)
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
@@ -659,10 +659,10 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertFalse(updated_user.email_verification_required)
+        self.assertTrue(updated_user.email_verified)
 
         logged_in_user = User.objects.get(pk=other_user.pk)
-        self.assertTrue(logged_in_user.email_verification_required)
+        self.assertFalse(logged_in_user.email_verified)
 
     def test_full_stack_wrong_url(self):
         user = UserFactory.create()
@@ -952,7 +952,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
 
     def test_post_email_already_verified(self):
         """Assert email already verified does not trigger another email."""
-        user = UserFactory.create(email_verification_required=False)
+        user = UserFactory.create(email_verified=True)
         data = {'email': user.email}
         request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()

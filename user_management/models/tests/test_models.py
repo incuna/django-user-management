@@ -40,7 +40,7 @@ class TestUser(utils.APIRequestTestCase):
             'name',
             'date_joined',
             'email',
-            'email_verification_required',
+            'email_verified',
             'is_active',
             'is_staff',
             'is_superuser',
@@ -115,7 +115,7 @@ class TestUserManager(TestCase):
         self.assertFalse(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
-        self.assertTrue(user.email_verification_required)
+        self.assertFalse(user.email_verified)
 
         # Check that the time is correct (or at least, in range)
         time_after = timezone.now()
@@ -175,7 +175,7 @@ class TestVerifyEmailMixin(TestCase):
         user = self.model()
         user.save()
         self.assertFalse(user.is_active)
-        self.assertTrue(user.email_verification_required)
+        self.assertFalse(user.email_verified)
 
     def test_email_context(self):
         """Assert `email_context` returns the correct data."""
@@ -217,7 +217,7 @@ class TestVerifyEmailMixin(TestCase):
         send.assert_called_once_with(**expected)
 
     def test_verified_email(self):
-        user = self.model(email_verification_required=False)
+        user = self.model(email_verified=True)
 
         with patch(SEND_METHOD) as send:
             with self.assertRaises(ValueError):
@@ -259,7 +259,7 @@ class TestCustomNameUser(utils.APIRequestTestCase):
             'name',
             'date_joined',
             'email',
-            'email_verification_required',
+            'email_verified',
             'is_active',
             'is_staff',
             'last_login',

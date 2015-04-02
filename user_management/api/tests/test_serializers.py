@@ -344,7 +344,7 @@ class ResendConfirmationEmailSerializerTest(TestCase):
 
     def test_user_already_validated(self):
         """Assert confirmation email is not send if user was already verified."""
-        user = UserFactory.create(email_verification_required=False)
+        user = UserFactory.create(email_verified=True)
         data = {'email': user.email}
         serializer = serializers.ResendConfirmationEmailSerializer(data=data)
         self.assertFalse(serializer.is_valid())
