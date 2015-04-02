@@ -1,8 +1,8 @@
 ## v9.0.0 (Upcoming)
 
 * Replace `email_verification_required` flag with `email_verified` flag.
-** Note that `email_verified == not email_verification_required`.
-** A data migration will be necessary.
+ * Note that `email_verified == not email_verification_required`.
+ * A data migration will be necessary.
 
 ## v8.1.0
 
