@@ -1,7 +1,7 @@
 import datetime
 import re
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from mock import patch
+from mock import MagicMock, patch
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
@@ -128,6 +128,31 @@ class GetAuthTokenTest(APIRequestTestCase):
 
         with self.assertRaises(self.model.DoesNotExist):
             self.model.objects.get(pk=token.pk)
+
+    def test_delete_user_logged_out_signal(self):
+        """Send the user_logged_out signal if a user deletes their Auth Token."""
+        handler = MagicMock()
+        signals.user_logged_out.connect(handler)
+
+        someday = timezone.now() + datetime.timedelta(days=1)
+        user = UserFactory.create()
+        token = AuthTokenFactory.create(user=user, expires=someday)
+
+        # Custom auth header containing token
+        auth = 'Token ' + token.key
+        request = self.create_request(
+            'delete',
+            user=user,
+            HTTP_AUTHORIZATION=auth,
+        )
+        response = self.view_class.as_view()(request)
+
+        handler.assert_called_once_with(
+            signal=signals.user_logged_out,
+            sender=views.GetAuthToken,
+            request=response.renderer_context['request'],
+            user=user,
+        )
 
     def test_delete_no_token(self):
         request = self.create_request('delete')

@@ -66,6 +66,11 @@ class GetAuthToken(ObtainAuthToken):
             pass
         else:
             token.delete()
+            signals.user_logged_out.send(
+                type(self),
+                user=token.user,
+                request=request,
+            )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
