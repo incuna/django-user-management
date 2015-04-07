@@ -86,13 +86,3 @@ class TestTokenAuthentication(TestCase):
         # User's token has expired now
         with self.assertRaises(exceptions.AuthenticationFailed):
             self.auth.authenticate_credentials(self.key)
-
-    def test_last_login_updates(self):
-        """Authenticating updates the user's last_login."""
-        tomorrow = self.now + datetime.timedelta(days=self.days)
-        self._create_token(when=tomorrow)
-
-        now = timezone.now()
-        self.assertLess(self.user.last_login, now)
-        user, token = self.auth.authenticate_credentials(self.key)
-        self.assertGreater(user.last_login, now)

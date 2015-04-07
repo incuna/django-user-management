@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.signals import user_logged_in
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
@@ -36,7 +37,9 @@ class GetAuthToken(ObtainAuthToken):
         but not re-using them."""
         serializer = self.serializer_class(data=request.DATA)
         if serializer.is_valid():
-            token = self.model.objects.create(user=serializer.object['user'])
+            user = serializer.object['user']
+            user_logged_in.send(type(self), user=user)
+            token = self.model.objects.create(user=user)
             token.update_expiry()
             return response.Response({'token': token.key})
 
