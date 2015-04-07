@@ -1,3 +1,7 @@
+## v9.0.1
+
+* Send `user_logged_in` and `user_logged_out` signals from `GetAuthToken` view.
+
 ## v9.0.0
 
 * Replace `email_verification_required` flag with `email_verified` flag.
