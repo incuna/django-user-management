@@ -1,3 +1,4 @@
+from django.contrib.auth.signals import user_logged_in
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import authentication, exceptions
@@ -40,5 +41,6 @@ class TokenAuthentication(DRFTokenAuthentication):
 
         # Update the token's expiration date
         token.update_expiry()
+        user_logged_in.send(type(self), user=user)
 
         return (user, token)
