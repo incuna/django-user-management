@@ -28,6 +28,9 @@ User = get_user_model()
 TEST_SERVER = 'http://testserver'
 SEND_METHOD = 'user_management.utils.notifications.incuna_mail.send'
 EMAIL_CONTEXT = 'user_management.utils.notifications.email_context'
+REGISTRATION_SERIALIZER_META_MODEL = (
+    'user_management.api.serializers.RegistrationSerializer.Meta.model'
+)
 
 
 class GetAuthTokenTest(APIRequestTestCase):
@@ -245,7 +248,7 @@ class TestRegisterView(APIRequestTestCase):
         # Password should validate
         self.assertTrue(check_password(self.data['password'], user.password))
 
-    @patch('user_management.api.serializers.User', new=BasicUser)
+    @patch(REGISTRATION_SERIALIZER_META_MODEL, new=BasicUser)
     def test_unauthenticated_user_post_no_verify_email(self):
         """
         An email should not be sent if email_verified is True.
