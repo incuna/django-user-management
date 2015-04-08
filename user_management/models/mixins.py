@@ -61,7 +61,7 @@ class EmailUserMixin(models.Model):
         unique=True,
         max_length=511,
     )
-    email_verification_required = False
+    email_verified = True
 
     objects = UserManager()
 
@@ -148,7 +148,7 @@ class EmailVerifyUserMethodsMixin:
 
     def send_validation_email(self):
         """Send a validation email to the user's email address."""
-        if not self.email_verification_required:
+        if self.email_verified:
             raise ValueError(_('Cannot validate already active user.'))
 
         site = Site.objects.get_current()
@@ -162,10 +162,10 @@ class EmailVerifyUserMethodsMixin:
 
 class EmailVerifyUserMixin(EmailVerifyUserMethodsMixin, models.Model):
     is_active = models.BooleanField(_('active'), default=False)
-    email_verification_required = models.BooleanField(
-        _('Email verification required?'),
-        default=True,
-        help_text=_('Indicates if the email address needs to be verified.'))
+    email_verified = models.BooleanField(
+        _('Email verified?'),
+        default=False,
+        help_text=_('Indicates if the email address has been verified.'))
 
     objects = VerifyEmailManager()
 

@@ -1,3 +1,19 @@
+## v9.0.1
+
+* Send `user_logged_in` and `user_logged_out` signals from `GetAuthToken` view.
+
+## v9.0.0
+
+* Replace `email_verification_required` flag with `email_verified` flag.
+ * Note that `email_verified == not email_verification_required`.
+ * A data migration will be necessary.
+
+## v8.1.0
+
+* Add docstrings for views.
+
+Docstrings will be displayed in `django-rest-framework` browsable API.
+
 ## v8.0.1
 
 * Fix translation for notifications.

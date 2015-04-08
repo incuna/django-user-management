@@ -2,7 +2,7 @@ import datetime
 import re
 from collections import OrderedDict
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from mock import patch
+from mock import MagicMock, patch
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
@@ -55,6 +55,17 @@ class GetAuthTokenTest(APIRequestTestCase):
         # Ensure user has a token now
         token = self.model.objects.get()
         self.assertEqual(response.data['token'], token.key)
+
+    def test_post_last_login_updates(self):
+        """Authenticating updates the user's last_login."""
+        user = UserFactory.create(email=self.username, password=self.password)
+        now = timezone.now()
+        self.assertLess(user.last_login, now)
+
+        request = self.create_request('post', auth=False, data=self.data)
+        self.view_class.as_view()(request)
+        user = User.objects.get(pk=user.pk)
+        self.assertGreater(user.last_login, now)
 
     def test_post_non_existing_user(self):
         """Assert non existing raises an error."""
@@ -118,6 +129,31 @@ class GetAuthTokenTest(APIRequestTestCase):
 
         with self.assertRaises(self.model.DoesNotExist):
             self.model.objects.get(pk=token.pk)
+
+    def test_delete_user_logged_out_signal(self):
+        """Send the user_logged_out signal if a user deletes their Auth Token."""
+        handler = MagicMock()
+        signals.user_logged_out.connect(handler)
+
+        someday = timezone.now() + datetime.timedelta(days=1)
+        user = UserFactory.create()
+        token = AuthTokenFactory.create(user=user, expires=someday)
+
+        # Custom auth header containing token
+        auth = 'Token ' + token.key
+        request = self.create_request(
+            'delete',
+            user=user,
+            HTTP_AUTHORIZATION=auth,
+        )
+        response = self.view_class.as_view()(request)
+
+        handler.assert_called_once_with(
+            signal=signals.user_logged_out,
+            sender=views.GetAuthToken,
+            request=response.renderer_context['request'],
+            user=user,
+        )
 
     def test_delete_no_token(self):
         request = self.create_request('delete')
@@ -212,7 +248,7 @@ class TestRegisterView(APIRequestTestCase):
     @patch('user_management.api.serializers.User', new=BasicUser)
     def test_unauthenticated_user_post_no_verify_email(self):
         """
-        An email should not be sent if email_verification_required is False.
+        An email should not be sent if email_verified is True.
         """
         request = self.create_request('post', auth=False, data=self.data)
 
@@ -600,7 +636,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertFalse(updated_user.email_verification_required)
+        self.assertTrue(updated_user.email_verified)
         self.assertTrue(updated_user.is_active)
 
     def test_post_unauthenticated(self):
@@ -614,7 +650,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertFalse(updated_user.email_verification_required)
+        self.assertTrue(updated_user.email_verified)
         self.assertTrue(updated_user.is_active)
 
     def test_post_invalid_user(self):
@@ -638,7 +674,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_verified_email(self):
-        user = UserFactory.create(email_verification_required=False)
+        user = UserFactory.create(email_verified=True)
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
@@ -659,10 +695,10 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
-        self.assertFalse(updated_user.email_verification_required)
+        self.assertTrue(updated_user.email_verified)
 
         logged_in_user = User.objects.get(pk=other_user.pk)
-        self.assertTrue(logged_in_user.email_verification_required)
+        self.assertFalse(logged_in_user.email_verified)
 
     def test_full_stack_wrong_url(self):
         user = UserFactory.create()
@@ -952,7 +988,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
 
     def test_post_email_already_verified(self):
         """Assert email already verified does not trigger another email."""
-        user = UserFactory.create(email_verification_required=False)
+        user = UserFactory.create(email_verified=True)
         data = {'email': user.email}
         request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()

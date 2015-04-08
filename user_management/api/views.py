@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
@@ -16,6 +16,15 @@ User = get_user_model()
 
 
 class GetAuthToken(ObtainAuthToken):
+    """
+    Obtain an authentication token.
+
+    Define a `POST` (create) method to authenticate a user using their `email` and
+    `password` and return a `token` if successful.
+    The `token` remains valid until `settings.AUTH_TOKEN_MAX_AGE` time has passed.
+
+    `DELETE` method removes the current `token` from the database.
+    """
     model = models.AuthToken
     throttle_classes = [
         throttling.UsernameLoginRateThrottle,
@@ -28,7 +37,9 @@ class GetAuthToken(ObtainAuthToken):
         but not re-using them."""
         serializer = AuthTokenSerializer(data=request.DATA)
         if serializer.is_valid():
-            token = self.model.objects.create(user=serializer.validated_data['user'])
+            user = serializer.validated_data['user']
+            signals.user_logged_in.send(type(self), user=user, request=request)
+            token = self.model.objects.create(user=user)
             token.update_expiry()
             return response.Response({'token': token.key})
 
@@ -56,10 +67,21 @@ class GetAuthToken(ObtainAuthToken):
             pass
         else:
             token.delete()
+            signals.user_logged_out.send(
+                type(self),
+                user=token.user,
+                request=request,
+            )
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserRegister(generics.CreateAPIView):
+    """
+    Register a new `User`.
+
+    An email to validate the new account is sent if `email_verified`
+    is set to `False`.
+    """
     serializer_class = serializers.RegistrationSerializer
     permission_classes = [permissions.IsNotAuthenticated]
 
@@ -77,7 +99,7 @@ class UserRegister(generics.CreateAPIView):
 
     def is_valid(self, serializer):
         user = serializer.save()
-        if user.email_verification_required:
+        if not user.email_verified:
             user.send_validation_email()
             ok_message = _(
                 'Your account has been created and an activation link sent ' +
@@ -93,6 +115,12 @@ class UserRegister(generics.CreateAPIView):
 
 
 class PasswordResetEmail(generics.GenericAPIView):
+    """
+    Send a password reset email to a user on request.
+
+    A user can request a password request email by providing their email address.
+    If the user is not found no error is raised.
+    """
     permission_classes = [permissions.IsNotAuthenticated]
     template_name = 'user_management/password_reset_email.html'
     serializer_class = serializers.PasswordResetEmailSerializer
@@ -120,6 +148,11 @@ class PasswordResetEmail(generics.GenericAPIView):
 
 
 class OneTimeUseAPIMixin(object):
+    """
+    Use a `uid` and a `token` to allow one-time access to a view.
+
+    Set user as a class attribute or raise an `InvalidExpiredToken`.
+    """
     def initial(self, request, *args, **kwargs):
         uidb64 = kwargs['uidb64']
         uid = urlsafe_base64_decode(force_text(uidb64))
@@ -141,6 +174,17 @@ class OneTimeUseAPIMixin(object):
 
 
 class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
+    """
+    Reset a user's password.
+
+    This view is generally called when a user has followed an email link to
+    reset a password.
+
+    This view will check first if the `uid` and `token` are valid.
+
+    `PasswordReset` is called with an `UPDATE` containing the new password
+    (`new_password` and `new_password2`).
+    """
     permission_classes = [permissions.IsNotAuthenticated]
     model = User
     serializer_class = serializers.PasswordResetSerializer
@@ -150,6 +194,12 @@ class PasswordReset(OneTimeUseAPIMixin, generics.UpdateAPIView):
 
 
 class PasswordChange(generics.UpdateAPIView):
+    """
+    Change a user's password.
+
+    Give ability to `PUT` (update) a password when authenticated by submitting current
+    password.
+    """
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.PasswordChangeSerializer
@@ -159,14 +209,19 @@ class PasswordChange(generics.UpdateAPIView):
 
 
 class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
+    """
+    Verify a new user's email address.
+
+    Verify a newly created account by checking the `uid` and `token` in a `POST` request.
+    """
     permission_classes = [AllowAny]
     ok_message = _('Your account has been verified.')
 
     def post(self, request, *args, **kwargs):
-        if not self.user.email_verification_required:
+        if self.user.email_verified:
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
-        self.user.email_verification_required = False
+        self.user.email_verified = True
         self.user.is_active = True
         self.user.save()
 
@@ -177,6 +232,11 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
 
 
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Allow a user to view and edit their profile information.
+
+    `GET`, `UPDATE` and `DELETE` current logged-in user.
+    """
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
@@ -186,19 +246,34 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserList(generics.ListCreateAPIView):
+    """
+    Return information about all users and allow creation of new users.
+
+    Allow to `GET` a list users and to `POST` new user for admin user only.
+    """
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializerCreate
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Display information about a user.
+
+    Allow admin users to update or delete user information.
+    """
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializer
 
 
 class ResendConfirmationEmail(generics.GenericAPIView):
-    """Resend a confirmation email."""
+    """
+    Resend a confirmation email.
+
+    `POST` request to resend a confirmation email for existing user. Useful when
+    the token has expired.
+    """
     permission_classes = [permissions.IsNotAuthenticated]
     serializer_class = serializers.ResendConfirmationEmailSerializer
     throttle_classes = [throttling.ResendConfirmationEmailRateThrottle]
