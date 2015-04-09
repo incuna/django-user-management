@@ -45,6 +45,10 @@ settings.configure(
     },
     SENTRY_CLIENT='user_management.utils.sentry.SensitiveDjangoClient',
     USE_TZ=True,
+    MIGRATION_MODULES={
+        'api': 'user_management.tests.testmigrations.api',
+        'tests': 'user_management.tests.testmigrations.tests',
+    },
 )
 
 
