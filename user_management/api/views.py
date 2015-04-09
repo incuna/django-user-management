@@ -5,7 +5,6 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import generics, response, status, views
 from rest_framework.authentication import get_authorization_header
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -35,7 +34,7 @@ class GetAuthToken(ObtainAuthToken):
     def post(self, request):
         """Create auth token. Differs from DRF that it always creates new token
         but not re-using them."""
-        serializer = AuthTokenSerializer(data=request.DATA)
+        serializer = self.serializer_class(data=request.DATA)
         if serializer.is_valid():
             user = serializer.validated_data['user']
             signals.user_logged_in.send(type(self), user=user, request=request)
