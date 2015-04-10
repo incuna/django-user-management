@@ -8,6 +8,14 @@ from colour_runner.django_runner import ColourRunnerMixin
 from django.conf import settings
 
 
+MIGRATION_MODULES = {}
+if django.VERSION >= (1, 8):
+    MIGRATION_MODULES = {
+        'api': 'user_management.tests.testmigrations.api',
+        'tests': 'user_management.tests.testmigrations.tests',
+    }
+
+
 settings.configure(
     DATABASES={
         'default': dj_database_url.config(
@@ -45,10 +53,7 @@ settings.configure(
     },
     SENTRY_CLIENT='user_management.utils.sentry.SensitiveDjangoClient',
     USE_TZ=True,
-    MIGRATION_MODULES={
-        'api': 'user_management.tests.testmigrations.api',
-        'tests': 'user_management.tests.testmigrations.tests',
-    },
+    MIGRATION_MODULES=MIGRATION_MODULES,
 )
 
 
