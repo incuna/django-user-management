@@ -58,13 +58,12 @@ class TestURLs(URLTestCase):
 
     def test_verify_email(self):
         """Assert `verify_user` is defined."""
-        uidb64 = '123'
         token = 'a-token'
         self.assert_url_matches_view(
             view=views.VerifyAccountView,
-            expected_url='/verify_email/{}/{}'.format(uidb64, token),
+            expected_url='/verify_email/{}'.format(token),
             url_name='user_management_api:verify_user',
-            url_kwargs={'uidb64': uidb64, 'token': token},
+            url_kwargs={'token': token},
         )
 
     def test_resend_confirmation_email(self):

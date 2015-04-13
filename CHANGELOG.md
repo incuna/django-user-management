@@ -1,3 +1,11 @@
+## v10.0.0 (Upcoming)
+
+* Replace `default_token_generator` with `django.core.signing`.
+
+### Notes
+
+* Previously not validated emails would be invalid.
+
 ## v9.0.1
 
 * Send `user_logged_in` and `user_logged_out` signals from `GetAuthToken` view.

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.tokens import default_token_generator
+from django.core import signing
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
@@ -210,7 +211,7 @@ class PasswordChange(generics.UpdateAPIView):
         return self.request.user
 
 
-class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
+class VerifyAccountView(views.APIView):
     """
     Verify a new user's email address.
 
@@ -218,6 +219,30 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
     """
     permission_classes = [AllowAny]
     ok_message = _('Your account has been verified.')
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Use `token` to allow one-time access to a view.
+
+        Set user as a class attribute or raise an `InvalidExpiredToken`.
+        """
+        try:
+            email_data = signing.loads(kwargs['token'])
+        except signing.BadSignature:
+            raise exceptions.InvalidExpiredToken
+
+        email = email_data['email']
+
+        try:
+            self.user = User.objects.get_by_natural_key(email)
+        except User.DoesNotExist:
+            raise exceptions.InvalidExpiredToken()
+
+        return super(VerifyAccountView, self).initial(
+            request,
+            *args,
+            **kwargs
+        )
 
     def post(self, request, *args, **kwargs):
         if self.user.email_verified:
