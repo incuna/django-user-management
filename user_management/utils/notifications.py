@@ -3,7 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from pigeon.notification import Notification
 
 
-def email_context(notification):
+def password_reset_email_context(notification):
+    """Email context to reset a user password."""
     return {
         'protocol': 'https',
         'uid': notification.user.generate_uid(),
@@ -12,7 +13,16 @@ def email_context(notification):
     }
 
 
-def email_handler(notification):
+def validation_email_context(notification):
+    """Email context to verify a user email."""
+    return {
+        'protocol': 'https',
+        'token': notification.user.generate_validation_token(),
+        'site': notification.site,
+    }
+
+
+def email_handler(notification, email_context):
     """Send a notification by email."""
     incuna_mail.send(
         to=notification.user.email,
@@ -27,14 +37,14 @@ def password_reset_email_handler(notification):
     """Password reset email handler."""
     subject = _('{domain} password reset').format(domain=notification.site.domain)
     notification.email_subject = subject
-    email_handler(notification)
+    email_handler(notification, password_reset_email_context)
 
 
 def validation_email_handler(notification):
     """Validation email handler."""
     subject = _('{domain} account validate').format(domain=notification.site.domain)
     notification.email_subject = subject
-    email_handler(notification)
+    email_handler(notification, validation_email_context)
 
 
 class PasswordResetNotification(Notification):

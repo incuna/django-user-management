@@ -12,13 +12,14 @@ from django.utils import six, timezone
 from mock import Mock, patch
 
 from user_management.models.tests import utils
-from user_management.utils.notifications import email_context
+from user_management.utils.notifications import validation_email_context
 from . import models
 from .factories import UserFactory
 from .. import mixins
 
 
-EMAIL_CONTEXT = 'user_management.utils.notifications.email_context'
+PASSWORD_CONTEXT = 'user_management.utils.notifications.password_reset_email_context'
+VALIDATION_CONTEXT = 'user_management.utils.notifications.validation_email_context'
 SEND_METHOD = 'user_management.utils.notifications.incuna_mail.send'
 
 skip_if_checks_unavailable = unittest.skipIf(
@@ -178,7 +179,7 @@ class TestVerifyEmailMixin(TestCase):
         self.assertFalse(user.email_verified)
 
     def test_email_context(self):
-        """Assert `email_context` returns the correct data."""
+        """Assert `password_reset_email_context` returns the correct data."""
         mocked_user = Mock()
         mocked_site = Mock()
 
@@ -187,12 +188,11 @@ class TestVerifyEmailMixin(TestCase):
             site = mocked_site
 
         notification = DummyNotification()
-        context = email_context(notification)
+        context = validation_email_context(notification)
 
         expected_context = {
             'protocol': 'https',
-            'uid': mocked_user.generate_uid(),
-            'token': mocked_user.generate_token(),
+            'token': mocked_user.generate_validation_token(),
             'site': mocked_site,
         }
         self.assertEqual(context, expected_context)
@@ -202,7 +202,7 @@ class TestVerifyEmailMixin(TestCase):
         site = Site.objects.get_current()
         user = self.model(email='email@email.email')
 
-        with patch(EMAIL_CONTEXT) as get_context:
+        with patch(VALIDATION_CONTEXT) as get_context:
             get_context.return_value = context
             with patch(SEND_METHOD) as send:
                 user.send_validation_email()
@@ -294,7 +294,7 @@ class TestCustomPasswordResetNotification(TestCase):
         site = Site.objects.get_current()
         user = self.model(email='email@email.email')
 
-        with patch(EMAIL_CONTEXT) as get_context:
+        with patch(PASSWORD_CONTEXT) as get_context:
             get_context.return_value = context
             with patch(SEND_METHOD) as send:
                 user.send_password_reset()
