@@ -1,4 +1,4 @@
-## v10.0.0 (Upcoming)
+## v10.0.0
 
 * Replace `default_token_generator` with `django.core.signing`.
 
