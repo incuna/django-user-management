@@ -221,6 +221,11 @@ class VerifyAccountView(views.APIView):
     ok_message = _('Your account has been verified.')
 
     def initial(self, request, *args, **kwargs):
+        """
+        Use `token` to allow one-time access to a view.
+
+        Set user as a class attribute or raise an `InvalidExpiredToken`.
+        """
         try:
             email_data = signing.loads(kwargs['token'])
         except signing.BadSignature:
