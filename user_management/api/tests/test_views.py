@@ -993,11 +993,29 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('email', response.data)
 
-    def test_send_email(self):
-        """Assert user can receive a new confirmation email."""
+    def test_send_email_unauthenticated(self):
+        """Assert unauthenticated user can receive a new confirmation email."""
         user = UserFactory.create()
         data = {'email': user.email}
         request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        view(request)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+
+        self.assertIn(user.email, email.to)
+        expected = 'https://example.com/#/register/verify/'
+        self.assertIn(expected, email.body)
+
+        expected = 'example.com account validate'
+        self.assertEqual(email.subject, expected)
+
+    def test_send_email_authenticated(self):
+        """Assert authenticated user can receive a new confirmation email."""
+        user = UserFactory.create()
+        data = {'email': user.email}
+        request = self.create_request('post', user=user, data=data)
         view = self.view_class.as_view()
         view(request)
 

@@ -301,7 +301,7 @@ class ResendConfirmationEmail(generics.GenericAPIView):
     `POST` request to resend a confirmation email for existing user. Useful when
     the token has expired.
     """
-    permission_classes = [permissions.IsNotAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.ResendConfirmationEmailSerializer
     throttle_classes = [throttling.ResendConfirmationEmailRateThrottle]
     throttle_scope = 'confirmations'
