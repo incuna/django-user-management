@@ -1028,3 +1028,23 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
 
         expected = 'example.com account validate'
         self.assertEqual(email.subject, expected)
+
+    def test_send_email_other_user(self):
+        """Assert a user can not request a confirmation email for another user."""
+        user, other_user = UserFactory.create_batch(2)
+        data = {'email': other_user.email}
+        request = self.create_request('post', user=user, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_send_email_empty(self):
+        """Assert we delegate the error to the serializer if no email data was sent."""
+        data = {}
+        request = self.create_request('post', data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('This field is required.', response.data['email'])

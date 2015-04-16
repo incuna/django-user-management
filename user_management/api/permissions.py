@@ -18,3 +18,14 @@ class IsAdminOrReadOnly(BasePermission):
             return True
 
         return request.user.is_staff
+
+
+class IsAnonymousOrOwner(BasePermission):
+    """Check if user is anonymous or if email belongs to user."""
+    def has_permission(self, request, view):
+        if request.user.is_anonymous():
+            return True
+        email = request.DATA.get('email')
+        if not email:
+            return True
+        return request.user.email.lower() == email.lower()
