@@ -1046,5 +1046,4 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
         view = self.view_class.as_view()
         response = view(request)
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('This field is required.', response.data['email'])
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
