@@ -1,3 +1,11 @@
+## v10.1.0 (Upcoming)
+
+* Allow authenticated user to receive a new confirmation email.
+
+### Notes
+
+* Previously only anonymous could request a new confirmation email.
+
 ## v10.0.0
 
 * Replace `default_token_generator` with `django.core.signing`.

@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import generics, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from . import exceptions, models, permissions, serializers, throttling
@@ -298,13 +299,29 @@ class ResendConfirmationEmail(generics.GenericAPIView):
     """
     Resend a confirmation email.
 
-    `POST` request to resend a confirmation email for existing user. Useful when
-    the token has expired.
+    `POST` request to resend a confirmation email for existing user. If user is
+    authenticated the email sent should match.
     """
-    permission_classes = [permissions.IsNotAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.ResendConfirmationEmailSerializer
     throttle_classes = [throttling.ResendConfirmationEmailRateThrottle]
     throttle_scope = 'confirmations'
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Use `token` to allow one-time access to a view.
+
+        Set user as a class attribute or raise an `InvalidExpiredToken`.
+        """
+        email = request.DATA.get('email')
+        if request.user.is_authenticated() and email != request.user.email:
+            raise PermissionDenied()
+
+        return super(ResendConfirmationEmail, self).initial(
+            request,
+            *args,
+            **kwargs
+        )
 
     def post(self, request, *args, **kwargs):
         """Validate `email` and send a request to confirm it."""
