@@ -1,4 +1,4 @@
-## v10.1.0 (Upcoming)
+## v10.1.0
 
 * Allow authenticated user to receive a new confirmation email.
 
