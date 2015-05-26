@@ -27,7 +27,7 @@ from user_management.tests.utils import iso_8601
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
 SEND_METHOD = 'user_management.utils.notifications.incuna_mail.send'
-EMAIL_CONTEXT = 'user_management.utils.notifications.email_context'
+EMAIL_CONTEXT = 'user_management.utils.notifications.password_reset_email_context'
 REGISTRATION_SERIALIZER_META_MODEL = (
     'user_management.api.serializers.RegistrationSerializer.Meta.model'
 )
@@ -230,8 +230,7 @@ class TestRegisterView(APIRequestTestCase):
         verify_url_regex = re.compile(
             r'''
                 https://example\.com/\#/register/verify/
-                [0-9A-Za-z_\-]+/  # uid
-                [0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20}/  # token
+                [0-9A-Za-z:\-_]+/  # token
             ''',
             re.VERBOSE,
         )
@@ -629,13 +628,13 @@ class TestVerifyAccountView(APIRequestTestCase):
     view_class = views.VerifyAccountView
 
     def test_post_authenticated(self):
+        """Assert authenticated user can verify its email."""
         user = UserFactory.create()
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = user.generate_validation_token()
 
-        request = self.create_request('post', auth=True)
+        request = self.create_request('post', user=user, auth=True)
         view = self.view_class.as_view()
-        response = view(request, uidb64=uid, token=token)
+        response = view(request, token=token)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
@@ -643,13 +642,13 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertTrue(updated_user.is_active)
 
     def test_post_unauthenticated(self):
+        """Assert unauthenticated user can verify its email."""
         user = UserFactory.create()
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = user.generate_validation_token()
 
         request = self.create_request('post', auth=False)
         view = self.view_class.as_view()
-        response = view(request, uidb64=uid, token=token)
+        response = view(request, token=token)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
@@ -657,44 +656,42 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertTrue(updated_user.is_active)
 
     def test_post_invalid_user(self):
-        # There should never be a user with pk 0
-        invalid_uid = urlsafe_base64_encode(b'0')
+        """Assert inexisting user verification return a bad request."""
+        user = UserFactory.build()
+        token = user.generate_validation_token()
 
         request = self.create_request('post')
         view = self.view_class.as_view()
-        response = view(request, uidb64=invalid_uid)
+        response = view(request, token=token)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_invalid_token(self):
-        user = UserFactory.create()
-        other_user = UserFactory.create()
-        token = default_token_generator.make_token(other_user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-
+        """Assert forged token return a bad request."""
+        token = 'nimporte-nawak'
         request = self.create_request('post')
         view = self.view_class.as_view()
-        response = view(request, uidb64=uid, token=token)
+        response = view(request, token=token)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_verified_email(self):
+        """Assert verified user cannot verify email."""
         user = UserFactory.create(email_verified=True)
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = user.generate_validation_token()
 
         request = self.create_request('post')
         view = self.view_class.as_view()
-        response = view(request, uidb64=uid, token=token)
+        response = view(request, token=token)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_post_different_user_logged_in(self):
+        """Assert a user can have amny accounts and verify one."""
         user = UserFactory.create()
         other_user = UserFactory.create()
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = user.generate_validation_token()
 
         request = self.create_request('post', user=other_user)
         view = self.view_class.as_view()
-        response = view(request, uidb64=uid, token=token)
+        response = view(request, token=token)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_user = User.objects.get(pk=user.pk)
@@ -704,12 +701,12 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertFalse(logged_in_user.email_verified)
 
     def test_full_stack_wrong_url(self):
-        user = UserFactory.create()
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(b'0')  # Invalid uid, therefore bad url
+        """Integration test to check non existant email returns a bad request."""
+        user = UserFactory.build()
+        token = user.generate_validation_token()
 
         view_name = 'user_management_api:verify_user'
-        url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
+        url = reverse(view_name, kwargs={'token': token})
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -999,8 +996,8 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('email', response.data)
 
-    def test_send_email(self):
-        """Assert user can receive a new confirmation email."""
+    def test_send_email_unauthenticated(self):
+        """Assert unauthenticated user can receive a new confirmation email."""
         user = UserFactory.create()
         data = {'email': user.email}
         request = self.create_request('post', auth=False, data=data)
@@ -1016,3 +1013,40 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
 
         expected = 'example.com account validate'
         self.assertEqual(email.subject, expected)
+
+    def test_send_email_authenticated(self):
+        """Assert authenticated user can receive a new confirmation email."""
+        user = UserFactory.create()
+        data = {'email': user.email}
+        request = self.create_request('post', user=user, data=data)
+        view = self.view_class.as_view()
+        view(request)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+
+        self.assertIn(user.email, email.to)
+        expected = 'https://example.com/#/register/verify/'
+        self.assertIn(expected, email.body)
+
+        expected = 'example.com account validate'
+        self.assertEqual(email.subject, expected)
+
+    def test_send_email_other_user(self):
+        """Assert a user can not request a confirmation email for another user."""
+        user, other_user = UserFactory.create_batch(2)
+        data = {'email': other_user.email}
+        request = self.create_request('post', user=user, data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_send_email_empty(self):
+        """Assert we delegate the error to the serializer if no email data was sent."""
+        data = {}
+        request = self.create_request('post', data=data)
+        view = self.view_class.as_view()
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

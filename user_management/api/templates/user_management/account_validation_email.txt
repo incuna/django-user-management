@@ -4,7 +4,7 @@ register an account at {{ name }}.
 
 Please click the following link to complete your registration:
 {% endblocktrans %}
-{{ protocol }}://{{ site.domain }}/#/register/verify/{{ uid }}/{{ token }}/
+{{ protocol }}://{{ site.domain }}/#/register/verify/{{ token }}/
 
 {% blocktrans with name=site.name %}
 The {{ name }} team.

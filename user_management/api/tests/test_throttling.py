@@ -135,6 +135,15 @@ class TestResendConfirmationEmail(ClearCacheMixin, APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+        # Duplicate the request here as we are accessing request.DATA twice. To
+        # get the `request.DATA`, `djangorestframework` `read` the `POST` request
+        # (a stream) without rewinding the stream.
+        # This was producing an `Assertion` error only happening in test where
+        # calling the `view` with the same `request` twice is returning:
+        # {'detail': 'JSON parse error - No JSON object could be decoded'}`
+        # https://github.com/tomchristie/django-rest-framework/blob/650a91ac24cbd3e5b4ad5d7d7c6706fdf6160a78/rest_framework/parsers.py#L60-L64
+        request = self.create_request('post', data=data, auth=False)
+        view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
             response.status_code,

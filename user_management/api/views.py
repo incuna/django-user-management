@@ -1,11 +1,13 @@
 from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.tokens import default_token_generator
+from django.core import signing
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import generics, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from . import exceptions, models, permissions, serializers, throttling
@@ -207,7 +209,7 @@ class PasswordChange(generics.UpdateAPIView):
         return self.request.user
 
 
-class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
+class VerifyAccountView(views.APIView):
     """
     Verify a new user's email address.
 
@@ -215,6 +217,30 @@ class VerifyAccountView(OneTimeUseAPIMixin, views.APIView):
     """
     permission_classes = [AllowAny]
     ok_message = _('Your account has been verified.')
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Use `token` to allow one-time access to a view.
+
+        Set user as a class attribute or raise an `InvalidExpiredToken`.
+        """
+        try:
+            email_data = signing.loads(kwargs['token'])
+        except signing.BadSignature:
+            raise exceptions.InvalidExpiredToken
+
+        email = email_data['email']
+
+        try:
+            self.user = User.objects.get_by_natural_key(email)
+        except User.DoesNotExist:
+            raise exceptions.InvalidExpiredToken()
+
+        return super(VerifyAccountView, self).initial(
+            request,
+            *args,
+            **kwargs
+        )
 
     def post(self, request, *args, **kwargs):
         if self.user.email_verified:
@@ -270,13 +296,29 @@ class ResendConfirmationEmail(generics.GenericAPIView):
     """
     Resend a confirmation email.
 
-    `POST` request to resend a confirmation email for existing user. Useful when
-    the token has expired.
+    `POST` request to resend a confirmation email for existing user. If user is
+    authenticated the email sent should match.
     """
-    permission_classes = [permissions.IsNotAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.ResendConfirmationEmailSerializer
     throttle_classes = [throttling.ResendConfirmationEmailRateThrottle]
     throttle_scope = 'confirmations'
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Use `token` to allow one-time access to a view.
+
+        Set user as a class attribute or raise an `InvalidExpiredToken`.
+        """
+        email = request.DATA.get('email')
+        if request.user.is_authenticated() and email != request.user.email:
+            raise PermissionDenied()
+
+        return super(ResendConfirmationEmail, self).initial(
+            request,
+            *args,
+            **kwargs
+        )
 
     def post(self, request, *args, **kwargs):
         """Validate `email` and send a request to confirm it."""

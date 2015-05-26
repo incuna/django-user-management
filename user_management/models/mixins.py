@@ -1,7 +1,7 @@
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
-from django.core import checks
+from django.core import checks, signing
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import force_bytes, python_2_unicode_compatible
@@ -138,12 +138,17 @@ class EmailVerifyUserMethodsMixin:
     password_reset_notification = notifications.PasswordResetNotification
     validation_notification = notifications.ValidationNotification
 
-    def generate_token(self):
+    def generate_validation_token(self):
         """Generate user token for account validation."""
+        data = {'email': self.email}
+        return signing.dumps(data)
+
+    def generate_token(self):
+        """Generate user token for password reset."""
         return default_token_generator.make_token(self)
 
     def generate_uid(self):
-        """Generate user uid for account validation."""
+        """Generate user uid for password reset."""
         return urlsafe_base64_encode(force_bytes(self.pk))
 
     def send_validation_email(self):
