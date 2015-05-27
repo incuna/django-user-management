@@ -1,3 +1,8 @@
+## Upcoming release
+
+* Add `django-rest-framework v3` support.
+* Drop `django-rest-framework v2` support.
+
 ## v10.1.0
 
 * Allow authenticated user to receive a new confirmation email.
