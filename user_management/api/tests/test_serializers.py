@@ -2,11 +2,13 @@
 import string
 
 from django.test import TestCase
-from rest_framework.fields import WritableField
+from rest_framework.fields import Field
 from rest_framework.reverse import reverse
+from rest_framework.serializers import ValidationError
 
 from user_management.models.tests.factories import UserFactory
 from user_management.models.tests.utils import RequestTestCase
+from user_management.tests.utils import iso_8601
 from .. import serializers
 
 
@@ -18,7 +20,7 @@ class ProfileSerializerTest(TestCase):
         expected = {
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         self.assertEqual(serializer.data, expected)
 
@@ -54,13 +56,14 @@ class PasswordChangeSerializerTest(TestCase):
 
         user = UserFactory.build(password=old_password)
 
-        serializer = serializers.PasswordChangeSerializer(user, data={
+        serializer = serializers.PasswordChangeSerializer()
+        data = {
             'old_password': 'invalid_password',
             'new_password': new_password,
             'new_password2': new_password,
-        })
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('old_password', serializer.errors)
+        }
+        with self.assertRaises(ValidationError):
+            serializer.update(user, data)
 
     def test_deserialize_invalid_new_password(self):
         old_password = '0ld_passworD'
@@ -75,7 +78,6 @@ class PasswordChangeSerializerTest(TestCase):
         })
         self.assertFalse(serializer.is_valid())
         self.assertIn('new_password', serializer.errors)
-        self.assertTrue(serializer.object.check_password(old_password))
 
     def test_deserialize_mismatched_passwords(self):
         old_password = '0ld_passworD'
@@ -116,7 +118,6 @@ class PasswordResetSerializerTest(TestCase):
         })
         self.assertFalse(serializer.is_valid())
         self.assertIn('new_password', serializer.errors)
-        self.assertFalse(serializer.object.check_password(new_password))
 
     def test_deserialize_mismatched_passwords(self):
         new_password = 'n3w_Password'
@@ -144,10 +145,10 @@ class RegistrationSerializerTest(TestCase):
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertTrue(serializer.is_valid())
 
-        user = serializer.object
-        self.assertEqual(user.name, self.data['name'])
-        self.assertEqual(user.email, self.data['email'].lower())
-        self.assertTrue(user.check_password(self.data['password']))
+        validated_data = serializer.validated_data
+        self.assertEqual(validated_data['name'], self.data['name'])
+        self.assertEqual(validated_data['email'], self.data['email'].lower())
+        self.assertEqual(validated_data['password'], self.data['password'])
 
     def test_deserialize_invalid_new_password(self):
         self.data['password'] = '2short'
@@ -155,7 +156,6 @@ class RegistrationSerializerTest(TestCase):
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('password', serializer.errors)
-        self.assertIs(serializer.object, None)
 
     def test_deserialize_mismatched_passwords(self):
         self.data['password2'] = 'different_password'
@@ -188,7 +188,7 @@ class UserSerializerTest(RequestTestCase):
             'url': url,
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         self.assertEqual(serializer.data, expected)
 
@@ -243,6 +243,21 @@ class TestUserSerializerCreate(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn('email', serializer.errors)
 
+    def test_deserialize_email_in_use(self):
+        other_user = UserFactory.create()
+        data = {
+            'name': "Robert'); DROP TABLE Students;--'",
+            'email': other_user.email,
+            'password': 'Sup3RSecre7paSSw0rD',
+            'password2': 'Sup3RSecre7paSSw0rD',
+        }
+        serializer = serializers.UserSerializerCreate(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer._errors['email'],
+            ['That email address has already been registered.'],
+        )
+
 
 class SerializerPasswordsTest(TestCase):
     too_simple = (
@@ -282,13 +297,13 @@ class SerializerPasswordsTest(TestCase):
     def test_missing(self):
         data = {}
         for serializer_class, field in self.serializers:
-            msg = WritableField.default_error_messages['required']
+            msg = Field.default_error_messages['required']
             self.assert_validation_error(serializer_class, field, data, msg)
 
     def test_too_short(self):
         for serializer_class, field in self.serializers:
             data = {field: 'Aa1'}
-            msg = 'Ensure this value has at least 8 characters (it has 3).'
+            msg = 'Ensure this field has at least 8 characters.'
             self.assert_validation_error(serializer_class, field, data, msg)
 
     def test_no_upper(self):

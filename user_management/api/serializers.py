@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 from user_management.utils.validators import validate_password_strength
 
@@ -8,18 +8,24 @@ from user_management.utils.validators import validate_password_strength
 User = get_user_model()
 
 
-class ValidateEmailMixin(object):
-    def validate_email(self, attrs, source):
-        email = attrs.get(source).lower()
+class UniqueEmailValidator(validators.UniqueValidator):
+    def filter_queryset(self, value, queryset):
+        """Check lower-cased email is unique."""
+        return super(UniqueEmailValidator, self).filter_queryset(
+            value.lower(),
+            queryset,
+        )
 
-        try:
-            User.objects.get_by_natural_key(email)
-        except User.DoesNotExist:
-            attrs[source] = email
-            return attrs
-        else:
-            msg = _('That email address has already been registered.')
-            raise serializers.ValidationError(msg)
+
+unique_email_validator = UniqueEmailValidator(
+    queryset=User.objects.all(),
+    message=_('That email address has already been registered.'),
+)
+
+
+class ValidateEmailMixin(object):
+    def validate_email(self, value):
+        return value.lower()
 
 
 class EmailSerializerBase(serializers.Serializer):
@@ -31,6 +37,7 @@ class EmailSerializerBase(serializers.Serializer):
 
 
 class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[unique_email_validator])
     password = serializers.CharField(
         write_only=True,
         min_length=8,
@@ -47,18 +54,19 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
         fields = ['name', 'email', 'password', 'password2']
         model = User
 
-    def validate_password2(self, attrs, source):
-        password2 = attrs.pop(source)
+    def validate(self, attrs):
+        password2 = attrs.pop('password2')
         if password2 != attrs.get('password'):
             msg = _('Your passwords do not match.')
-            raise serializers.ValidationError(msg)
+            raise serializers.ValidationError({'password2': msg})
         return attrs
 
-    def restore_object(self, attrs, instance=None):
-        password = attrs.pop('password')
-        instance = super(RegistrationSerializer, self).restore_object(attrs, instance)
-        instance.set_password(password)
-        return instance
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = self.Meta.model.objects.create(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class PasswordChangeSerializer(serializers.ModelSerializer):
@@ -82,25 +90,20 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         model = User
         fields = ('old_password', 'new_password', 'new_password2')
 
-    def restore_object(self, attrs, instance=None):
-        instance = super(PasswordChangeSerializer, self).restore_object(
-            attrs,
-            instance,
-        )
-        instance.set_password(attrs['new_password'])
+    def update(self, instance, validated_data):
+        """Check the old password is valid and set the new password."""
+        if not instance.check_password(validated_data['old_password']):
+            msg = _('Invalid password.')
+            raise serializers.ValidationError({'old_password': msg})
+
+        instance.set_password(validated_data['new_password'])
+        instance.save()
         return instance
 
-    def validate_old_password(self, attrs, source):
-        value = attrs[source]
-        if not self.object.check_password(value):
-            msg = _('Invalid password.')
-            raise serializers.ValidationError(msg)
-        return attrs
-
-    def validate_new_password2(self, attrs, source):
-        if attrs.get('new_password') != attrs[source]:
+    def validate(self, attrs):
+        if attrs.get('new_password') != attrs['new_password2']:
             msg = _('Your new passwords do not match.')
-            raise serializers.ValidationError(msg)
+            raise serializers.ValidationError({'new_password2': msg})
         return attrs
 
 
@@ -121,18 +124,16 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         model = User
         fields = ('new_password', 'new_password2')
 
-    def restore_object(self, attrs, instance=None):
-        instance = super(PasswordResetSerializer, self).restore_object(
-            attrs,
-            instance,
-        )
-        instance.set_password(attrs['new_password'])
+    def update(self, instance, validated_data):
+        """Set the new password for the user."""
+        instance.set_password(validated_data['new_password'])
+        instance.save()
         return instance
 
-    def validate_new_password2(self, attrs, source):
-        if attrs.get('new_password') != attrs[source]:
+    def validate(self, attrs):
+        if attrs.get('new_password') != attrs['new_password2']:
             msg = _('Your new passwords do not match.')
-            raise serializers.ValidationError(msg)
+            raise serializers.ValidationError({'new_password2': msg})
         return attrs
 
 
@@ -149,12 +150,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class ResendConfirmationEmailSerializer(EmailSerializerBase):
     """Serializer defining an `email` field to resend a confirmation email."""
-    def validate_email(self, attrs, source):
-        """Validate if email exists and requires a verification.
+    def validate_email(self, email):
+        """
+        Validate if email exists and requires a verification.
 
         `validate_email` will set a `user` attribute on the instance allowing
-        the view to send an email confirmation."""
-        email = attrs[source]
+        the view to send an email confirmation.
+        """
         try:
             self.user = User.objects.get_by_natural_key(email)
         except User.DoesNotExist:
@@ -164,7 +166,7 @@ class ResendConfirmationEmailSerializer(EmailSerializerBase):
         if self.user.email_verified:
             msg = _('User email address is already verified.')
             raise serializers.ValidationError(msg)
-        return attrs
+        return email
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -176,5 +178,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializerCreate(ValidateEmailMixin, UserSerializer):
+    email = serializers.EmailField(validators=[unique_email_validator])
+
     class Meta(UserSerializer.Meta):
         read_only_fields = ('date_joined',)

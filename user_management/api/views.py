@@ -38,7 +38,7 @@ class GetAuthToken(ObtainAuthToken):
         but not re-using them."""
         serializer = self.serializer_class(data=request.DATA)
         if serializer.is_valid():
-            user = serializer.object['user']
+            user = serializer.validated_data['user']
             signals.user_logged_in.send(type(self), user=user, request=request)
             token = self.model.objects.create(user=user)
             token.update_expiry()
@@ -87,10 +87,7 @@ class UserRegister(generics.CreateAPIView):
     permission_classes = [permissions.IsNotAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(
-            data=request.DATA,
-            files=request.FILES,
-        )
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             return self.is_valid(serializer)
         return self.is_invalid(serializer)
@@ -102,9 +99,9 @@ class UserRegister(generics.CreateAPIView):
         )
 
     def is_valid(self, serializer):
-        serializer.save()
-        if not serializer.object.email_verified:
-            serializer.object.send_validation_email()
+        user = serializer.save()
+        if not user.email_verified:
+            user.send_validation_email()
             ok_message = _(
                 'Your account has been created and an activation link sent ' +
                 'to your email address. Please check your email to continue.'
@@ -279,7 +276,7 @@ class UserList(generics.ListCreateAPIView):
 
     Allow to `GET` a list users and to `POST` new user for admin user only.
     """
-    model = User
+    queryset = User.objects.all()
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializerCreate
 
@@ -290,7 +287,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 
     Allow admin users to update or delete user information.
     """
-    model = User
+    queryset = User.objects.all()
     permission_classes = (IsAuthenticated, permissions.IsAdminOrReadOnly)
     serializer_class = serializers.UserSerializer
 

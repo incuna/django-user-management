@@ -1,5 +1,6 @@
 import datetime
 import re
+from collections import OrderedDict
 
 from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.hashers import check_password
@@ -20,12 +21,16 @@ from user_management.api.tests.test_throttling import THROTTLE_RATE_PATH
 from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.models import BasicUser
 from user_management.models.tests.utils import APIRequestTestCase
+from user_management.tests.utils import iso_8601
 
 
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
 SEND_METHOD = 'user_management.utils.notifications.incuna_mail.send'
 EMAIL_CONTEXT = 'user_management.utils.notifications.password_reset_email_context'
+REGISTRATION_SERIALIZER_META_MODEL = (
+    'user_management.api.serializers.RegistrationSerializer.Meta.model'
+)
 
 
 class GetAuthTokenTest(APIRequestTestCase):
@@ -97,8 +102,7 @@ class GetAuthTokenTest(APIRequestTestCase):
 
     def test_post_no_data(self):
         """Assert sending no data raise an error."""
-        data = {'username': None, 'password': None}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data={})
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(
@@ -243,8 +247,7 @@ class TestRegisterView(APIRequestTestCase):
         # Password should validate
         self.assertTrue(check_password(self.data['password'], user.password))
 
-    @patch('user_management.api.serializers.RegistrationSerializer.Meta.model',
-           new=BasicUser)
+    @patch(REGISTRATION_SERIALIZER_META_MODEL, new=BasicUser)
     def test_unauthenticated_user_post_no_verify_email(self):
         """
         An email should not be sent if email_verified is True.
@@ -388,15 +391,15 @@ class TestPasswordResetEmail(APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        expected_post_options = {
-            'email': {
-                'type': 'email',
-                'required': True,
-                'read_only': False,
-                'label': 'Email address',
-                'max_length': 511,
-            },
-        }
+        expected_post_options = OrderedDict((
+            ('email', OrderedDict((
+                ('type', 'email'),
+                ('required', True),
+                ('read_only', False),
+                ('label', 'Email address'),
+                ('max_length', 511),
+            ))),
+        ))
         self.assertEqual(
             response.data['actions']['POST'],
             expected_post_options,
@@ -717,7 +720,7 @@ class TestProfileDetail(APIRequestTestCase):
         expected = {
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         return expected
 
@@ -801,7 +804,7 @@ class TestUserList(APIRequestTestCase):
             'url': TEST_SERVER + url,
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         return expected
 
@@ -864,7 +867,7 @@ class TestUserDetail(APIRequestTestCase):
             'url': TEST_SERVER + url,
             'name': user.name,
             'email': user.email,
-            'date_joined': user.date_joined,
+            'date_joined': iso_8601(user.date_joined),
         }
         return expected
 

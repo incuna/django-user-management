@@ -35,7 +35,7 @@ class AvatarAPIViewBase(generics.RetrieveUpdateAPIView):
     authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES + [
         authentication.FormTokenAuthentication,
     ]
-    model = User
+    queryset = User.objects.all()
     parser_classes = (parsers.MultiPartParser,)
     serializer_class = serializers.AvatarSerializer
 

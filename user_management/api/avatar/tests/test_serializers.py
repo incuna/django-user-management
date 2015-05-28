@@ -1,16 +1,7 @@
 from django.test import TestCase
 from mock import MagicMock, patch
 
-from user_management.models.tests.factories import UserFactory
 from .. import serializers
-
-
-class AvatarSerializerTest(TestCase):
-    def test_deserialize(self):
-        user = UserFactory.build()
-        data = {'avatar': ''}
-        serializer = serializers.AvatarSerializer(user, data=data)
-        self.assertTrue(serializer.is_valid())
 
 
 class ThumbnailField(TestCase):
@@ -74,10 +65,18 @@ class ThumbnailField(TestCase):
         image = field.to_native(mocked_image)
         self.assertEqual(image, None)
 
+    def mock_parent(self, context):
+        parent = MagicMock()
+        parent._context = context
+        parent.parent = None
+        return parent
+
     def test_to_native_no_request(self):
         """Calling to_native with no request returns the image url."""
         field = serializers.ThumbnailField()
-        field.context = {'request': None}
+
+        field.parent = self.mock_parent({'request': None})
+
         expected = '/url/'
         mocked_image = MagicMock(
             name='image.png',
@@ -93,7 +92,8 @@ class ThumbnailField(TestCase):
         expected = 'test.com/url/'
         request.build_absolute_uri.return_value = expected
 
-        field.context = {'request': request}
+        field.parent = self.mock_parent({'request': request})
+
         field.get_generator_kwargs = MagicMock(return_value={})
         mocked_image = MagicMock(
             name='image.png',
@@ -108,7 +108,7 @@ class ThumbnailField(TestCase):
         field = serializers.ThumbnailField()
 
         request = MagicMock()
-        field.context = {'request': request}
+        field.parent = self.mock_parent({'request': request})
 
         kwargs = {'width': 100}
         field.get_generator_kwargs = MagicMock(return_value=kwargs)
