@@ -1,4 +1,4 @@
-## Upcoming release
+## v11.0.0
 
 * Add `django-rest-framework v3` support.
 * Drop `django-rest-framework v2` support.
