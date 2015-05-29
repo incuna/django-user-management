@@ -1,3 +1,7 @@
+## v12.0.0 (upcoming)
+
+* Add `django v.18` support.
+
 ## v11.0.0
 
 * Add `django-rest-framework v3` support.
