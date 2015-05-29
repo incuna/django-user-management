@@ -1,6 +1,6 @@
 ## v12.0.0 (upcoming)
 
-* Add `django v.18` support.
+* Add `django v1.8` support.
 
 ## v11.0.0
 
