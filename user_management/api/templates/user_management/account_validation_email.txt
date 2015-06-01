@@ -10,5 +10,4 @@ Please click the following link to complete your registration:
 
 {% blocktrans with name=site.name %}
 The {{ name }} team.
-{% endblocktrans %}{% endautoescape %}
-{% endspaceless %}
+{% endblocktrans %}
