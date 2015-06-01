@@ -1,13 +1,18 @@
 {% load i18n %}
+<p>
 {% blocktrans with name=site.name %}
-<p>You are receiving this email because your email address has been used to
-register an account at {{ name }}.</p>
-
-<p>Please click the following link to complete your registration:</p>
+You are receiving this email because your email address has been used to
+register an account at {{ name }}.
 {% endblocktrans %}
-
+</p>
+<p>
+{% blocktrans %}
+Please click the following link to complete your registration:
+{% endblocktrans %}
+</p>
 <p><a href="{{ protocol }}://{{ site.domain }}/#/register/verify/{{ token }}/">{{ protocol }}://{{ site.domain }}/#/register/verify/{{ token }}/</a></p>
-
+<p>
 {% blocktrans with name=site.name %}
-<p>The {{ name }} team.</p>
+The {{ name }} team.
 {% endblocktrans %}
+</p>
