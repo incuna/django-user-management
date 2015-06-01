@@ -1,3 +1,7 @@
+## Unreleased
+
+* Add correct HTML to HTML email templates.
+
 ## v11.0.0
 
 * Add `django-rest-framework v3` support.
