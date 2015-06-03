@@ -1,12 +1,18 @@
-{% spaceless %}{% load i18n %}{% autoescape off %}{% blocktrans with name=site.name %}
+{% load i18n %}
+<p>
+{% blocktrans with name=site.name %}
 You are receiving this email because your email address has been used to
 register an account at {{ name }}.
-
+{% endblocktrans %}
+</p>
+<p>
+{% blocktrans %}
 Please click the following link to complete your registration:
 {% endblocktrans %}
-{{ protocol }}://{{ site.domain }}/#/register/verify/{{ token }}/
-
+</p>
+<p><a href="{{ protocol }}://{{ site.domain }}/#/register/verify/{{ token }}/">{{ protocol }}://{{ site.domain }}/#/register/verify/{{ token }}/</a></p>
+<p>
 {% blocktrans with name=site.name %}
 The {{ name }} team.
-{% endblocktrans %}{% endautoescape %}
-{% endspaceless %}
+{% endblocktrans %}
+</p>
