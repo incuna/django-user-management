@@ -61,14 +61,12 @@ class GetAuthTokenTest(APIRequestTestCase):
 
     def test_post_last_login_updates(self):
         """Authenticating updates the user's last_login."""
-        now = timezone.now()
         user = UserFactory.create(
             email=self.username,
             password=self.password,
-            last_login=now,
         )
-        self.assertEqual(user.last_login, now)
 
+        now = timezone.now()
         request = self.create_request('post', auth=False, data=self.data)
         self.view_class.as_view()(request)
         user = User.objects.get(pk=user.pk)
