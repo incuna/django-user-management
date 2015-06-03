@@ -1,6 +1,7 @@
 ## Unreleased
 
 * Add correct HTML to HTML email templates.
+* Add `django v1.8` support.
 
 ## v11.0.0
 
