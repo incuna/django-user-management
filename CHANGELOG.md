@@ -1,4 +1,4 @@
-## Unreleased
+## v11.1.0
 
 * Add correct HTML to HTML email templates.
 * Add `django v1.8` support.
