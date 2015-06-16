@@ -1,3 +1,7 @@
+## v12.0.0 (Upcoming)
+
+* Update factories to use `class Meta:` syntax instead of `FACTORY_FOR`.
+
 ## v11.1.0
 
 * Add correct HTML to HTML email templates.
