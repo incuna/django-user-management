@@ -1,4 +1,4 @@
-## v12.0.0 (Upcoming)
+## v12.0.0
 
 * Update factories to use `class Meta:` syntax instead of `FACTORY_FOR`.
 
