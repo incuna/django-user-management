@@ -6,11 +6,12 @@ from user_management.api.models import AuthToken
 
 
 class UserFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = get_user_model()
-
     name = factory.Sequence('Test User {}'.format)
     email = factory.Sequence('email{}@example.com'.format)
     is_active = True
+
+    class Meta:
+        model = get_user_model()
 
     @factory.post_generation
     def password(self, create, extracted='default password', **kwargs):
@@ -21,7 +22,8 @@ class UserFactory(factory.DjangoModelFactory):
 
 
 class AuthTokenFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = AuthToken
-
     key = factory.Sequence('key{}'.format)
     user = factory.SubFactory(UserFactory)
+
+    class Meta:
+        model = AuthToken
