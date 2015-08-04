@@ -75,8 +75,9 @@ class PasswordChangeSerializerTest(TestCase):
         })
         self.assertFalse(serializer.is_valid())
         self.assertIn('new_password', serializer.errors)
-        self.assertNotIn('Your passwords do not match', serializer.errors)
         self.assertTrue(serializer.object.check_password(old_password))
+        # Assert that there are no spurious password mismatch errors
+        self.assertNotIn('non_field_errors', serializer.errors)
 
     def test_deserialize_mismatched_passwords(self):
         old_password = '0ld_passworD'
