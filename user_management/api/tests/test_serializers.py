@@ -75,6 +75,7 @@ class PasswordChangeSerializerTest(TestCase):
         })
         self.assertFalse(serializer.is_valid())
         self.assertIn('new_password', serializer.errors)
+        self.assertNotIn('Your passwords do not match', serializer.errors)
         self.assertTrue(serializer.object.check_password(old_password))
 
     def test_deserialize_mismatched_passwords(self):
@@ -161,7 +162,8 @@ class RegistrationSerializerTest(TestCase):
         self.data['password2'] = 'different_password'
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
-        self.assertIn('password2', serializer.errors)
+        message = 'Your passwords do not match.'
+        self.assertIn(message, serializer.errors['non_field_errors'])
 
     def test_deserialize_no_email(self):
         self.data['email'] = None

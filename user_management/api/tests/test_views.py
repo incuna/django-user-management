@@ -238,7 +238,7 @@ class TestRegisterView(APIRequestTestCase):
         request = self.create_request('post', auth=False, data=self.data)
         response = self.view_class.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('password2', response.data)
+        self.assertIn('Your passwords do not match.', response.data['non_field_errors'])
 
         self.assertFalse(User.objects.count())
 

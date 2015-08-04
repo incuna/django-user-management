@@ -47,8 +47,8 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
         fields = ['name', 'email', 'password', 'password2']
         model = User
 
-    def validate_password2(self, attrs, source):
-        password2 = attrs.pop(source)
+    def validate(self, attrs):
+        password2 = attrs.pop('password2')
         if password2 != attrs.get('password'):
             msg = _('Your passwords do not match.')
             raise serializers.ValidationError(msg)
