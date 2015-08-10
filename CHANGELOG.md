@@ -1,3 +1,7 @@
+## v8.1.1
+
+* Bugfix: Don't show "passwords do not match" when the first password is invalid.
+
 ## v8.1.0
 
 * Add docstrings for views.
