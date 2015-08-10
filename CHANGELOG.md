@@ -1,3 +1,7 @@
+## v12.0.1 (Upcoming)
+
+* Ensure new and old passwords differ when changing password.
+
 ## v12.0.0
 
 * Update factories to use `class Meta:` syntax instead of `FACTORY_FOR`.
@@ -37,6 +41,10 @@
 * Replace `email_verification_required` flag with `email_verified` flag.
  * Note that `email_verified == not email_verification_required`.
  * A data migration will be necessary.
+
+## v8.1.2 (Upcoming) (Backport of v12.0.1)
+
+* Ensure new and old passwords differ when changing password.
 
 ## v8.1.0
 
