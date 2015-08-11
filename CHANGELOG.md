@@ -1,4 +1,4 @@
-## v12.0.1 (Upcoming)
+## v12.0.1
 
 * Ensure new and old passwords differ when changing password.
 
