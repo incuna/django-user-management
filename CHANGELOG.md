@@ -1,4 +1,4 @@
-## v8.1.2 (Upcoming) (Backport of v12.0.1)
+## v8.1.2 (Backport of v12.0.1)
 
 * Ensure new and old passwords differ when changing password.
 
