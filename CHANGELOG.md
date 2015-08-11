@@ -38,6 +38,10 @@
  * Note that `email_verified == not email_verification_required`.
  * A data migration will be necessary.
 
+## v8.1.1 (Partial backport of fefdf6a from v11)
+
+* Bugfix: Don't show "passwords do not match" when the first password is invalid.
+
 ## v8.1.0
 
 * Add docstrings for views.
