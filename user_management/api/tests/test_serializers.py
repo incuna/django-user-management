@@ -93,6 +93,21 @@ class PasswordChangeSerializerTest(TestCase):
         })
         self.assertFalse(serializer.is_valid())
 
+    def test_no_change_password(self):
+        """A password cannot be changed if it doesn't change!"""
+        password = 'Same_passw0rd'
+
+        user = UserFactory.create(password=password)
+
+        serializer = serializers.PasswordChangeSerializer(user, data={
+            'old_password': password,
+            'new_password': password,
+            'new_password2': password,
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('new_password', serializer.errors)
+
 
 class PasswordResetSerializerTest(TestCase):
     def test_deserialize_passwords(self):

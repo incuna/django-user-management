@@ -104,6 +104,9 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         if attrs.get('new_password') != attrs['new_password2']:
             msg = _('Your new passwords do not match.')
             raise serializers.ValidationError({'new_password2': msg})
+        if attrs.get('old_password') == attrs.get('new_password'):
+            msg = _('Your password has not changed.')
+            raise serializers.ValidationError({'new_password': msg})
         return attrs
 
 
