@@ -1,4 +1,4 @@
-## v8.1.1
+## v8.1.1 (Partial backport of fefdf6a from v11)
 
 * Bugfix: Don't show "passwords do not match" when the first password is invalid.
 
