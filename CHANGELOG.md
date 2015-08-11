@@ -1,3 +1,7 @@
+## v8.1.2 (Upcoming) (Backport of v12.0.1)
+
+* Ensure new and old passwords differ when changing password.
+
 ## v8.1.1 (Partial backport of fefdf6a from v11)
 
 * Bugfix: Don't show "passwords do not match" when the first password is invalid.
