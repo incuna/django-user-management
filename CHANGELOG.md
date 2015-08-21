@@ -1,3 +1,7 @@
+## v13.0.0 (upcoming)
+
+* Make `RegistrationSerializer` and `EmailSerializerBase` fields a tuple.
+
 ## v12.0.1
 
 * Ensure new and old passwords differ when changing password.
