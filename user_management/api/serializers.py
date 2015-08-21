@@ -33,7 +33,7 @@ class EmailSerializerBase(serializers.Serializer):
     email = serializers.EmailField(max_length=511, label=_('Email address'))
 
     class Meta:
-        fields = ['email']
+        fields = ('email',)
 
 
 class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
@@ -51,7 +51,7 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ['name', 'email', 'password', 'password2']
+        fields = ('name', 'email', 'password', 'password2')
         model = User
 
     def validate(self, attrs):
