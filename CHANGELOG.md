@@ -1,3 +1,28 @@
+## v13.0.0 (upcoming)
+
+* Make `RegistrationSerializer` and `EmailSerializerBase` fields a tuple.
+
+### Notes
+
+`RegistrationSerializer` or `EmailSerializerBase` subclasses adding new fields
+with a `list` will generate a `TypeError`:
+
+```
+class CustomRegistration(RegistrationSerializer):
+    class Meta(RegistrationSerializer.Meta):
+        fields = RegistrationSerializer.Meta.fields + ['custom_field']
+
+TypeError: can only concatenate tuple (not "list") to tuple`
+```
+
+To fix the previous error we use a tuple instead:
+
+```
+class CustomRegistration(RegistrationSerializer):
+    class Meta(RegistrationSerializer.Meta):
+        fields = RegistrationSerializer.Meta.fields + ('custom_field',)
+```
+
 ## v12.0.1
 
 * Ensure new and old passwords differ when changing password.
