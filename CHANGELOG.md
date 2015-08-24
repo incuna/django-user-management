@@ -1,4 +1,4 @@
-## v13.0.0 (upcoming)
+## v13.0.0
 
 * Make `RegistrationSerializer` and `EmailSerializerBase` fields a tuple.
 
