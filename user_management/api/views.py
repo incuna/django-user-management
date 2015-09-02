@@ -218,12 +218,15 @@ class VerifyAccountView(views.APIView):
     """
     permission_classes = [AllowAny]
     ok_message = _('Your account has been verified.')
-    # Default token expiry sets to 31 days in seconds
-    DEFAULT_VERIFY_ACCOUNT_EXPIRY = 60 * 60 * 24 * 31
+    # Default token never expires.
+    DEFAULT_VERIFY_ACCOUNT_EXPIRY = None
 
     def initial(self, request, *args, **kwargs):
         """
         Use `token` to allow one-time access to a view.
+
+        Token expiry can be set in `settings` with `VERIFY_ACCOUNT_EXPIRY` and is
+        set in seconds.
 
         Set user as a class attribute or raise an `InvalidExpiredToken`.
         """
