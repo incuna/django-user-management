@@ -1,3 +1,12 @@
+## v13.1.0
+
+* Make token to verify account to expires if `VERIFY_ACCOUNT_EXPIRY` is set to
+a value in seconds.
+
+### Notes
+
+* If `VERIFY_ACCOUNT_EXPIRY` is not set the token will never expire.
+
 ## v13.0.0
 
 * Make `RegistrationSerializer` and `EmailSerializerBase` fields a tuple.
