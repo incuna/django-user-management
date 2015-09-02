@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.tokens import default_token_generator
 from django.core import signing
@@ -217,6 +218,8 @@ class VerifyAccountView(views.APIView):
     """
     permission_classes = [AllowAny]
     ok_message = _('Your account has been verified.')
+    # Default token expiry sets to 31 days in seconds
+    DEFAULT_VERIFY_ACCOUNT_EXPIRY = 60 * 60 * 24 * 31
 
     def initial(self, request, *args, **kwargs):
         """
@@ -224,8 +227,14 @@ class VerifyAccountView(views.APIView):
 
         Set user as a class attribute or raise an `InvalidExpiredToken`.
         """
+        max_age = getattr(
+            settings,
+            'VERIFY_ACCOUNT_EXPIRY',
+            self.DEFAULT_VERIFY_ACCOUNT_EXPIRY,
+        )
+
         try:
-            email_data = signing.loads(kwargs['token'])
+            email_data = signing.loads(kwargs['token'], max_age=max_age)
         except signing.BadSignature:
             raise exceptions.InvalidExpiredToken
 
