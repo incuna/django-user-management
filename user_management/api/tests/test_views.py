@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -674,6 +675,31 @@ class TestVerifyAccountView(APIRequestTestCase):
         request = self.create_request('post')
         view = self.view_class.as_view()
         response = view(request, token=token)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_default_expiry_token(self):
+        """Assert `DEFAULT_VERIFY_ACCOUNT_EXPIRY` doesn't expire by default."""
+        user = UserFactory.create()
+        token = user.generate_validation_token()
+        request = self.create_request('post', auth=False)
+        view = self.view_class.as_view()
+
+        with patch('django.core.signing.loads') as signing_loads:
+            signing_loads.return_value = {'email': user.email}
+            view(request, token=token)
+
+        signing_loads.assert_called_once_with(token, max_age=None)
+
+    @override_settings(VERIFY_ACCOUNT_EXPIRY=0)
+    def test_post_expired_token(self):
+        """Assert token expires."""
+        user = UserFactory.create()
+        token = user.generate_validation_token()
+        request = self.create_request('post', auth=False)
+        view = self.view_class.as_view()
+
+        response = view(request, token=token)
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_verified_email(self):

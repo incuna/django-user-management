@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.tokens import default_token_generator
 from django.core import signing
@@ -217,15 +218,25 @@ class VerifyAccountView(views.APIView):
     """
     permission_classes = [AllowAny]
     ok_message = _('Your account has been verified.')
+    # Default token never expires.
+    DEFAULT_VERIFY_ACCOUNT_EXPIRY = None
 
     def initial(self, request, *args, **kwargs):
         """
         Use `token` to allow one-time access to a view.
 
+        Token expiry can be set in `settings` with `VERIFY_ACCOUNT_EXPIRY` and is
+        set in seconds.
+
         Set user as a class attribute or raise an `InvalidExpiredToken`.
         """
         try:
-            email_data = signing.loads(kwargs['token'])
+            max_age = settings.VERIFY_ACCOUNT_EXPIRY
+        except AttributeError:
+            max_age = self.DEFAULT_VERIFY_ACCOUNT_EXPIRY
+
+        try:
+            email_data = signing.loads(kwargs['token'], max_age=max_age)
         except signing.BadSignature:
             raise exceptions.InvalidExpiredToken
 
