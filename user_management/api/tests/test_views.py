@@ -685,6 +685,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         view = self.view_class.as_view()
 
         with patch('django.core.signing.loads') as signing_loads:
+            signing_loads.return_value = {'email': user.email}
             view(request, token=token)
 
         signing_loads.assert_called_once_with(token, max_age=None)
