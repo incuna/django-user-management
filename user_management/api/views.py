@@ -230,11 +230,10 @@ class VerifyAccountView(views.APIView):
 
         Set user as a class attribute or raise an `InvalidExpiredToken`.
         """
-        max_age = getattr(
-            settings,
-            'VERIFY_ACCOUNT_EXPIRY',
-            self.DEFAULT_VERIFY_ACCOUNT_EXPIRY,
-        )
+        try:
+            max_age = settings.VERIFY_ACCOUNT_EXPIRY
+        except AttributeError:
+            max_age = self.DEFAULT_VERIFY_ACCOUNT_EXPIRY
 
         try:
             email_data = signing.loads(kwargs['token'], max_age=max_age)
