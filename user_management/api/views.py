@@ -37,7 +37,7 @@ class GetAuthToken(ObtainAuthToken):
     def post(self, request):
         """Create auth token. Differs from DRF that it always creates new token
         but not re-using them."""
-        serializer = self.serializer_class(data=request.DATA)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
             signals.user_logged_in.send(type(self), user=user, request=request)
@@ -130,7 +130,7 @@ class PasswordResetEmail(generics.GenericAPIView):
     throttle_scope = 'passwords'
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.DATA)
+        serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return response.Response(
                 serializer.errors,
@@ -321,7 +321,7 @@ class ResendConfirmationEmail(generics.GenericAPIView):
 
         Set user as a class attribute or raise an `InvalidExpiredToken`.
         """
-        email = request.DATA.get('email')
+        email = request.data.get('email')
         if request.user.is_authenticated() and email != request.user.email:
             raise PermissionDenied()
 
@@ -333,7 +333,7 @@ class ResendConfirmationEmail(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         """Validate `email` and send a request to confirm it."""
-        serializer = self.serializer_class(data=request.DATA)
+        serializer = self.serializer_class(data=request.data)
 
         if not serializer.is_valid():
             return response.Response(
