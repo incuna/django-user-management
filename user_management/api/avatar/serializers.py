@@ -54,7 +54,7 @@ class ThumbnailField(serializers.ImageField):
         if request is None:
             return image.url
 
-        kwargs = self.get_generator_kwargs(request.QUERY_PARAMS)
+        kwargs = self.get_generator_kwargs(request.query_params)
         if kwargs.get('width') or kwargs.get('height'):
             image = self.generate_thumbnail(image, **kwargs)
 
