@@ -135,8 +135,8 @@ class TestResendConfirmationEmail(ClearCacheMixin, APIRequestTestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        # Duplicate the request here as we are accessing request.DATA twice. To
-        # get the `request.DATA`, `djangorestframework` `read` the `POST` request
+        # Duplicate the request here as we are accessing request.data twice. To
+        # get the `request.data`, `djangorestframework` `read` the `POST` request
         # (a stream) without rewinding the stream.
         # This was producing an `Assertion` error only happening in test where
         # calling the `view` with the same `request` twice is returning:

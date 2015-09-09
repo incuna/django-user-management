@@ -1,3 +1,7 @@
+## Upcoming (v13.1.1)
+
+* Swap `request.DATA` (deprecated in DRF v3.0, removed in DRF v3.2) for `request.data`.
+
 ## v13.1.0
 
 * Make token to verify account to expires if `VERIFY_ACCOUNT_EXPIRY` is set to
