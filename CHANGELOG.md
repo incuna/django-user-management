@@ -1,4 +1,4 @@
-## Upcoming (v13.1.1)
+## v13.1.1
 
 * Swap `request.DATA` (deprecated in DRF v3.0, removed in DRF v3.2) for `request.data`.
 
