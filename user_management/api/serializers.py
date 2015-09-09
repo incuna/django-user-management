@@ -177,7 +177,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('url', 'name', 'email', 'date_joined')
         read_only_fields = ('email', 'date_joined')
-        view_name = 'user_management_api:user_detail'
+        extra_kwargs = {
+            'url': {
+                'lookup_field': 'pk',
+                'view_name': 'user_management_api:user_detail',
+            }
+        }
 
 
 class UserSerializerCreate(ValidateEmailMixin, UserSerializer):
