@@ -12,14 +12,14 @@ from ..authentication import FormTokenAuthentication, TokenAuthentication
 
 class TestFormTokenAuthentication(TestCase):
     def test_no_token(self):
-        request = mock.Mock(DATA=QueryDict(''))
+        request = mock.Mock(data=QueryDict(''))
         response = FormTokenAuthentication().authenticate(request)
         self.assertIsNone(response)
 
     def test_invalid_token(self):
         data = QueryDict('', mutable=True)
         data.update({'token': 'WOOT'})
-        request = mock.Mock(DATA=data)
+        request = mock.Mock(data=data)
         response = FormTokenAuthentication().authenticate(request)
         self.assertIsNone(response)
 
@@ -27,7 +27,7 @@ class TestFormTokenAuthentication(TestCase):
         token = AuthTokenFactory.create()
         data = QueryDict('', mutable=True)
         data.update({'token': token.key})
-        request = mock.Mock(DATA=data)
+        request = mock.Mock(data=data)
         response = FormTokenAuthentication().authenticate(request)
         expected = (token.user, token)
         self.assertEqual(response, expected)
