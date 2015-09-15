@@ -105,7 +105,7 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs.get('old_password') == attrs.get('new_password'):
-            msg = _('Your password has not changed.')
+            msg = _('Your new password must not be the same as your old password.')
             raise serializers.ValidationError({'new_password': msg})
         return attrs
 
