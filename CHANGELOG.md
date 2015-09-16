@@ -1,3 +1,7 @@
+## Upcoming
+
+* Clarify error message when your old and new passwords match, you will need to update translations.
+
 ## v13.1.1
 
 * Swap `request.DATA` (deprecated in DRF v3.0, removed in DRF v3.2) for `request.data`.
