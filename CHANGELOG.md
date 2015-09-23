@@ -1,11 +1,18 @@
-## v8.1.2
+## v8.2.0
 
-**This release backports specific changes from v12.0.1 and v14.0.0**
+**This release backports a specific change from v14.0.0**
 
-* Ensure new and old passwords differ when changing password.
 * Clarify error message when your old and new passwords match, you will need to update translations.
 
-## v8.1.1 (Partial backport of fefdf6a from v11)
+## v8.1.2
+
+**This release backports a specific change from v12.0.1**
+
+* Ensure new and old passwords differ when changing password.
+
+## v8.1.1
+
+**This release partially backports commit fefdf6a from v11.0.0**
 
 * Bugfix: Don't show "passwords do not match" when the first password is invalid.
 
