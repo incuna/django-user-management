@@ -2,6 +2,7 @@ language: python
 env:
   global:
     - DATABASE_URL='postgres://postgres@localhost/user_management'
+    - TERM='xterm-256color'
   matrix:
     - TOX_ENV=py27-django16
     - TOX_ENV=py27-django17
