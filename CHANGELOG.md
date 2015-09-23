@@ -1,6 +1,95 @@
-## v8.1.2 (Backport of v12.0.1)
+## v13.2.0 (Upcoming)
+
+* Clarify error message when your old and new passwords match, you will need to update translations.
+
+## v13.1.1
+
+* Swap `request.DATA` (deprecated in DRF v3.0, removed in DRF v3.2) for `request.data`.
+
+## v13.1.0
+
+* Make token to verify account to expires if `VERIFY_ACCOUNT_EXPIRY` is set to
+a value in seconds.
+
+### Notes
+
+* If `VERIFY_ACCOUNT_EXPIRY` is not set the token will never expire.
+
+## v13.0.0
+
+* Make `RegistrationSerializer` and `EmailSerializerBase` fields a tuple.
+
+### Notes
+
+`RegistrationSerializer` or `EmailSerializerBase` subclasses adding new fields
+with a `list` will generate a `TypeError`:
+
+```
+class CustomRegistration(RegistrationSerializer):
+    class Meta(RegistrationSerializer.Meta):
+        fields = RegistrationSerializer.Meta.fields + ['custom_field']
+
+TypeError: can only concatenate tuple (not "list") to tuple`
+```
+
+To fix the previous error we use a tuple instead:
+
+```
+class CustomRegistration(RegistrationSerializer):
+    class Meta(RegistrationSerializer.Meta):
+        fields = RegistrationSerializer.Meta.fields + ('custom_field',)
+```
+
+## v12.0.1
 
 * Ensure new and old passwords differ when changing password.
+
+## v12.0.0
+
+* Update factories to use `class Meta:` syntax instead of `FACTORY_FOR`.
+
+## v11.1.0
+
+* Add correct HTML to HTML email templates.
+* Add `django v1.8` support.
+
+## v11.0.0
+
+* Add `django-rest-framework v3` support.
+* Drop `django-rest-framework v2` support.
+
+## v10.1.0
+
+* Allow authenticated user to receive a new confirmation email.
+
+### Notes
+
+* Previously only anonymous could request a new confirmation email.
+
+## v10.0.0
+
+* Replace `default_token_generator` with `django.core.signing`.
+
+### Notes
+
+* Previously not validated emails would be invalid.
+
+## v9.0.1
+
+* Send `user_logged_in` and `user_logged_out` signals from `GetAuthToken` view.
+
+## v9.0.0
+
+* Replace `email_verification_required` flag with `email_verified` flag.
+ * Note that `email_verified == not email_verification_required`.
+ * A data migration will be necessary.
+
+## v8.1.2
+
+**This release backports specific changes from v12.0.1 and v13.2.0**
+
+* Ensure new and old passwords differ when changing password.
+* Clarify error message when your old and new passwords match, you will need to update translations.
 
 ## v8.1.1 (Partial backport of fefdf6a from v11)
 
