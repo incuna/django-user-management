@@ -84,12 +84,18 @@ class CustomRegistration(RegistrationSerializer):
  * Note that `email_verified == not email_verification_required`.
  * A data migration will be necessary.
 
+## v8.2.0
+
+**This release backports a specific change from v14.0.0**
+
+* Clarify error message when your old and new passwords match, you will need to update translations.
+
 ## v8.1.2
 
-**This release backports specific changes from v12.0.1 and v14.0.0**
+**This release backports a specific change from v12.0.1**
 
 * Ensure new and old passwords differ when changing password.
-* Clarify error message when your old and new passwords match, you will need to update translations.
+
 
 ## v8.1.1 (Partial backport of fefdf6a from v11)
 
