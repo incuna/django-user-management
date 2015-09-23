@@ -1,4 +1,4 @@
-## v13.2.0 (Upcoming)
+## v14.0.0 (Upcoming)
 
 * Clarify error message when your old and new passwords match, you will need to update translations.
 
@@ -86,7 +86,7 @@ class CustomRegistration(RegistrationSerializer):
 
 ## v8.1.2
 
-**This release backports specific changes from v12.0.1 and v13.2.0**
+**This release backports specific changes from v12.0.1 and v14.0.0**
 
 * Ensure new and old passwords differ when changing password.
 * Clarify error message when your old and new passwords match, you will need to update translations.
