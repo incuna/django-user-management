@@ -1,6 +1,7 @@
 ## v14.0.0 (Upcoming)
 
 * Clarify error message when your old and new passwords match, you will need to update translations.
+* Add translation for email in `RegistrationSerializer` and `UserSerializerCreate`.
 
 ## v13.1.1
 
