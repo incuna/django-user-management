@@ -37,7 +37,10 @@ class EmailSerializerBase(serializers.Serializer):
 
 
 class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
-    email = serializers.EmailField(validators=[unique_email_validator])
+    email = serializers.EmailField(
+        label=_('Email address'),
+        validators=[unique_email_validator],
+    )
     password = serializers.CharField(
         write_only=True,
         min_length=8,
@@ -186,7 +189,10 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializerCreate(ValidateEmailMixin, UserSerializer):
-    email = serializers.EmailField(validators=[unique_email_validator])
+    email = serializers.EmailField(
+        label=_('Email address'),
+        validators=[unique_email_validator],
+    )
 
     class Meta(UserSerializer.Meta):
         read_only_fields = ('date_joined',)
