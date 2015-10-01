@@ -7,6 +7,11 @@ from user_management.utils.validators import validate_password_strength
 
 User = get_user_model()
 
+PASSWORD_HELP_TEXT = (
+    'The password has to be a minimum of 8 characters and contain at ' +
+    'least one capital letter, one small letter and one number.'
+)
+
 
 class ValidateEmailMixin(object):
     def validate_email(self, attrs, source):
@@ -36,11 +41,13 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
         min_length=8,
         label=_('Password'),
         validators=[validate_password_strength],
+        help_text=PASSWORD_HELP_TEXT,
     )
     password2 = serializers.CharField(
         write_only=True,
         min_length=8,
         label=_('Repeat password'),
+        help_text=PASSWORD_HELP_TEXT,
     )
 
     class Meta:
@@ -71,11 +78,13 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         min_length=8,
         label=_('New password'),
         validators=[validate_password_strength],
+        help_text=PASSWORD_HELP_TEXT,
     )
     new_password2 = serializers.CharField(
         write_only=True,
         min_length=8,
         label=_('Repeat new password'),
+        help_text=PASSWORD_HELP_TEXT,
     )
 
     class Meta:
@@ -113,11 +122,13 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         min_length=8,
         label=_('New password'),
         validators=[validate_password_strength],
+        help_text=PASSWORD_HELP_TEXT,
     )
     new_password2 = serializers.CharField(
         write_only=True,
         min_length=8,
         label=_('Repeat new password'),
+        help_text=PASSWORD_HELP_TEXT,
     )
 
     class Meta:
