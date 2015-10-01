@@ -1,3 +1,7 @@
+## v8.2.1
+
+* Add help text to password fields.
+
 ## v8.2.0
 
 **This release backports a specific change from v14.0.0**
