@@ -179,7 +179,7 @@ class RegistrationSerializerTest(TestCase):
         serializer = serializers.RegistrationSerializer(data=self.data)
         self.assertFalse(serializer.is_valid())
         message = 'Your passwords do not match.'
-        self.assertIn(message, serializer.errors['non_field_errors'])
+        self.assertIn(message, serializer.errors['password2'])
 
     def test_deserialize_no_email(self):
         self.data['email'] = None

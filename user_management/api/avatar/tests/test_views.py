@@ -17,7 +17,7 @@ User = get_user_model()
 TEST_SERVER = 'http://testserver'
 
 
-def _simple_png():
+def simple_png():
     """Create a 1x1 black png in memory."""
     image_file = BytesIO()
     image = Image.new('RGBA', (1, 1))
@@ -30,23 +30,19 @@ def _simple_png():
     )
     image_file.seek(0)
     return image_file
-SIMPLE_PNG = _simple_png()
 
 
 class TestProfileAvatar(APIRequestTestCase):
     view_class = views.ProfileAvatar
 
-    def tearDown(self):
-        SIMPLE_PNG.seek(0)
-
     def test_get(self):
-        user = UserFactory.build(avatar=SIMPLE_PNG)
+        user = UserFactory.build(avatar=simple_png())
 
         request = self.create_request(user=user)
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['avatar'], SIMPLE_PNG.url)
+        self.assertEqual(response.data['avatar'], simple_png().url)
 
     def test_get_no_avatar(self):
         user = UserFactory.build()
@@ -64,7 +60,7 @@ class TestProfileAvatar(APIRequestTestCase):
         The view should respond with a 401 response, confirming the user
         is unauthorised to put to the view.
         """
-        data = {'avatar': SIMPLE_PNG}
+        data = {'avatar': simple_png()}
         request = APIRequestFactory().put('/', data=data)
         view = self.view_class.as_view()
         response = view(request)
@@ -73,7 +69,7 @@ class TestProfileAvatar(APIRequestTestCase):
 
     def test_authenticated_put(self):
         user = UserFactory.create()
-        data = {'avatar': SIMPLE_PNG}
+        data = {'avatar': simple_png()}
 
         request = APIRequestFactory().put('/', data=data)
         request.user = user
@@ -84,9 +80,8 @@ class TestProfileAvatar(APIRequestTestCase):
             mocked_url.return_value = 'mocked-url'
             response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=user.pk)
-        self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
+        self.assertEqual(user.avatar.read(), simple_png().read())
 
     def test_options(self):
         request = self.create_request('options')
@@ -95,7 +90,7 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_resize(self):
-        user = UserFactory.build(avatar=SIMPLE_PNG)
+        user = UserFactory.build(avatar=simple_png())
 
         data = {
             'width': 10,
@@ -111,7 +106,7 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_get_resize_width(self):
-        user = UserFactory.build(avatar=SIMPLE_PNG)
+        user = UserFactory.build(avatar=simple_png())
 
         data = {
             'width': 10,
@@ -126,7 +121,7 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertNotEqual(response.data['avatar'], expected_url)
 
     def test_get_resize_height(self):
-        user = UserFactory.build(avatar=SIMPLE_PNG)
+        user = UserFactory.build(avatar=simple_png())
 
         data = {
             'height': 10,
@@ -149,7 +144,7 @@ class TestProfileAvatar(APIRequestTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_with_avatar(self):
-        user = UserFactory.create(avatar=SIMPLE_PNG)
+        user = UserFactory.create(avatar=simple_png())
         request = self.create_request('delete', user=user)
         view = self.view_class.as_view()
         response = view(request)
@@ -171,7 +166,7 @@ class TestProfileAvatar(APIRequestTestCase):
         user = UserFactory.create()
         token = AuthTokenFactory(user=user)
 
-        data = {'avatar': SIMPLE_PNG, 'token': token.key}
+        data = {'avatar': simple_png(), 'token': token.key}
         url = reverse('user_management_api:profile_avatar')
         response = client.post(url, data=data)
 
@@ -185,10 +180,7 @@ class TestUserAvatar(APIRequestTestCase):
 
     def setUp(self):
         self.user = UserFactory.build()
-        self.other_user = UserFactory.build(avatar=SIMPLE_PNG)
-
-    def tearDown(self):
-        SIMPLE_PNG.seek(0)
+        self.other_user = UserFactory.build(avatar=simple_png())
 
     def get_response(self, request):
         """
@@ -240,7 +232,7 @@ class TestUserAvatar(APIRequestTestCase):
         request = self.create_request(user=self.user)
         response = self.get_response(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['avatar'], SIMPLE_PNG.url)
+        self.assertEqual(response.data['avatar'], simple_png().url)
 
     def test_get_no_avatar(self):
         self.other_user.avatar = None
@@ -289,7 +281,7 @@ class TestUserAvatar(APIRequestTestCase):
     def test_put(self):
         user = UserFactory.build(is_staff=True)
         other_user = UserFactory.create()
-        data = {'avatar': SIMPLE_PNG}
+        data = {'avatar': simple_png()}
 
         request = APIRequestFactory().put('/', data=data)
         request.user = user
@@ -300,14 +292,13 @@ class TestUserAvatar(APIRequestTestCase):
             mocked_url.return_value = 'mocked-url'
             response = view(request, pk=other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=other_user.pk)
-        self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
+        self.assertEqual(user.avatar.read(), simple_png().read())
 
     def test_patch(self):
         user = UserFactory.build(is_staff=True)
         other_user = UserFactory.create()
-        data = {'avatar': SIMPLE_PNG}
+        data = {'avatar': simple_png()}
 
         request = APIRequestFactory().patch('/', data=data)
         request.user = user
@@ -318,9 +309,8 @@ class TestUserAvatar(APIRequestTestCase):
             mocked_url.return_value = 'mocked-url'
             response = view(request, pk=other_user.pk)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        SIMPLE_PNG.seek(0)
         user = User.objects.get(pk=other_user.pk)
-        self.assertEqual(user.avatar.read(), SIMPLE_PNG.read())
+        self.assertEqual(user.avatar.read(), simple_png().read())
 
     def test_send_without_token_header(self):
         """Test support for legacy browsers that cannot support AJAX uploads.
@@ -334,7 +324,7 @@ class TestUserAvatar(APIRequestTestCase):
         user = UserFactory.create(is_staff=True)
         token = AuthTokenFactory(user=user)
 
-        data = {'avatar': SIMPLE_PNG, 'token': token.key}
+        data = {'avatar': simple_png(), 'token': token.key}
         url_kwargs = {'pk': user.pk}
         url = reverse('user_management_api:user_avatar', kwargs=url_kwargs)
         response = client.post(url, data=data)

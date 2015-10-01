@@ -1,3 +1,7 @@
+## v8.2.0 (upcoming)
+
+* Backport an improvement for dual password field validation that displays the error next to the `password2` field.
+
 ## v8.1.2 (Backport of v12.0.1)
 
 * Ensure new and old passwords differ when changing password.
