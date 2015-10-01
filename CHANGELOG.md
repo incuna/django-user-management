@@ -1,8 +1,10 @@
+
 ## v8.2.0
 
 **This release backports a specific change from v14.0.0**
 
-* Clarify error message when your old and new passwords match, you will need to update translations.
+* Clarify error message when your old and new passwords match; you will need to update translations.
+* Also backport an improvement for dual password field validation that displays the error next to the `password2` field.
 
 ## v8.1.2
 
