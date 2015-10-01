@@ -1,12 +1,20 @@
-## v8.2.0 (upcoming)
 
-* Backport an improvement for dual password field validation that displays the error next to the `password2` field.
+## v8.2.0
 
-## v8.1.2 (Backport of v12.0.1)
+**This release backports a specific change from v14.0.0**
+
+* Clarify error message when your old and new passwords match; you will need to update translations.
+* Also backport an improvement for dual password field validation that displays the error next to the `password2` field.
+
+## v8.1.2
+
+**This release backports a specific change from v12.0.1**
 
 * Ensure new and old passwords differ when changing password.
 
-## v8.1.1 (Partial backport of fefdf6a from v11)
+## v8.1.1
+
+**This release partially backports commit fefdf6a from v11.0.0**
 
 * Bugfix: Don't show "passwords do not match" when the first password is invalid.
 
