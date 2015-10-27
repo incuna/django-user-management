@@ -1,11 +1,11 @@
 from setuptools import find_packages, setup
 
 
-version = '12.0.1'
+version = '14.0.0'
 
 
 install_requires = (
-    'djangorestframework>=3.1.0,<3.2',
+    'djangorestframework>=3.1.0,<3.3',
     'incuna_mail>=2.0.0,<4.0.0',
     'incuna-pigeon>=0.1.0,<1.0.0',
 )

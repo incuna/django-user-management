@@ -33,11 +33,14 @@ class EmailSerializerBase(serializers.Serializer):
     email = serializers.EmailField(max_length=511, label=_('Email address'))
 
     class Meta:
-        fields = ['email']
+        fields = ('email',)
 
 
 class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
-    email = serializers.EmailField(validators=[unique_email_validator])
+    email = serializers.EmailField(
+        label=_('Email address'),
+        validators=[unique_email_validator],
+    )
     password = serializers.CharField(
         write_only=True,
         min_length=8,
@@ -51,7 +54,7 @@ class RegistrationSerializer(ValidateEmailMixin, serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ['name', 'email', 'password', 'password2']
+        fields = ('name', 'email', 'password', 'password2')
         model = User
 
     def validate(self, attrs):
@@ -105,7 +108,7 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
             msg = _('Your new passwords do not match.')
             raise serializers.ValidationError({'new_password2': msg})
         if attrs.get('old_password') == attrs.get('new_password'):
-            msg = _('Your password has not changed.')
+            msg = _('Your new password must not be the same as your old password.')
             raise serializers.ValidationError({'new_password': msg})
         return attrs
 
@@ -177,11 +180,19 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('url', 'name', 'email', 'date_joined')
         read_only_fields = ('email', 'date_joined')
-        view_name = 'user_management_api:user_detail'
+        extra_kwargs = {
+            'url': {
+                'lookup_field': 'pk',
+                'view_name': 'user_management_api:user_detail',
+            }
+        }
 
 
 class UserSerializerCreate(ValidateEmailMixin, UserSerializer):
-    email = serializers.EmailField(validators=[unique_email_validator])
+    email = serializers.EmailField(
+        label=_('Email address'),
+        validators=[unique_email_validator],
+    )
 
     class Meta(UserSerializer.Meta):
         read_only_fields = ('date_joined',)

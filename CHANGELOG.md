@@ -2,6 +2,49 @@
 
 * Add `TimeZoneMixin` for custom `User` models.
 
+## v14.0.0
+
+* Clarify error message when your old and new passwords match, you will need to update translations.
+* Add translation for email in `RegistrationSerializer` and `UserSerializerCreate`.
+
+## v13.1.1
+
+* Swap `request.DATA` (deprecated in DRF v3.0, removed in DRF v3.2) for `request.data`.
+
+## v13.1.0
+
+* Make token to verify account to expires if `VERIFY_ACCOUNT_EXPIRY` is set to
+a value in seconds.
+
+### Notes
+
+* If `VERIFY_ACCOUNT_EXPIRY` is not set the token will never expire.
+
+## v13.0.0
+
+* Make `RegistrationSerializer` and `EmailSerializerBase` fields a tuple.
+
+### Notes
+
+`RegistrationSerializer` or `EmailSerializerBase` subclasses adding new fields
+with a `list` will generate a `TypeError`:
+
+```
+class CustomRegistration(RegistrationSerializer):
+    class Meta(RegistrationSerializer.Meta):
+        fields = RegistrationSerializer.Meta.fields + ['custom_field']
+
+TypeError: can only concatenate tuple (not "list") to tuple`
+```
+
+To fix the previous error we use a tuple instead:
+
+```
+class CustomRegistration(RegistrationSerializer):
+    class Meta(RegistrationSerializer.Meta):
+        fields = RegistrationSerializer.Meta.fields + ('custom_field',)
+```
+
 ## v12.0.1
 
 * Ensure new and old passwords differ when changing password.
@@ -46,9 +89,18 @@
  * Note that `email_verified == not email_verification_required`.
  * A data migration will be necessary.
 
-## v8.1.2 (Upcoming) (Backport of v12.0.1)
+## v8.2.0
+
+**This release backports a specific change from v14.0.0**
+
+* Clarify error message when your old and new passwords match, you will need to update translations.
+
+## v8.1.2
+
+**This release backports a specific change from v12.0.1**
 
 * Ensure new and old passwords differ when changing password.
+
 
 ## v8.1.1 (Partial backport of fefdf6a from v11)
 
