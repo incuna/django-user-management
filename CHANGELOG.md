@@ -1,3 +1,7 @@
+## Upcoming
+
+* Add `TimeZoneMixin` for custom `User` models.
+
 ## v12.0.1
 
 * Ensure new and old passwords differ when changing password.
