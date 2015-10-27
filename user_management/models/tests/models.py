@@ -11,20 +11,23 @@ from ..mixins import (
     EmailVerifyUserMixin,
     IsStaffUserMixin,
     NameUserMethodsMixin,
+    TimeZoneMixin,
     VerifyEmailMixin,
 )
 
 
-class User(AvatarMixin, VerifyEmailMixin, PermissionsMixin, AbstractBaseUser):
-    pass
+class User(
+        AvatarMixin, TimeZoneMixin, VerifyEmailMixin, PermissionsMixin,
+        AbstractBaseUser):
+    """A User model using all the custom mixins."""
 
 
 class BasicUser(BasicUserFieldsMixin, AbstractBaseUser):
-    pass
+    """A User model using just the BasicUserFieldsMixin."""
 
 
 class VerifyEmailUser(VerifyEmailMixin, AbstractBaseUser):
-    pass
+    """A User model using just the VerifyEmailMixin."""
 
 
 class CustomVerifyEmailUser(VerifyEmailMixin, AbstractBaseUser):
@@ -35,6 +38,12 @@ class CustomVerifyEmailUser(VerifyEmailMixin, AbstractBaseUser):
 class CustomBasicUserFieldsMixin(
         NameUserMethodsMixin, EmailUserMixin, DateJoinedUserMixin,
         IsStaffUserMixin):
+    """
+    A replacement for BasicUserFieldsMixin with a custom name field.
+
+    Uses NameUserMethodsMixin instead of NameUserMixin.
+    """
+
     name = models.TextField()
 
     USERNAME_FIELD = 'email'
@@ -46,4 +55,4 @@ class CustomBasicUserFieldsMixin(
 class CustomNameUser(
         AvatarMixin, EmailVerifyUserMixin, CustomBasicUserFieldsMixin,
         AbstractBaseUser):
-    pass
+    """A User model using the CustomBasicUserFieldsMixin."""

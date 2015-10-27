@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
@@ -50,6 +51,13 @@ class DateJoinedUserMixin(models.Model):
         default=timezone.now,
         editable=False,
     )
+
+    class Meta:
+        abstract = True
+
+
+class TimeZoneMixin(models.Model):
+    timezone = models.CharField(max_length=255, default=settings.TIME_ZONE)
 
     class Meta:
         abstract = True
