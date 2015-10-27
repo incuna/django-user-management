@@ -1,4 +1,4 @@
-from collections import OrderedDict, defaultdict
+from collections import defaultdict, OrderedDict
 
 
 class DefaultOrderedDict(OrderedDict, defaultdict):

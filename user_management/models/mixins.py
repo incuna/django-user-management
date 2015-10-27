@@ -1,4 +1,4 @@
-from django.conf import settings
+import pytz
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
@@ -10,6 +10,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
 
 from user_management.utils import notifications
+from .utils import timezone_choices
 
 
 class UserManager(BaseUserManager):
@@ -57,7 +58,10 @@ class DateJoinedUserMixin(models.Model):
 
 
 class TimeZoneMixin(models.Model):
-    timezone = models.CharField(max_length=255, default=settings.TIME_ZONE)
+    timezone = models.CharField(
+        max_length=255,
+        choices=timezone_choices(pytz.common_timezones),
+    )
 
     class Meta:
         abstract = True
