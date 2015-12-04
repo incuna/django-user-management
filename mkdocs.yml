@@ -1,6 +1,6 @@
 site_name: django-user-management
 pages:
-- [index.md, Home]
+- [README.md, Home]
 - [installation.md, Installation]
 - [mixins.md, Mixins]
 - [views.md, Views]
