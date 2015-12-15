@@ -48,6 +48,7 @@ class TestUser(utils.APIRequestTestCase):
             'last_login',
             'password',
             'avatar',
+            'timezone',
 
             # Incoming
             'groups',  # Django permission groups
