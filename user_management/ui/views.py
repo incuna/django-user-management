@@ -5,6 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
+from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 
@@ -22,7 +23,7 @@ class VerifyUserEmailView(generic.RedirectView):
     """
     permanent = False
     url = '/'
-    success_message = 'Your email address was confirmed.'
+    success_message = _('Your email address was confirmed.')
 
     def get(self, request, *args, **kwargs):
         # Retrieve and decode the UID.
