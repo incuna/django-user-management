@@ -51,4 +51,4 @@ class VerifyUserEmailView(generic.RedirectView):
         messages.success(request, self.success_message)
 
         # Redirect using the generic view's get method.
-        return super().get(request, *args, **kwargs)
+        return super(VerifyUserEmailView, self).get(request, *args, **kwargs)

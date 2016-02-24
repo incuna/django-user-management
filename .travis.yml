@@ -4,16 +4,12 @@ env:
     - DATABASE_URL='postgres://postgres@localhost/user_management'
     - TERM='xterm-256color'
   matrix:
-    - TOX_ENV=py27-django16
-    - TOX_ENV=py27-django17
     - TOX_ENV=py27-django18
-    - TOX_ENV=py33-django16
-    - TOX_ENV=py33-django17
+    - TOX_ENV=py27-django19
     - TOX_ENV=py33-django18
-    - TOX_ENV=py34-django16
-    - TOX_ENV=py34-django17
+    - TOX_ENV=py33-django19
     - TOX_ENV=py34-django18
-    - TOX_ENV=py27-djangopre
+    - TOX_ENV=py34-django19
     - TOX_ENV=py34-djangopre
 matrix:
   fast_finish: true
