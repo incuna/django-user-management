@@ -12,7 +12,6 @@ MIGRATION_MODULES = {}
 if django.VERSION >= (1, 8):
     MIGRATION_MODULES = {
         'api': 'user_management.tests.testmigrations.api',
-        'ui': 'user_management.tests.testmigrations.ui',
         'tests': 'user_management.tests.testmigrations.tests',
     }
 
