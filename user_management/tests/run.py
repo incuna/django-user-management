@@ -12,6 +12,7 @@ MIGRATION_MODULES = {}
 if django.VERSION >= (1, 8):
     MIGRATION_MODULES = {
         'api': 'user_management.tests.testmigrations.api',
+        'ui': 'user_management.tests.testmigrations.ui',
         'tests': 'user_management.tests.testmigrations.tests',
     }
 
@@ -36,6 +37,7 @@ settings.configure(
 
         # Added for templates
         'user_management.api',
+        'user_management.ui',
         'user_management.models.tests',
     ),
     PASSWORD_HASHERS=('django.contrib.auth.hashers.MD5PasswordHasher',),
