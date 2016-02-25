@@ -26,12 +26,3 @@ after_success:
   coveralls
 notifications:
   email: false
-deploy:
-  provider: pypi
-  user: incuna
-  on:
-    condition: $TOX_ENV=py34-django17
-    tags: true
-  password:
-    secure: DBkb54BXJe8FZ9Zp91VWOgDE3UjQ3ZHwPXJxLuSZWoUrluHbyE7ANdD3mbS+M97Ux7kfxRHpl1lSxZUe2ppMdl4Sl4hm5iVvdZkTc1ErmeJTDExMnK9E+4FDFj4UXTtGYQ1atTtE2cR8Dpbf0j3MchjiKBROOytNEUbYQfGnxEU=
-  distributions: "sdist bdist_wheel"
