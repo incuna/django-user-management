@@ -1,0 +1,13 @@
+from incuna_test_utils.testcases.urls import URLTestCase
+
+from .. import views
+
+
+class TestURLs(URLTestCase):
+    def test_password_reset_confirm_url(self):
+        self.assert_url_matches_view(
+            view=views.VerifyUserEmailView,
+            expected_url='/register/verify/a/x-y/',
+            url_name='user_management_api:registration-verify',
+            url_kwargs={'uidb64': 'a', 'token': 'x-y'},
+        )
