@@ -1,3 +1,7 @@
+## v14.1.0
+
+* Add `VerifyUserEmailView` to handle links from registration verification emails. 
+
 ## v14.0.0
 
 * Clarify error message when your old and new passwords match, you will need to update translations.
