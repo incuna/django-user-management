@@ -3,6 +3,7 @@ import factory
 from django.contrib.auth import get_user_model
 
 from user_management.api.models import AuthToken
+from user_management.models.tests.models import VerifyEmailUser
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -19,6 +20,13 @@ class UserFactory(factory.DjangoModelFactory):
         self.set_password(self.raw_password)
         if create:
             self.save()
+
+
+class VerifyEmailUserFactory(UserFactory):
+    email_verified = False
+
+    class Meta:
+        model = VerifyEmailUser
 
 
 class AuthTokenFactory(factory.DjangoModelFactory):
