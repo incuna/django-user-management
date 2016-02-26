@@ -1,7 +1,5 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model, signals
 from django.contrib.auth.tokens import default_token_generator
-from django.core import signing
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import ugettext_lazy as _
@@ -11,8 +9,8 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from user_management.utils.views import VerifyAccountViewMixin
 from . import exceptions, models, permissions, serializers, throttling
-
 
 User = get_user_model()
 
@@ -210,57 +208,14 @@ class PasswordChange(generics.UpdateAPIView):
         return self.request.user
 
 
-class VerifyAccountView(views.APIView):
+class VerifyAccountView(VerifyAccountViewMixin, views.APIView):
     """
-    Verify a new user's email address.
-
-    Verify a newly created account by checking the `uid` and `token` in a `POST` request.
+    Verify a new user's email address.  Accepts a POST request with a token in the URL.
     """
     permission_classes = [AllowAny]
-    ok_message = _('Your account has been verified.')
-    # Default token never expires.
-    DEFAULT_VERIFY_ACCOUNT_EXPIRY = None
-
-    def initial(self, request, *args, **kwargs):
-        """
-        Use `token` to allow one-time access to a view.
-
-        Token expiry can be set in `settings` with `VERIFY_ACCOUNT_EXPIRY` and is
-        set in seconds.
-
-        Set user as a class attribute or raise an `InvalidExpiredToken`.
-        """
-        try:
-            max_age = settings.VERIFY_ACCOUNT_EXPIRY
-        except AttributeError:
-            max_age = self.DEFAULT_VERIFY_ACCOUNT_EXPIRY
-
-        try:
-            email_data = signing.loads(kwargs['token'], max_age=max_age)
-        except signing.BadSignature:
-            raise exceptions.InvalidExpiredToken
-
-        email = email_data['email']
-
-        try:
-            self.user = User.objects.get_by_natural_key(email)
-        except User.DoesNotExist:
-            raise exceptions.InvalidExpiredToken()
-
-        return super(VerifyAccountView, self).initial(
-            request,
-            *args,
-            **kwargs
-        )
 
     def post(self, request, *args, **kwargs):
-        if self.user.email_verified:
-            return response.Response(status=status.HTTP_403_FORBIDDEN)
-
-        self.user.email_verified = True
-        self.user.is_active = True
-        self.user.save()
-
+        self.activate_user()
         return response.Response(
             data={'data': self.ok_message},
             status=status.HTTP_201_CREATED,
@@ -316,11 +271,7 @@ class ResendConfirmationEmail(generics.GenericAPIView):
     throttle_scope = 'confirmations'
 
     def initial(self, request, *args, **kwargs):
-        """
-        Use `token` to allow one-time access to a view.
-
-        Set user as a class attribute or raise an `InvalidExpiredToken`.
-        """
+        """Disallow users other than the user whose email is being reset."""
         email = request.data.get('email')
         if request.user.is_authenticated() and email != request.user.email:
             raise PermissionDenied()
