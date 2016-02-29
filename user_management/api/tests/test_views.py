@@ -9,7 +9,6 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -23,7 +22,6 @@ from user_management.models.tests.factories import AuthTokenFactory, UserFactory
 from user_management.models.tests.models import BasicUser
 from user_management.models.tests.utils import APIRequestTestCase
 from user_management.tests.utils import iso_8601
-
 
 User = get_user_model()
 TEST_SERVER = 'http://testserver'
@@ -646,7 +644,11 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertTrue(updated_user.is_active)
 
     def test_post_unauthenticated(self):
-        """Assert unauthenticated user can verify its email."""
+        """
+        Assert an unauthenticated user can verify its email.
+
+        Regression test for https://github.com/incuna/django-user-management/pull/120.
+        """
         user = UserFactory.create()
         token = user.generate_validation_token()
 
@@ -659,78 +661,8 @@ class TestVerifyAccountView(APIRequestTestCase):
         self.assertTrue(updated_user.email_verified)
         self.assertTrue(updated_user.is_active)
 
-    def test_post_invalid_user(self):
-        """Assert inexisting user verification return a bad request."""
-        user = UserFactory.build()
-        token = user.generate_validation_token()
-
-        request = self.create_request('post')
-        view = self.view_class.as_view()
-        response = view(request, token=token)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_post_invalid_token(self):
-        """Assert forged token return a bad request."""
-        token = 'nimporte-nawak'
-        request = self.create_request('post')
-        view = self.view_class.as_view()
-        response = view(request, token=token)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_default_expiry_token(self):
-        """Assert `DEFAULT_VERIFY_ACCOUNT_EXPIRY` doesn't expire by default."""
-        user = UserFactory.create()
-        token = user.generate_validation_token()
-        request = self.create_request('post', auth=False)
-        view = self.view_class.as_view()
-
-        with patch('django.core.signing.loads') as signing_loads:
-            signing_loads.return_value = {'email': user.email}
-            view(request, token=token)
-
-        signing_loads.assert_called_once_with(token, max_age=None)
-
-    @override_settings(VERIFY_ACCOUNT_EXPIRY=0)
-    def test_post_expired_token(self):
-        """Assert token expires."""
-        user = UserFactory.create()
-        token = user.generate_validation_token()
-        request = self.create_request('post', auth=False)
-        view = self.view_class.as_view()
-
-        response = view(request, token=token)
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_post_verified_email(self):
-        """Assert verified user cannot verify email."""
-        user = UserFactory.create(email_verified=True)
-        token = user.generate_validation_token()
-
-        request = self.create_request('post')
-        view = self.view_class.as_view()
-        response = view(request, token=token)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_post_different_user_logged_in(self):
-        """Assert a user can have amny accounts and verify one."""
-        user = UserFactory.create()
-        other_user = UserFactory.create()
-        token = user.generate_validation_token()
-
-        request = self.create_request('post', user=other_user)
-        view = self.view_class.as_view()
-        response = view(request, token=token)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        updated_user = User.objects.get(pk=user.pk)
-        self.assertTrue(updated_user.email_verified)
-
-        logged_in_user = User.objects.get(pk=other_user.pk)
-        self.assertFalse(logged_in_user.email_verified)
-
     def test_full_stack_wrong_url(self):
-        """Integration test to check non existant email returns a bad request."""
+        """Integration test to check a nonexistent email returns a bad request."""
         user = UserFactory.build()
         token = user.generate_validation_token()
 
