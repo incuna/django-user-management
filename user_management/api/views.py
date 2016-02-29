@@ -7,7 +7,6 @@ from rest_framework import generics, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import PermissionDenied
-
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from user_management.utils.views import VerifyAccountViewMixin
