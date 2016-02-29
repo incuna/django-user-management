@@ -14,6 +14,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from mock import MagicMock, patch
 from rest_framework import status
+
 from rest_framework.test import APIRequestFactory
 
 from user_management.api import models, views

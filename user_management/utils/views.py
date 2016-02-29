@@ -20,7 +20,7 @@ class VerifyAccountViewMixin(object):
     # Default token never expires.
     DEFAULT_VERIFY_ACCOUNT_EXPIRY = None
 
-    def initial(self, request, *args, **kwargs):
+    def verify_token(self, request, *args, **kwargs):
         """
         Use `token` to allow one-time access to a view.
 
@@ -50,8 +50,6 @@ class VerifyAccountViewMixin(object):
 
         if self.user.email_verified:
             raise self.permission_denied_class
-
-        return super(VerifyAccountViewMixin, self).initial(request, *args, **kwargs)
 
     def activate_user(self):
         self.user.email_verified = True

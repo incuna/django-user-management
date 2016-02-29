@@ -7,6 +7,7 @@ from rest_framework import generics, response, status, views
 from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import PermissionDenied
+
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from user_management.utils.views import VerifyAccountViewMixin
@@ -213,6 +214,10 @@ class VerifyAccountView(VerifyAccountViewMixin, views.APIView):
     Verify a new user's email address.  Accepts a POST request with a token in the URL.
     """
     permission_classes = [AllowAny]
+
+    def initial(self, request, *args, **kwargs):
+        self.verify_token(request, *args, **kwargs)
+        return super(VerifyAccountView, self).initial(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.activate_user()

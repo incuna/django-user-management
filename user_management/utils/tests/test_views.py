@@ -9,22 +9,9 @@ from .. import views
 User = get_user_model()
 
 
-class FakeViewSuperclass(object):
-    """
-    initial() on APIView is a pain, so here's the easiest way to get the super call
-    in VerifyAccountViewMixin.initial() working.
-    """
-    def initial(self, request, *args, **kwargs):
-        pass
-
-
-class FakeVerifyView(views.VerifyAccountViewMixin, FakeViewSuperclass):
-    """A minimal subclass of the mixin for testing."""
-
-
 @override_settings(AUTH_USER_MODEL='tests.VerifyEmailUser')
 class TestVerifyAccountView(APIRequestTestCase):
-    view_class = FakeVerifyView
+    view_class = views.VerifyAccountViewMixin
 
     @classmethod
     def setUpTestData(cls):
@@ -33,44 +20,44 @@ class TestVerifyAccountView(APIRequestTestCase):
         cls.user = VerifyEmailUserFactory.create(email_verified=False)
         cls.token = cls.user.generate_validation_token()
 
-    def test_initial_allowed(self):
+    def test_verify_token_allowed(self):
         """Assert a user can verify its own email."""
-        self.view_instance.initial(self.request, token=self.token)
+        self.view_instance.verify_token(self.request, token=self.token)
         self.assertEqual(self.view_instance.user, self.user)
 
-    def test_initial_invalid_user(self):
+    def test_verify_token_invalid_user(self):
         """Assert a nonexistent user throws an exception."""
         user = VerifyEmailUserFactory.build()
         token = user.generate_validation_token()
         with self.assertRaises(self.view_instance.invalid_exception_class):
-            self.view_instance.initial(self.request, token=token)
+            self.view_instance.verify_token(self.request, token=token)
 
-    def test_initial_invalid_token(self):
+    def test_verify_token_invalid_token(self):
         """Assert forged token return a bad request."""
         token = 'nimporte-nawak'
         with self.assertRaises(self.view_instance.invalid_exception_class):
-            self.view_instance.initial(self.request, token=token)
+            self.view_instance.verify_token(self.request, token=token)
 
     def test_default_expiry_token(self):
         """Assert `DEFAULT_VERIFY_ACCOUNT_EXPIRY` doesn't expire by default."""
         with mock.patch('django.core.signing.loads') as signing_loads:
             signing_loads.return_value = {'email': self.user.email}
-            self.view_instance.initial(self.request, token=self.token)
+            self.view_instance.verify_token(self.request, token=self.token)
 
         signing_loads.assert_called_once_with(self.token, max_age=None)
 
     @override_settings(VERIFY_ACCOUNT_EXPIRY=0)
-    def test_initial_expired_token(self):
+    def test_verify_token_expired_token(self):
         """Assert token expires when VERIFY_ACCOUNT_EXPIRY is set."""
         with self.assertRaises(self.view_instance.invalid_exception_class):
-            self.view_instance.initial(self.request, token=self.token)
+            self.view_instance.verify_token(self.request, token=self.token)
 
-    def test_initial_verified_email(self):
+    def test_verify_token_verified_email(self):
         """Assert verified user cannot verify email."""
         user = VerifyEmailUserFactory.create(email_verified=True)
         token = user.generate_validation_token()
         with self.assertRaises(self.view_instance.permission_denied_class):
-            self.view_instance.initial(self.request, token=token)
+            self.view_instance.verify_token(self.request, token=token)
 
     def test_activate_user(self):
         user = VerifyEmailUserFactory.create(email_verified=False, is_active=False)
