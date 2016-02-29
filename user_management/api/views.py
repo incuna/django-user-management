@@ -214,6 +214,10 @@ class VerifyAccountView(VerifyAccountViewMixin, views.APIView):
     """
     permission_classes = [AllowAny]
 
+    def initial(self, request, *args, **kwargs):
+        self.verify_token(request, *args, **kwargs)
+        return super(VerifyAccountView, self).initial(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         self.activate_user()
         return response.Response(
