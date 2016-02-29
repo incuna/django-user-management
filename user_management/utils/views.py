@@ -7,7 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 from user_management.api.exceptions import InvalidExpiredToken
 
 
-class VerifyAccountViewMixin():
+class VerifyAccountViewMixin(object):
     """
     Verify a new user's email address.
 
