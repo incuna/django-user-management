@@ -1,3 +1,7 @@
+## v14.2.1
+
+* Fix the URL for `VerifyUserEmailView`.
+
 ## v14.2.0
 
 * Refactor the UI `VerifyUserEmailView` to function in the same way as the existing API
