@@ -7,7 +7,7 @@ class TestURLs(URLTestCase):
     def test_password_reset_confirm_url(self):
         self.assert_url_matches_view(
             view=views.VerifyUserEmailView,
-            expected_url='/register/verify/a/x-y/',
+            expected_url='/register/verify/x:-y/',
             url_name='user_management_api:registration-verify',
-            url_kwargs={'uidb64': 'a', 'token': 'x-y'},
+            url_kwargs={'token': 'x:-y'},
         )
