@@ -1,3 +1,8 @@
+## v14.2.0
+
+* Refactor the UI `VerifyUserEmailView` to function in the same way as the existing API
+  `VerifyAccountView`.
+
 ## v14.1.0
 
 * Add `VerifyUserEmailView` to handle links from registration verification emails. 

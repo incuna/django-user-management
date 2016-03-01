@@ -28,11 +28,12 @@ Add the URLs to your `ROOT_URLCONF`:
     ]
 
 If you are using the `VerifyEmailMixin`, then you'll also need to include
-`user_management.api.urls.verify_email`:
+`user_management.api.urls.verify_email` or `user_management.ui.urls`:
 
     urlpatterns = [
         ...
-        url('', include('user_management.api.urls.verify_email')),
+        url('', include('user_management.api.urls.verify_email')),  # or
+        url('', include('user_management.ui.urls')),
         ...
     ]
 
