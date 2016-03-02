@@ -36,3 +36,17 @@ If you want to use the `VerifyEmailMixin`, substitute it for `ActiveUserMixin`.
 
 Make sure the app containing your custom user model is added to `settings.INSTALLED_APPS`,
 and set `settings.AUTH_USER_MODEL` to be the path to your custom user model.
+
+## Authtoken
+
+If you have `user_management.api` in your `INSTALLED_APPS`, you'll also need to create a migration in your project for the `AuthToken` model.
+
+Add the following to `settings.MIGRATION_MODULES`:
+
+    MIGRATION_MODULES = {
+        ...
+        'api': 'core.projectmigrations.user_management_api',  # substitute the path to your projectmigrations folder
+        ...
+    }
+
+Then run `python manage.py makemigrations api` to create the migration you need.  This avoids database errors involving the relation `users_user` not existing when Django tries to synchronise the "unmigrated" `api` app before setting up the rest of the database.
