@@ -330,6 +330,7 @@ class TestPasswordResetEmail(APIRequestTestCase):
             'html_template_name': 'user_management/password_reset_email.html',
             'subject': '{} password reset'.format(site.domain),
             'context': context,
+            'headers': {},
         }
         send_email.assert_called_once_with(**expected)
 

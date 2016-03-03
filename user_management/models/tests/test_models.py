@@ -212,7 +212,8 @@ class TestVerifyEmailMixin(TestCase):
             'template_name': 'user_management/account_validation_email.txt',
             'html_template_name': 'user_management/account_validation_email.html',
             'subject': '{} account validate'.format(site.domain),
-            'context': context
+            'context': context,
+            'headers': {},
         }
         send.assert_called_once_with(**expected)
 
@@ -304,6 +305,7 @@ class TestCustomPasswordResetNotification(TestCase):
             'template_name': 'my_custom_email.txt',
             'html_template_name': None,
             'subject': '{} password reset'.format(site.domain),
-            'context': context
+            'context': context,
+            'headers': {'test-header': 'Test'},
         }
         send.assert_called_once_with(**expected)
