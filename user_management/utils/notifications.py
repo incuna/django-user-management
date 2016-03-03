@@ -30,7 +30,7 @@ def email_handler(notification, email_context):
         template_name=notification.text_email_template,
         html_template_name=notification.html_email_template,
         context=email_context(notification),
-        headers=getattr(notification, 'headers', {})
+        headers=getattr(notification, 'headers', {}),
     )
 
 

@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 
-version = '14.2.1'
+version = '14.3.0'
 
 
 install_requires = (
