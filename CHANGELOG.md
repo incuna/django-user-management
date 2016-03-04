@@ -1,3 +1,7 @@
+## v14.3.0
+
+* Add `headers` to `utils.email_handler` enabling custom email headers to be sent.
+
 ## v14.2.1
 
 * Fix the URL for `VerifyUserEmailView`.
