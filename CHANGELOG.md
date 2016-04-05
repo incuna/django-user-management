@@ -1,3 +1,8 @@
+## v14.4.0
+
+* Make `VerifyUserEmailView` redirect to the login page if `LOGIN_URL` is set (and `/`
+  otherwise).
+
 ## v14.3.0
 
 * Add `headers` to `utils.email_handler` enabling custom email headers to be sent.
