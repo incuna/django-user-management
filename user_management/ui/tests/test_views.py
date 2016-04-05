@@ -19,7 +19,7 @@ class TestVerifyUserEmailView(RequestTestCase):
         view = self.view_class.as_view()
         response = view(request, token=token)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, '/accounts/login/?next=/')
 
         user = VerifyEmailUser.objects.get(pk=user.pk)
 
