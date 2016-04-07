@@ -1,14 +1,14 @@
 -e .[avatar]
 -e .[utils]
 colour-runner==0.0.4
-coverage==3.7.1
-dj-database-url==0.3.0
-dj-inmemorystorage==1.3.0
-factory_boy==2.5.2
-flake8==2.3.0
-flake8-import-order==0.5.1
-incuna-test-utils==6.0.0
-mkdocs==0.11.1
-mock==1.0.1
-pillow==2.7.0
-psycopg2==2.6
+coverage==4.0.3
+dj-database-url==0.4.1
+dj-inmemorystorage==1.4.0
+factory_boy==2.6.1
+flake8==2.5.4
+flake8-import-order==0.7
+incuna-test-utils==6.4.1
+mkdocs==0.15.3
+mock==2.0.0
+pillow==3.2.0
+psycopg2==2.6.1
