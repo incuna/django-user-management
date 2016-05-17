@@ -1,4 +1,5 @@
 import incuna_mail
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from pigeon.notification import Notification
 
@@ -36,14 +37,16 @@ def email_handler(notification, email_context):
 
 def password_reset_email_handler(notification):
     """Password reset email handler."""
-    subject = _('{domain} password reset').format(domain=notification.site.domain)
+    base_subject = _('{domain} password reset').format(domain=notification.site.domain)
+    subject = getattr(settings, 'DUM_PASSWORD_RESET_SUBJECT', base_subject)
     notification.email_subject = subject
     email_handler(notification, password_reset_email_context)
 
 
 def validation_email_handler(notification):
     """Validation email handler."""
-    subject = _('{domain} account validate').format(domain=notification.site.domain)
+    base_subject = _('{domain} account validate').format(domain=notification.site.domain)
+    subject = getattr(settings, 'DUM_VALIDATE_EMAIL_SUBJECT', base_subject)
     notification.email_subject = subject
     email_handler(notification, validation_email_context)
 

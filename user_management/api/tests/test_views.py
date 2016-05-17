@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.test import override_settings
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -382,6 +383,19 @@ class TestPasswordResetEmail(APIRequestTestCase):
         self.assertEqual('example.com password reset', sent_mail.subject)
         self.assertIn('auth/password_reset/confirm/', sent_mail.body)
         self.assertIn('https://', sent_mail.body)
+
+    @override_settings(DUM_PASSWORD_RESET_SUBJECT='overridden subject')
+    def test_email_settings_subject(self):
+        """Assert email content is output correctly."""
+        user = UserFactory.create()
+        request = self.create_request('post', auth=False, data={'email': user.email})
+        view = self.view_class.as_view()
+        view(request)
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        sent_mail = mail.outbox[0]
+        self.assertEqual('overridden subject', sent_mail.subject)
 
     def test_options(self):
         """
@@ -993,6 +1007,19 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
 
         expected = 'example.com account validate'
         self.assertEqual(email.subject, expected)
+
+    @override_settings(DUM_VALIDATE_EMAIL_SUBJECT='overridden subject')
+    def test_send_email_subject_setting(self):
+        """Assert the subject is affected by the DUM_VALIDATE_EMAIL_SUBJECT setting."""
+        user = UserFactory.create()
+        data = {'email': user.email}
+        request = self.create_request('post', auth=False, data=data)
+        view = self.view_class.as_view()
+        view(request)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.subject, 'overridden subject')
 
     def test_send_email_other_user(self):
         """Assert a user can not request a confirmation email for another user."""
