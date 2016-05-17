@@ -965,8 +965,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
     def test_post_email_already_verified(self):
         """Assert email already verified does not trigger another email."""
         user = UserFactory.create(email_verified=True)
-        data = {'email': user.email}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data={'email': user.email})
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -975,8 +974,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
     def test_send_email_unauthenticated(self):
         """Assert unauthenticated user can receive a new confirmation email."""
         user = UserFactory.create()
-        data = {'email': user.email}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data={'email': user.email})
         view = self.view_class.as_view()
         view(request)
 
@@ -993,8 +991,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
     def test_send_email_authenticated(self):
         """Assert authenticated user can receive a new confirmation email."""
         user = UserFactory.create()
-        data = {'email': user.email}
-        request = self.create_request('post', user=user, data=data)
+        request = self.create_request('post', user=user, data={'email': user.email})
         view = self.view_class.as_view()
         view(request)
 
@@ -1012,8 +1009,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
     def test_send_email_subject_setting(self):
         """Assert the subject is affected by the DUM_VALIDATE_EMAIL_SUBJECT setting."""
         user = UserFactory.create()
-        data = {'email': user.email}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data={'email': user.email})
         view = self.view_class.as_view()
         view(request)
 
