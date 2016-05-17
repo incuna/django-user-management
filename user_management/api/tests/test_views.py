@@ -935,7 +935,7 @@ class TestUserDetail(APIRequestTestCase):
         self.assertEqual(self.user, user)
 
 
-@patch(THROTTLE_RATE_PATH, new={'confirmations': '4/minute'})
+@patch(THROTTLE_RATE_PATH, new={'confirmations': '40/minute'})
 class ResendConfirmationEmailTest(APIRequestTestCase):
     """Assert `ResendConfirmationEmail` behaves properly."""
     view_class = views.ResendConfirmationEmail
