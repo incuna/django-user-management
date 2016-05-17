@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.test import override_settings
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -382,6 +383,19 @@ class TestPasswordResetEmail(APIRequestTestCase):
         self.assertEqual('example.com password reset', sent_mail.subject)
         self.assertIn('auth/password_reset/confirm/', sent_mail.body)
         self.assertIn('https://', sent_mail.body)
+
+    @override_settings(DUM_PASSWORD_RESET_SUBJECT='overridden subject')
+    def test_email_settings_subject(self):
+        """Assert email content is output correctly."""
+        user = UserFactory.create()
+        request = self.create_request('post', auth=False, data={'email': user.email})
+        view = self.view_class.as_view()
+        view(request)
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        sent_mail = mail.outbox[0]
+        self.assertEqual('overridden subject', sent_mail.subject)
 
     def test_options(self):
         """
@@ -921,7 +935,7 @@ class TestUserDetail(APIRequestTestCase):
         self.assertEqual(self.user, user)
 
 
-@patch(THROTTLE_RATE_PATH, new={'confirmations': '4/minute'})
+@patch(THROTTLE_RATE_PATH, new={'confirmations': '40/minute'})
 class ResendConfirmationEmailTest(APIRequestTestCase):
     """Assert `ResendConfirmationEmail` behaves properly."""
     view_class = views.ResendConfirmationEmail
@@ -951,8 +965,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
     def test_post_email_already_verified(self):
         """Assert email already verified does not trigger another email."""
         user = UserFactory.create(email_verified=True)
-        data = {'email': user.email}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data={'email': user.email})
         view = self.view_class.as_view()
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -961,8 +974,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
     def test_send_email_unauthenticated(self):
         """Assert unauthenticated user can receive a new confirmation email."""
         user = UserFactory.create()
-        data = {'email': user.email}
-        request = self.create_request('post', auth=False, data=data)
+        request = self.create_request('post', auth=False, data={'email': user.email})
         view = self.view_class.as_view()
         view(request)
 
@@ -979,8 +991,7 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
     def test_send_email_authenticated(self):
         """Assert authenticated user can receive a new confirmation email."""
         user = UserFactory.create()
-        data = {'email': user.email}
-        request = self.create_request('post', user=user, data=data)
+        request = self.create_request('post', user=user, data={'email': user.email})
         view = self.view_class.as_view()
         view(request)
 
@@ -993,6 +1004,18 @@ class ResendConfirmationEmailTest(APIRequestTestCase):
 
         expected = 'example.com account validate'
         self.assertEqual(email.subject, expected)
+
+    @override_settings(DUM_VALIDATE_EMAIL_SUBJECT='overridden subject')
+    def test_send_email_subject_setting(self):
+        """Assert the subject is affected by the DUM_VALIDATE_EMAIL_SUBJECT setting."""
+        user = UserFactory.create()
+        request = self.create_request('post', auth=False, data={'email': user.email})
+        view = self.view_class.as_view()
+        view(request)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.subject, 'overridden subject')
 
     def test_send_email_other_user(self):
         """Assert a user can not request a confirmation email for another user."""
