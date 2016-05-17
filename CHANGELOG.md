@@ -1,3 +1,8 @@
+## v14.5.0
+
+* Allow changing the subject of email verification and password reset emails with
+  Django settings (`DUM_PASSWORD_RESET_SUBJECT` and `DUM_VALIDATE_EMAIL_SUBJECT`).
+
 ## v14.4.0
 
 * Make `VerifyUserEmailView` redirect to the login page if `LOGIN_URL` is set (and `/`
