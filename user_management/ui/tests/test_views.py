@@ -10,10 +10,12 @@ from .. import views
 class TestVerifyUserEmailView(RequestTestCase):
     view_class = views.VerifyUserEmailView
 
+    def setUp(self):
+        self.user = VerifyEmailUserFactory.create(email_verified=False)
+
     def test_get(self):
         """A user clicks the link in their email and activates their account."""
-        user = VerifyEmailUserFactory.create(email_verified=False)
-        token = user.generate_validation_token()
+        token = self.user.generate_validation_token()
 
         request = self.create_request('get', auth=False)
         view = self.view_class.as_view()
@@ -21,7 +23,7 @@ class TestVerifyUserEmailView(RequestTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/accounts/login/?next=/')
 
-        user = VerifyEmailUser.objects.get(pk=user.pk)
+        user = VerifyEmailUser.objects.get(pk=self.user.pk)
 
         self.assertTrue(user.email_verified)
         self.assertTrue(user.is_active)
@@ -30,6 +32,21 @@ class TestVerifyUserEmailView(RequestTestCase):
             self.view_class.success_message,
             str(request._messages.store[0]),
         )
+
+    def test_auto_login_get(self):
+        """Test the user is automatically logged in after email verification."""
+        token = self.user.generate_validation_token()
+
+        request = self.create_request('get', auth=False)
+        self.add_session_to_request(request)
+
+        with override_settings(USER_MANAGEMENT_AUTO_LOGIN=True):
+            view = self.view_class.as_view()
+            response = view(request, token=token)
+
+        self.assertEqual(response.url, '/')
+
+        self.assertEqual(int(request.session['_auth_user_id']), self.user.pk)
 
     def test_get_nonsense_token(self):
         """The view is accessed with a broken token and 404s."""

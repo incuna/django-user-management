@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import login  # authenticate, login
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
@@ -21,9 +23,13 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
     As a RedirectView, this will return a HTTP 302 on success.  This defaults to
     `/` but can be overridden by changing the `url` attribute in a subclass or setting
     LOGIN_URL in your settings.
+
+    Write some stuff
+
     """
     permanent = False
     url = getattr(settings, 'LOGIN_URL', '/')
+    auto_login_url = getattr(settings, 'USER_MANAGEMENT_AUTO_LOGIN_URL', '/')
     success_message = _('Your email address was confirmed.')
     invalid_exception_class = InvalidExpiredToken
     permission_denied_class = PermissionDenied
@@ -35,4 +41,12 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
     def get(self, request, *args, **kwargs):
         self.activate_user()
         messages.success(request, self.success_message)
+
+        if getattr(settings, 'USER_MANAGEMENT_AUTO_LOGIN', False):
+            self.user.backend = settings.AUTHENTICATION_BACKENDS
+            # authenticate(username=, password=)
+            login(request, self.user)
+
+            return redirect(self.auto_login_url)
+
         return redirect_to_login('/', login_url=self.url)
