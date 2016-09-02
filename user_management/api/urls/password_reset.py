@@ -1,11 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt
 
 from .. import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         regex=(
             r'^auth/password_reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/'
@@ -19,4 +18,4 @@ urlpatterns = patterns(
         view=views.PasswordResetEmail.as_view(),
         name='password_reset',
     ),
-)
+]

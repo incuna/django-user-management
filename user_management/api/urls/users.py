@@ -1,10 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .. import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         regex=r'^users/?$',
         view=views.UserList.as_view(),
@@ -15,4 +14,4 @@ urlpatterns = patterns(
         view=views.UserDetail.as_view(),
         name='user_detail'
     ),
-)
+]
