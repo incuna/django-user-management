@@ -1,11 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .. import views
 
 
-urlpatterns = patterns(
-    '',
-
+urlpatterns = [
     url(
         regex=r'^profile/?$',
         view=views.ProfileDetail.as_view(),
@@ -16,4 +14,4 @@ urlpatterns = patterns(
         view=views.PasswordChange.as_view(),
         name='password_change',
     ),
-)
+]

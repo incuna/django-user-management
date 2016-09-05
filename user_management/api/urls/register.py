@@ -1,10 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .. import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         regex=r'^register/?$',
         view=views.UserRegister.as_view(),
@@ -15,4 +14,4 @@ urlpatterns = patterns(
         view=views.ResendConfirmationEmail.as_view(),
         name='resend_confirmation_email',
     ),
-)
+]
