@@ -55,6 +55,12 @@ settings.configure(
     SENTRY_CLIENT='user_management.utils.sentry.SensitiveDjangoClient',
     USE_TZ=True,
     MIGRATION_MODULES=MIGRATION_MODULES,
+    TEMPLATES=[
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+        },
+    ]
 )
 
 
