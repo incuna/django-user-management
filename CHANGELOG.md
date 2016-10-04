@@ -1,3 +1,7 @@
+## 15.0.0
+
+* Updated for compatibility with Python 3.5 and Django 1.10
+
 ## v14.5.0
 
 * Allow changing the subject of email verification and password reset emails with
