@@ -35,14 +35,16 @@ class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
             'username': 'jimmy@example.com',
             'password': 'password;lol',
         }
-        request = self.create_request('post', auth=False, data=data)
         view = self.view_class.as_view()
 
         # no token attached hence HTTP 400
+        request = self.create_request('post', auth=False, data=data)
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # request should be throttled now
+        # (new request created to prevent django.http.request.RawPostDataException)
+        request = self.create_request('post', auth=False, data=data)
         response = view(request)
         self.assertEqual(response.status_code, self.throttle_expected_status)
 
@@ -81,7 +83,6 @@ class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
     @patch(THROTTLE_RATE_PATH, new={'logins': '1/minute'})
     def test_authenticated_user_not_throttled(self):
         """An authenticated user is not throttled by UsernameLoginRateThrottle."""
-        request = self.create_request('post', data={})
 
         class View(self.view_class):
             throttle_classes = [throttling.UsernameLoginRateThrottle]
@@ -89,10 +90,13 @@ class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
         view = View.as_view()
 
         # We are not throttled here
+        request = self.create_request('post', data={})
         response = view(request)
         self.assertNotEqual(response.status_code, self.throttle_expected_status)
 
         # Or here
+        # (new request created to prevent django.http.request.RawPostDataException)
+        request = self.create_request('post', data={})
         response = view(request)
         self.assertNotEqual(response.status_code, self.throttle_expected_status)
 
