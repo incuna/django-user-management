@@ -1,4 +1,4 @@
-from incuna_test_utils.compat import wipe_id_fields_on_django_lt_17
+from incuna_test_utils.utils import get_all_field_names
 
 from user_management.models.tests import factories, utils
 from ..models import AuthToken
@@ -8,9 +8,9 @@ class TestAuthToken(utils.APIRequestTestCase):
     model = AuthToken
 
     def test_fields(self):
-        fields = self.model._meta.get_all_field_names()
+        fields = get_all_field_names(self.model)
 
-        expected = wipe_id_fields_on_django_lt_17((
+        expected = (
             # Inherited from subclassed model
             'key',
             'user',
@@ -18,7 +18,7 @@ class TestAuthToken(utils.APIRequestTestCase):
             'created',
 
             'expires',
-        ))
+        )
 
         self.assertCountEqual(fields, expected)
 

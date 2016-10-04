@@ -7,7 +7,7 @@ dj-inmemorystorage==1.4.0
 factory_boy==2.6.1
 flake8==2.5.4
 flake8-import-order==0.7
-incuna-test-utils==6.4.1
+incuna-test-utils==6.5.0
 mkdocs==0.15.3
 mock==2.0.0
 pillow==3.2.0

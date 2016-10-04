@@ -11,6 +11,8 @@ from django.test import TestCase
 from django.utils import six, timezone
 from mock import Mock, patch
 
+from incuna_test_utils.utils import get_all_field_names
+
 from user_management.models.tests import utils
 from user_management.utils.notifications import validation_email_context
 from . import models
@@ -34,7 +36,7 @@ class TestUser(utils.APIRequestTestCase):
 
     def test_fields(self):
         """Do we have the fields we expect?"""
-        fields = self.model._meta.get_all_field_names()
+        fields = get_all_field_names(self.model)
         expected = {
             # On model
             'id',
@@ -253,7 +255,7 @@ class TestCustomNameUser(utils.APIRequestTestCase):
 
     def test_fields(self):
         """Do we have the fields we expect?"""
-        fields = self.model._meta.get_all_field_names()
+        fields = get_all_field_names(self.model)
         expected = {
             # On model
             'id',
