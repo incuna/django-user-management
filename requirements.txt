@@ -1,7 +1,7 @@
 -e .[avatar]
 -e .[utils]
 colour-runner==0.0.4
-coverage==4.0.3
+coverage==4.2.0
 dj-database-url==0.4.1
 dj-inmemorystorage==1.4.0
 factory_boy==2.6.1

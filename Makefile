@@ -7,7 +7,7 @@ help:
 
 test:
 	@coverage run ./user_management/tests/run.py
-	@coverage report --show-missing --fail-under=100
+	@coverage report
 	@flake8
 
 run-doc:
