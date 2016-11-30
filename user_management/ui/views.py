@@ -17,12 +17,10 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
     object, for verification.  If everything lines up, it makes the user
     active.
 
-    As a RedirectView, this will return a HTTP 302 on success.  This defaults to
-    `/` but can be overridden by changing the `url` attribute in a subclass or setting
-    LOGIN_URL in your settings.
+    As a RedirectView, this will return a HTTP 302 to LOGIN_URL on success.
     """
     permanent = False
-    url = getattr(settings, 'LOGIN_URL', '/')
+    url = settings.LOGIN_URL
     success_message = _('Your email address was confirmed.')
     invalid_exception_class = InvalidExpiredToken
     permission_denied_class = PermissionDenied
