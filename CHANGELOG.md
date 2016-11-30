@@ -1,4 +1,4 @@
-## UPCOMING
+## 16.0.0
 
 * Update `VerifyUserEmailView` to redirect to login without providing a next.
 * Redirect to the login when attempting to verify an email address that is already verified.
