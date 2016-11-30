@@ -32,6 +32,19 @@ class TestVerifyUserEmailView(RequestTestCase):
             str(request._messages.store[0]),
         )
 
+    @override_settings(LOGIN_URL='login')
+    def test_get_named_login_url(self):
+        """A user clicks the link in their email and activates their account."""
+        user = VerifyEmailUserFactory.create(email_verified=False)
+        token = user.generate_validation_token()
+
+        request = self.create_request('get', auth=False)
+        view = self.view_class.as_view()
+        response = view(request, token=token)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(response.url, '/login/')
+
     def test_get_nonsense_token(self):
         """The view is accessed with a broken token and 404s."""
         token = 'I_am_a_token'

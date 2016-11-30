@@ -1,3 +1,7 @@
+## UPCOMING
+
+* Fix email verification when `LOGIN_URL` is a url name.
+
 ## 16.0.0
 
 * Update `VerifyUserEmailView` to redirect to login without providing a next.

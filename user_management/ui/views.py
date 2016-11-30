@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
+from django.shortcuts import resolve_url
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
@@ -20,11 +21,13 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
     """
     permanent = False
     already_verified = False
-    url = settings.LOGIN_URL
     success_message = _('Your email address was confirmed.')
     already_verified_message = _('Your email is already confirmed.')
     invalid_exception_class = InvalidExpiredToken
     permission_denied_class = AlreadyVerifiedException
+
+    def get_redirect_url(self, *args, **kwargs):
+        return resolve_url(settings.LOGIN_URL)
 
     def dispatch(self, request, *args, **kwargs):
         try:
