@@ -42,11 +42,24 @@ class TestVerifyUserEmailView(RequestTestCase):
             view(request, token=token)
 
     def test_get_registered_user(self):
-        """The view is accessed for an already-verified user and 403s."""
+        """The view is accessed for an already-verified user then redirect."""
         user = VerifyEmailUserFactory.create(email_verified=True)
         token = user.generate_validation_token()
 
         request = self.create_request('get', auth=False)
         view = self.view_class.as_view()
-        with(self.assertRaises(self.view_class.permission_denied_class)):
-            view(request, token=token)
+
+        response = view(request, token=token)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(response.url, '/accounts/login/')
+
+        user = VerifyEmailUser.objects.get(pk=user.pk)
+
+        self.assertTrue(user.email_verified)
+        self.assertTrue(user.is_active)
+
+        self.assertEqual(
+            self.view_class.already_verified_message,
+            str(request._messages.store[0]),
+        )
