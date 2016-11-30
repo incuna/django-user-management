@@ -1,3 +1,7 @@
+## UPCOMING
+
+* Update `VerifyUserEmailView` to redirect to login without providing a next.
+
 ## 15.0.0
 
 * Updated for compatibility with Python 3.5 and Django 1.10
