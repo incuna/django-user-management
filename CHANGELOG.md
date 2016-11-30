@@ -1,6 +1,6 @@
 ## UPCOMING
 
-* Update `VerifyUserEmailView` to use LOGIN_REDIRECT_URL rather than `/` as the next url after the login redirect.
+* Update `VerifyUserEmailView` to redirect to login without providing a next.
 
 ## 15.0.0
 

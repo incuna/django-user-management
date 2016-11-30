@@ -1,7 +1,4 @@
-from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test import override_settings
-from django.test.utils import override_script_prefix
 
 from user_management.models.tests.factories import VerifyEmailUserFactory
 from user_management.models.tests.models import VerifyEmailUser
@@ -23,8 +20,7 @@ class TestVerifyUserEmailView(RequestTestCase):
         response = view(request, token=token)
         self.assertEqual(response.status_code, 302)
 
-        expected_url = '{}?next={}'.format(settings.LOGIN_URL, settings.LOGIN_REDIRECT_URL)
-        self.assertEqual(response.url, expected_url)
+        self.assertEqual(response.url, '/accounts/login/')
 
         user = VerifyEmailUser.objects.get(pk=user.pk)
 
@@ -35,24 +31,6 @@ class TestVerifyUserEmailView(RequestTestCase):
             self.view_class.success_message,
             str(request._messages.store[0]),
         )
-
-    @override_settings(LOGIN_REDIRECT_URL='user_management_api:profile_detail')
-    @override_script_prefix('/blah/')
-    def test_get_prefix(self):
-        """Regression test to ensure that the login redirect uses SCRIPT_NAME prefix."""
-        user = VerifyEmailUserFactory.create(email_verified=False)
-        token = user.generate_validation_token()
-
-        request = self.create_request('get', auth=False)
-
-        view = self.view_class.as_view()
-        response = view(request, token=token)
-        self.assertEqual(response.status_code, 302)
-
-        login_redirect_url = reverse(settings.LOGIN_REDIRECT_URL)
-        self.assertIn('/blah/', login_redirect_url)
-        expected_url = '{}?next={}'.format(settings.LOGIN_URL, login_redirect_url)
-        self.assertEqual(response.url, expected_url)
 
     def test_get_nonsense_token(self):
         """The view is accessed with a broken token and 404s."""
