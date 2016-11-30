@@ -1,3 +1,7 @@
+## UPCOMING
+
+* Update `VerifyUserEmailView` to use LOGIN_REDIRECT_URL rather than `/` as the next url after the login redirect.
+
 ## 15.0.0
 
 * Updated for compatibility with Python 3.5 and Django 1.10
