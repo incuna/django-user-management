@@ -38,10 +38,7 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
         return super(VerifyUserEmailView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        try:
-            auto_login = settings.LOGIN_ON_EMAIL_VERIFICATION
-        except:
-            pass
+        auto_login = getattr(settings, 'LOGIN_ON_EMAIL_VERIFICATION', False)
 
         if not self.already_verified:
             self.activate_user()
