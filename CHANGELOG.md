@@ -1,3 +1,8 @@
+## Upcoming
+
+* Allow user login after email verification providing a setting is true in an apps settings file.
+  This works in Django 1.10.
+
 ## 16.0.1
 
 * Fix email verification when `LOGIN_URL` is a url name.
