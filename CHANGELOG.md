@@ -1,3 +1,7 @@
+## Upcoming
+
+* Allow VerifyUserEmailView get_redirect_url function to accept an extra string.
+
 ## 16.0.1
 
 * Fix email verification when `LOGIN_URL` is a url name.
