@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib import messages, auth
+from django.contrib import auth, messages
 from django.shortcuts import resolve_url
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic

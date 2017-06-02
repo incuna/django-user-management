@@ -1,8 +1,13 @@
-from django.test import override_settings
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.urlresolvers import reverse
+from django.test import override_settings, RequestFactory
+
+from incuna_test_utils.testcases.request import DummyStorage
 
 from user_management.models.tests.factories import VerifyEmailUserFactory
 from user_management.models.tests.models import VerifyEmailUser
 from user_management.models.tests.utils import RequestTestCase
+
 from .. import views
 
 
@@ -31,6 +36,30 @@ class TestVerifyUserEmailView(RequestTestCase):
             self.view_class.success_message,
             str(request._messages.store[0]),
         )
+
+    @override_settings(LOGIN_ON_EMAIL_VERIFICATION=True)
+    def test_get_user_is_logged_in(self):
+        """
+        A user clicks the link in their email, activates their account and gets logged in.
+
+        Using RequestFactory as RequestTestCase doesnt handle sessions.
+        """
+        factory = RequestFactory()
+        middleware = SessionMiddleware()
+
+        user = VerifyEmailUserFactory.create(email_verified=False, is_active=False)
+        token = user.generate_validation_token()
+
+        url = reverse('user_management_api:registration-verify', kwargs={'token': token})
+        request = factory.get(url)
+        middleware.process_request(request)
+        request.session.save()
+        request._messages = DummyStorage()
+        view = self.view_class.as_view()
+
+        user = VerifyEmailUser.objects.get(pk=user.pk)
+
+        self.assertEqual(user.is_anonymous(), False)
 
     @override_settings(LOGIN_URL='login')
     def test_get_named_login_url(self):
