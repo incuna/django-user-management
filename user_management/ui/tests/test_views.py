@@ -3,6 +3,7 @@ from django.test import override_settings
 from user_management.models.tests.factories import VerifyEmailUserFactory
 from user_management.models.tests.models import VerifyEmailUser
 from user_management.models.tests.utils import RequestTestCase
+
 from .. import views
 
 
@@ -31,6 +32,20 @@ class TestVerifyUserEmailView(RequestTestCase):
             self.view_class.success_message,
             str(request._messages.store[0]),
         )
+
+    @override_settings(LOGIN_ON_EMAIL_VERIFICATION=True)
+    def test_auto_login_get(self):
+        """A user is automatically logged in when they activate their account."""
+        user = VerifyEmailUserFactory.create(email_verified=False)
+        token = user.generate_validation_token()
+
+        request = self.create_request('get', auth=False)
+        self.add_session_to_request(request)
+
+        view = self.view_class.as_view()
+        view(request, token=token)
+
+        self.assertEqual(int(request.session['_auth_user_id']), user.pk)
 
     @override_settings(LOGIN_URL='login')
     def test_get_named_login_url(self):

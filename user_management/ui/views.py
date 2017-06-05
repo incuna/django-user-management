@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib import messages
+from django.contrib import auth, messages
 from django.shortcuts import resolve_url
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
@@ -44,7 +44,12 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
         return super(VerifyUserEmailView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+        auto_login = getattr(settings, 'LOGIN_ON_EMAIL_VERIFICATION', False)
+
         if not self.already_verified:
             self.activate_user()
+            if auto_login is True:
+                self.user.backend = settings.AUTHENTICATION_BACKENDS[0]
+                auth.login(request=request, user=self.user)
         messages.success(request, self.success_message)
         return super(VerifyUserEmailView, self).get(request, *args, **kwargs)
