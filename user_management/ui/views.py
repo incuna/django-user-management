@@ -43,6 +43,7 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
         if not self.already_verified:
             self.activate_user()
             if auto_login is True:
+                self.user.backend = settings.AUTHENTICATION_BACKENDS[0]
                 auth.login(request=request, user=self.user)
         messages.success(request, self.success_message)
         return super(VerifyUserEmailView, self).get(request, *args, **kwargs)
