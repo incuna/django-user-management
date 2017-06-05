@@ -91,3 +91,29 @@ class TestVerifyUserEmailView(RequestTestCase):
             self.view_class.already_verified_message,
             str(request._messages.store[0]),
         )
+
+    query_string = 'validated'
+
+    @override_settings(VERIFIED_QUERYSTRING=query_string)
+    def test_get_redirect_url_with_query_string(self):
+        view = views.VerifyUserEmailView()
+        view.already_verified = False
+        response = view.get_redirect_url()
+        expected_url = '/accounts/login/?' + self.query_string
+
+        self.assertEqual(response, expected_url)
+
+    @override_settings(VERIFIED_QUERYSTRING=query_string)
+    def test_get_redirect_url_with_verified_user(self):
+        view = views.VerifyUserEmailView()
+        view.already_verified = True
+        response = view.get_redirect_url()
+
+        self.assertEqual(response, '/accounts/login/')
+
+    def test_get_redirect_url_without_query_setting(self):
+        view = views.VerifyUserEmailView()
+        view.already_verified = False
+        response = view.get_redirect_url()
+
+        self.assertEqual(response, '/accounts/login/')

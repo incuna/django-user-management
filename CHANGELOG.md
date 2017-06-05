@@ -1,5 +1,7 @@
 ## Upcoming
 
+* Allow VerifyUserEmailView get_redirect_url function to accept an extra string.
+
 * Allow user login after email verification providing a setting is true in an apps settings file.
   This works in Django 1.10.
 
