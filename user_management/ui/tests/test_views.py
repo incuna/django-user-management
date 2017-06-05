@@ -81,37 +81,24 @@ class TestVerifyUserEmailView(RequestTestCase):
 
     @override_settings(VERIFIED_QUERYSTRING=query_string)
     def test_get_redirect_url_with_query_string(self):
-        user = VerifyEmailUserFactory.create(email_verified=False)
-        token = user.generate_validation_token()
-
-        request = self.create_request('get', auth=False)
-        view = self.view_class.as_view()
-
-        response = view(request, token=token)
-
+        view = views.VerifyUserEmailView()
+        view.already_verified = False
+        response = view.get_redirect_url()
         expected_url = '/accounts/login/?' + self.query_string
 
-        self.assertEqual(response.url, expected_url)
+        self.assertEqual(response, expected_url)
 
     @override_settings(VERIFIED_QUERYSTRING=query_string)
     def test_get_redirect_url_with_verified_user(self):
-        user = VerifyEmailUserFactory.create(email_verified=True)
-        token = user.generate_validation_token()
+        view = views.VerifyUserEmailView()
+        view.already_verified = True
+        response = view.get_redirect_url()
 
-        request = self.create_request('get', auth=False)
-        view = self.view_class.as_view()
-
-        response = view(request, token=token)
-
-        self.assertEqual(response.url, '/accounts/login/')
+        self.assertEqual(response, '/accounts/login/')
 
     def test_get_redirect_url_without_query_setting(self):
-        user = VerifyEmailUserFactory.create(email_verified=False)
-        token = user.generate_validation_token()
+        view = views.VerifyUserEmailView()
+        view.already_verified = False
+        response = view.get_redirect_url()
 
-        request = self.create_request('get', auth=False)
-        view = self.view_class.as_view()
-
-        response = view(request, token=token)
-
-        self.assertEqual(response.url, '/accounts/login/')
+        self.assertEqual(response, '/accounts/login/')
