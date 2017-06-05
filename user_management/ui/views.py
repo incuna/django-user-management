@@ -27,7 +27,7 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
     permission_denied_class = AlreadyVerifiedException
 
     def get_redirect_url(self, *args, **kwargs):
-        query_string = getattr(settings, 'VALIDATED_QUERYSTRING', '')
+        query_string = getattr(settings, 'VERIFIED_QUERYSTRING', '')
         url_extra = ''
 
         if query_string and not self.already_verified:
