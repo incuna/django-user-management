@@ -1,4 +1,4 @@
-## Upcoming
+## 16.1.0
 
 * Allow VerifyUserEmailView get_redirect_url function to accept an extra string.
 
