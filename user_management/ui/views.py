@@ -33,7 +33,7 @@ class VerifyUserEmailView(VerifyAccountViewMixin, generic.RedirectView):
         if query_string and not self.already_verified:
             url_extra = '?' + query_string
 
-        return resolve_url(settings.LOGIN_URL + url_extra)
+        return resolve_url(settings.LOGIN_URL) + url_extra
 
     def dispatch(self, request, *args, **kwargs):
         try:

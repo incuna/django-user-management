@@ -1,3 +1,11 @@
+Changelog for django-user-management
+
+This project uses Semantic Versioning (2.0).
+
+## UPCOMING
+
+* Fix bug using VERIFIED_QUERYSTRING with a LOGIN_URL.
+
 ## 16.1.0
 
 * Allow VerifyUserEmailView get_redirect_url function to accept an extra string.
