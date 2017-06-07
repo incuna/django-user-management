@@ -2,7 +2,7 @@ Changelog for django-user-management
 
 This project uses Semantic Versioning (2.0).
 
-## UPCOMING
+## 16.1.1
 
 * Fix bug using VERIFIED_QUERYSTRING with a LOGIN_URL.
 
