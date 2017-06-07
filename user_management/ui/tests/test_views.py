@@ -103,6 +103,16 @@ class TestVerifyUserEmailView(RequestTestCase):
 
         self.assertEqual(response, expected_url)
 
+    @override_settings(LOGIN_URL='login')
+    @override_settings(VERIFIED_QUERYSTRING=query_string)
+    def test_get_redirect_url_with_query_string_and_login_url(self):
+        view = views.VerifyUserEmailView()
+        view.already_verified = False
+        response = view.get_redirect_url()
+        expected_url = '/login/?' + self.query_string
+
+        self.assertEqual(response, expected_url)
+
     @override_settings(VERIFIED_QUERYSTRING=query_string)
     def test_get_redirect_url_with_verified_user(self):
         view = views.VerifyUserEmailView()
