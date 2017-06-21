@@ -74,6 +74,11 @@ class TestUser(utils.APIRequestTestCase):
         self.assertEqual(user.get_full_name(), expected)
         self.assertEqual(user.get_short_name(), expected)
 
+    def test_case_insensitive_uniqueness(self):
+        self.model(email='CAPS@example.com').save()
+        with self.assertRaises(IntegrityError):
+            self.model(email='caps@example.com').save()
+
 
 class TestUserManager(TestCase):
     manager = models.User.objects

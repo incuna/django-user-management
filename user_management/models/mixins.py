@@ -1,5 +1,6 @@
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.postgres.fields import CIEmailField
 from django.contrib.sites.models import Site
 from django.core import checks, signing
 from django.db import models
@@ -56,7 +57,7 @@ class DateJoinedUserMixin(models.Model):
 
 
 class EmailUserMixin(models.Model):
-    email = models.EmailField(
+    email = CIEmailField(
         verbose_name=_('Email address'),
         unique=True,
         max_length=511,
