@@ -37,6 +37,15 @@ If you want to use the `VerifyEmailMixin`, substitute it for `ActiveUserMixin`.
 Make sure the app containing your custom user model is added to `settings.INSTALLED_APPS`,
 and set `settings.AUTH_USER_MODEL` to be the path to your custom user model.
 
+If you use `EmailUserMixin` or any of its derivatives, you'll need to set up Postgres to support a `CIText` extension in your migration. Add the following to your migration:
+
+    from django.contrib.postgres.operations import CITextExtension
+	
+    operations = [
+        CITextExtension(),
+        ...
+    ]
+
 ## Authtoken
 
 If you have `user_management.api` in your `INSTALLED_APPS`, you'll also need to create a migration in your project for the `AuthToken` model.

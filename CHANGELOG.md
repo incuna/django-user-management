@@ -2,6 +2,10 @@ Changelog for django-user-management
 
 This project uses Semantic Versioning (2.0).
 
+## 17.0.0
+
+* Backwards incompatible: Use `CIEmailField` from Django 1.11 for a case-insensitive email field.
+
 ## 16.1.1
 
 * Fix bug using VERIFIED_QUERYSTRING with a LOGIN_URL.
@@ -9,7 +13,6 @@ This project uses Semantic Versioning (2.0).
 ## 16.1.0
 
 * Allow VerifyUserEmailView get_redirect_url function to accept an extra string.
-
 * Allow user login after email verification providing a setting is true in an apps settings file.
   This works in Django 1.10.
 
