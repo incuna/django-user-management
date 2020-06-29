@@ -16,10 +16,15 @@ matrix:
     - env: TOX_ENV=py27-djangopre
     - env: TOX_ENV=py34-djangopre
     - env: TOX_ENV=py35-djangopre
+services:
+  - postgresql
+addons:
+  postgresql: "9.4"
 install:
-  - psql -c 'CREATE DATABASE user_management' -U postgres;
   - pip install -U pip
   - pip install tox==1.9.0 coveralls
+before_script:
+  - psql -c 'CREATE DATABASE user_management' -U postgres;
 script:
   - tox -e $TOX_ENV
 after_success:
