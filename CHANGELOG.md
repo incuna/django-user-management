@@ -2,6 +2,11 @@ Changelog for django-user-management
 
 This project uses Semantic Versioning (2.0).
 
+## Upcoming
+
+* Fix Pillow security issue
+* Drop support for Python < 3.6
+
 ## 17.0.0
 
 * Backwards incompatible: Use `CIEmailField` from Django 1.11 for a case-insensitive email field.

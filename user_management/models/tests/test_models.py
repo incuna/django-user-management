@@ -5,7 +5,7 @@ from django.core import checks
 from django.db.models import TextField
 from django.db.utils import IntegrityError
 from django.test import TestCase
-from django.utils import six, timezone
+from django.utils import timezone
 
 from mock import Mock, patch
 
@@ -56,7 +56,7 @@ class TestUser(utils.APIRequestTestCase):
         """Does "User.__str__()" work as expected?"""
         expected = 'Leopold Stotch'
         user = self.model(name=expected)
-        self.assertEqual(six.text_type(user), expected)
+        self.assertEqual(str(user), expected)
 
     def test_name_methods(self):
         """Do "User.get_full_name()" & "get_short_name()" work as expected?"""
@@ -271,7 +271,7 @@ class TestCustomNameUser(utils.APIRequestTestCase):
         model = self.model(name=expected)
 
         self.assertEqual(model.get_full_name(), expected)
-        self.assertEqual(six.text_type(model), expected)
+        self.assertEqual(str(model), expected)
         field = self.model._meta.get_field('name')
         self.assertIsInstance(field, TextField)
 
