@@ -150,7 +150,7 @@ class EmailVerifyUserMethodsMixin:
 
     def generate_uid(self):
         """Generate user uid for password reset."""
-        return urlsafe_base64_encode(force_bytes(self.pk)).decode()
+        return urlsafe_base64_encode(force_bytes(self.pk))
 
     def send_validation_email(self):
         """Send a validation email to the user's email address."""

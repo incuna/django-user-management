@@ -8,12 +8,10 @@ from colour_runner.django_runner import ColourRunnerMixin
 from django.conf import settings
 
 
-MIGRATION_MODULES = {}
-if django.VERSION >= (1, 8):
-    MIGRATION_MODULES = {
-        'api': 'user_management.tests.testmigrations.api',
-        'tests': 'user_management.tests.testmigrations.tests',
-    }
+MIGRATION_MODULES = {
+    'api': 'user_management.tests.testmigrations.api',
+    'tests': 'user_management.tests.testmigrations.tests',
+}
 
 
 settings.configure(
@@ -31,6 +29,7 @@ settings.configure(
         'django.contrib.auth',
         'django.contrib.sessions',
         'django.contrib.admin',
+        'django.contrib.messages',
 
         'rest_framework.authtoken',
 
@@ -45,7 +44,11 @@ settings.configure(
     AUTHENTICATION_BACKENDS=(
         'user_management.models.backends.CaseInsensitiveEmailBackend',
     ),
-    MIDDLEWARE=(),
+    MIDDLEWARE=(
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+    ),
     ROOT_URLCONF='user_management.api.tests.urls',
     REST_FRAMEWORK={
         'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -60,13 +63,18 @@ settings.configure(
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ]
+            }
         },
     ]
 )
 
 
-if django.VERSION >= (1, 7):
-    django.setup()
+django.setup()
 
 
 # DiscoverRunner requires `django.setup()` to have been called
