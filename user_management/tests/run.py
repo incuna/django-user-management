@@ -1,11 +1,16 @@
 #! /usr/bin/env python
 """From http://stackoverflow.com/a/12260597/400691"""
+import os
 import sys
+from ast import literal_eval
 
 import dj_database_url
 import django
 from colour_runner.django_runner import ColourRunnerMixin
 from django.conf import settings
+
+
+KEEPDB = literal_eval(os.environ.get('KEEPDB', False))
 
 
 MIGRATION_MODULES = {
@@ -85,7 +90,7 @@ class TestRunner(ColourRunnerMixin, DiscoverRunner):
     pass
 
 
-test_runner = TestRunner(verbosity=1, keepdb=True)
+test_runner = TestRunner(verbosity=1, keepdb=KEEPDB)
 failures = test_runner.run_tests(['user_management'])
 if failures:
     sys.exit(1)
