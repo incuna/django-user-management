@@ -6,8 +6,11 @@ This project uses Semantic Versioning (2.0).
 
 * Fix Pillow security issue
 * Drop support for Python < 3.6
-* Drop support for Django < 2.2
+* Add support for Python 3.6, 3.7 and 3.8
+* Drop support for Django < 1.11
 * Add Django 2.2 and 3.0 to travis
+* Update djangorestframework>=3.9.1 for XSS fix https://github.com/encode/django-rest-framework/commit/75a489150ae24c2f3c794104a8e98fa43e2c9ce9
+* Update incuna_mail>=4.1.0 for Django 3 support
 
 ## 17.0.0
 
