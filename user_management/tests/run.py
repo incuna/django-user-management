@@ -11,8 +11,6 @@ from django.conf import settings
 
 
 KEEPDB = literal_eval(os.environ.get('KEEPDB', False))
-
-
 MIGRATION_MODULES = {
     'api': 'user_management.tests.testmigrations.api',
     'tests': 'user_management.tests.testmigrations.tests',

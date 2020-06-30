@@ -20,5 +20,5 @@ run-doc:
 release:
 	@(git diff --quiet && git diff --cached --quiet) || (echo "You have uncommitted changes - stash or commit your changes"; exit 1)
 	@git clean -dxf
-	@python setup.py register sdist bdist_wheel
+	@python setup.py sdist bdist_wheel
 	@twine upload dist/*
