@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import patch
 from rest_framework import status
 from rest_framework.test import APIRequestFactory

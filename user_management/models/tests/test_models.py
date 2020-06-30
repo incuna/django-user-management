@@ -10,7 +10,6 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import six, timezone
 
-from incuna_test_utils.utils import get_all_field_names, get_field_by_name
 from mock import Mock, patch
 
 from user_management.models.tests import utils
@@ -36,7 +35,7 @@ class TestUser(utils.APIRequestTestCase):
 
     def test_fields(self):
         """Do we have the fields we expect?"""
-        fields = get_all_field_names(self.model)
+        fields = {field.name for field in self.model._meta.get_fields()}
         expected = {
             # On model
             'id',
@@ -260,7 +259,7 @@ class TestCustomNameUser(utils.APIRequestTestCase):
 
     def test_fields(self):
         """Do we have the fields we expect?"""
-        fields = get_all_field_names(self.model)
+        fields = {field.name for field in self.model._meta.get_fields()}
         expected = {
             # On model
             'id',
@@ -283,7 +282,7 @@ class TestCustomNameUser(utils.APIRequestTestCase):
 
         self.assertEqual(model.get_full_name(), expected)
         self.assertEqual(six.text_type(model), expected)
-        field = get_field_by_name(self.model, 'name')[0]
+        field = self.model._meta.get_field('name')
         self.assertIsInstance(field, TextField)
 
     @skip_if_checks_unavailable

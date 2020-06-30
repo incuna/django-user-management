@@ -62,7 +62,7 @@ class GetAuthToken(ObtainAuthToken):
             return response.Response(msg, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            token = self.model.objects.get(key=auth[1])
+            token = self.model.objects.get(key=auth[1].decode('utf-8'))
         except self.model.DoesNotExist:
             pass
         else:
@@ -277,7 +277,7 @@ class ResendConfirmationEmail(generics.GenericAPIView):
     def initial(self, request, *args, **kwargs):
         """Disallow users other than the user whose email is being reset."""
         email = request.data.get('email')
-        if request.user.is_authenticated() and email != request.user.email:
+        if request.user.is_authenticated and email != request.user.email:
             raise PermissionDenied()
 
         return super(ResendConfirmationEmail, self).initial(

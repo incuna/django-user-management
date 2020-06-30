@@ -1,8 +1,8 @@
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
 from django.test.client import Client
+from django.urls import reverse
 from mock import patch
 from PIL import Image
 from rest_framework import status

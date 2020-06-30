@@ -5,6 +5,8 @@ from ..backends import CaseInsensitiveEmailBackend
 
 
 class CaseInsensitveEmailBackendTest(TestCase):
+    request = 'any'
+
     def test_authenticate(self):
         """
         Check case-insensitive username authentication
@@ -17,7 +19,10 @@ class CaseInsensitveEmailBackendTest(TestCase):
 
         backend = CaseInsensitiveEmailBackend()
         authenticated_user = backend.authenticate(
-            username='Test-email@example.com', password=password)
+            self.request,
+            username='Test-email@example.com',
+            password=password,
+        )
 
         self.assertEqual(user, authenticated_user)
 
@@ -33,7 +38,10 @@ class CaseInsensitveEmailBackendTest(TestCase):
 
         backend = CaseInsensitiveEmailBackend()
         authenticated_user = backend.authenticate(
-            email='Test-email@example.com', password=password)
+            self.request,
+            email='Test-email@example.com',
+            password=password,
+        )
 
         self.assertEqual(user, authenticated_user)
 
@@ -46,6 +54,10 @@ class CaseInsensitveEmailBackendTest(TestCase):
         password = 'arandomsuperstrongpassword'
 
         backend = CaseInsensitiveEmailBackend()
-        authenticated_user = backend.authenticate(email=email, password=password)
+        authenticated_user = backend.authenticate(
+            self.request,
+            email=email,
+            password=password,
+        )
 
         self.assertIs(authenticated_user, None)

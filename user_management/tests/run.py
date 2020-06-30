@@ -45,7 +45,7 @@ settings.configure(
     AUTHENTICATION_BACKENDS=(
         'user_management.models.backends.CaseInsensitiveEmailBackend',
     ),
-    MIDDLEWARE_CLASSES=(),
+    MIDDLEWARE=(),
     ROOT_URLCONF='user_management.api.tests.urls',
     REST_FRAMEWORK={
         'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -54,6 +54,7 @@ settings.configure(
     },
     SENTRY_CLIENT='user_management.utils.sentry.SensitiveDjangoClient',
     USE_TZ=True,
+    TIME_ZONE='UTC',
     MIGRATION_MODULES=MIGRATION_MODULES,
     TEMPLATES=[
         {
@@ -76,7 +77,7 @@ class TestRunner(ColourRunnerMixin, DiscoverRunner):
     pass
 
 
-test_runner = TestRunner(verbosity=1)
+test_runner = TestRunner(verbosity=1, keepdb=True)
 failures = test_runner.run_tests(['user_management'])
 if failures:
     sys.exit(1)

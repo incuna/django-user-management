@@ -31,7 +31,7 @@ class LoginRateThrottle(ScopedRateThrottleBase):
 
 class UsernameLoginRateThrottle(LoginRateThrottle):
     def get_cache_key(self, request, view):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return None  # Only throttle unauthenticated requests
 
         ident = request.POST.get('username')

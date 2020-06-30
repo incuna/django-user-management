@@ -50,7 +50,11 @@ class AuthToken(models.Model):
     many tokens (multiple devices) in order to token expiration to work.
     """
     key = models.CharField(max_length=40, primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='authtoken')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='authtoken',
+        on_delete=models.CASCADE,
+    )
     created = models.DateTimeField(default=timezone.now, editable=False)
     expires = models.DateTimeField(default=update_expiry, editable=False)
 
