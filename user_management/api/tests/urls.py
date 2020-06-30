@@ -1,5 +1,5 @@
 from django.conf.urls import include, url
-from django.contrib.auth.views import login
+from django.contrib.auth.views import LoginView
 
 
 urlpatterns = [
@@ -16,5 +16,5 @@ urlpatterns = [
         ),
         namespace='user_management_api',
     )),
-    url(r'^login/$', login, name='login')
+    url(r'^login/$', LoginView.as_view(), name='login')
 ]
