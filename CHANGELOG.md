@@ -6,6 +6,8 @@ This project uses Semantic Versioning (2.0).
 
 * Fix Pillow security issue
 * Drop support for Python < 3.6
+* Drop support for Django < 2.2
+* Add Django 2.2 and 3.0 to travis
 
 ## 17.0.0
 
