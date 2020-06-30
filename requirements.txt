@@ -10,5 +10,5 @@ flake8-import-order==0.7
 incuna-test-utils==6.5.1
 mkdocs==0.15.3
 mock==2.0.0
-pillow==3.2.0
-psycopg2==2.6.1
+pillow>3.3.2
+psycopg2-binary==2.8.5

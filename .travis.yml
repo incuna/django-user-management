@@ -4,22 +4,27 @@ env:
     - DATABASE_URL='postgres://postgres@localhost/user_management'
     - TERM='xterm-256color'
   matrix:
-    - TOX_ENV=py27-django111
-    - TOX_ENV=py34-django111
-    - TOX_ENV=py35-django111
-    - TOX_ENV=py27-djangopre
-    - TOX_ENV=py34-djangopre
-    - TOX_ENV=py35-djangopre
+    - TOX_ENV=py36-django111
+    - TOX_ENV=py37-django111
+    - TOX_ENV=py38-django111
+    - TOX_ENV=py36-djangopre
+    - TOX_ENV=py37-djangopre
+    - TOX_ENV=py38-djangopre
 matrix:
   fast_finish: true
   allow_failures:
-    - env: TOX_ENV=py27-djangopre
-    - env: TOX_ENV=py34-djangopre
-    - env: TOX_ENV=py35-djangopre
+    - env: TOX_ENV=py36-djangopre
+    - env: TOX_ENV=py37-djangopre
+    - env: TOX_ENV=py38-djangopre
+services:
+  - postgresql
+addons:
+  postgresql: "9.4"
 install:
-  - psql -c 'CREATE DATABASE user_management' -U postgres;
   - pip install -U pip
   - pip install tox==1.9.0 coveralls
+before_script:
+  - psql -c 'CREATE DATABASE user_management' -U postgres;
 script:
   - tox -e $TOX_ENV
 after_success:

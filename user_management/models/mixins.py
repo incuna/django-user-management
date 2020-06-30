@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.core import checks, signing
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import force_bytes, python_2_unicode_compatible
+from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
 
@@ -79,7 +79,6 @@ class IsStaffUserMixin(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class NameUserMethodsMixin:
     def get_full_name(self):
         return self.name
