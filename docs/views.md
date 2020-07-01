@@ -23,7 +23,7 @@ Add the URLs to your `ROOT_URLCONF`:
 
     urlpatterns = [
         ...
-        url('', include('user_management.api.urls', namespace='user_management_api')),
+        url('', include('user_management.api.urls', namespace='user_management_api_core')),
         ...
     ]
 
@@ -32,8 +32,8 @@ If you are using the `VerifyEmailMixin`, then you'll also need to include
 
     urlpatterns = [
         ...
-        url('', include('user_management.api.urls.verify_email')),  # or
-        url('', include('user_management.ui.urls')),
+        url('', include('user_management.api.urls.verify_email', namespace='user_management_api_verify')),  # or
+        url('', include('user_management.ui.urls', namespace='user_management_ui')),
         ...
     ]
 
@@ -42,7 +42,7 @@ If you are using the `AvatarMixin`, then you'll also need to include
 
     urlpatterns = [
         ...
-        url('', include('user_management.api.avatar.urls.avatar')),
+        url('', include('user_management.api.avatar.urls.avatar', namespace='user_management_api_avatar')),
         ...
     ]
 

@@ -194,7 +194,7 @@ class UserSerializerTest(RequestTestCase):
         serializer = serializers.UserSerializer(user, context=context)
 
         url = reverse(
-            'user_management_api:user_detail',
+            'user_management_api_users:user_detail',
             kwargs={'pk': user.pk},
             request=request,
         )

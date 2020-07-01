@@ -11,6 +11,7 @@ This project uses Semantic Versioning (2.0).
 * Add Django 2.2 and 3.0 to travis
 * Update djangorestframework>=3.9.1 for XSS fix https://github.com/encode/django-rest-framework/commit/75a489150ae24c2f3c794104a8e98fa43e2c9ce9
 * Update incuna_mail>=4.1.0 for Django 3 support
+* Add a app_name to each of the urls entry points. See the docs/views.md for updated instructions.
 
 ## 17.0.0
 

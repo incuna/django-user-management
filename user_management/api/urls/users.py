@@ -3,6 +3,7 @@ from django.conf.urls import url
 from .. import views
 
 
+app_name = 'user_management_api_users'
 urlpatterns = [
     url(
         regex=r'^users/?$',

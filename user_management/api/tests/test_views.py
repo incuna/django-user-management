@@ -195,7 +195,7 @@ class GetAuthTokenTest(APIRequestTestCase):
 
     def test_user_auth_method_not_allowed(self):
         """Ensure GET requests are not allowed."""
-        auth_url = reverse('user_management_api:auth')
+        auth_url = reverse('user_management_api_core:auth')
         request = APIRequestFactory().get(auth_url)
         response = self.view_class.as_view()(request)
 
@@ -527,7 +527,7 @@ class TestPasswordReset(APIRequestTestCase):
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(b'0')  # Invalid uid, therefore bad url
 
-        view_name = 'user_management_api:password_reset_confirm'
+        view_name = 'user_management_api_core:password_reset_confirm'
         url = reverse(view_name, kwargs={'uidb64': uid, 'token': token})
         response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -681,7 +681,7 @@ class TestVerifyAccountView(APIRequestTestCase):
         user = UserFactory.build()
         token = user.generate_validation_token()
 
-        view_name = 'user_management_api:verify_user'
+        view_name = 'user_management_api_verify:verify_user'
         url = reverse(view_name, kwargs={'token': token})
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -773,7 +773,7 @@ class TestUserList(APIRequestTestCase):
 
     def expected_data(self, user):
         url = reverse(
-            'user_management_api:user_detail',
+            'user_management_api_users:user_detail',
             kwargs={'pk': user.pk},
         )
         expected = {
@@ -836,7 +836,7 @@ class TestUserDetail(APIRequestTestCase):
 
     def expected_data(self, user):
         url = reverse(
-            'user_management_api:user_detail',
+            'user_management_api_users:user_detail',
             kwargs={'pk': user.pk},
         )
         expected = {
