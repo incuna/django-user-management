@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .. import views
 
 
+app_name = 'user_management_api_verify'
 urlpatterns = [
     url(
         regex=(

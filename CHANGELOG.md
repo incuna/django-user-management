@@ -4,6 +4,7 @@ This project uses Semantic Versioning (2.0).
 
 ## Upcoming
 
+* BREAKING: Add a app_name to each of the urls entry points. See the docs/views.md for updated default url namespaces.
 * Fix Pillow security issue
 * Drop support for Python < 3.6
 * Add support for Python 3.6, 3.7 and 3.8
