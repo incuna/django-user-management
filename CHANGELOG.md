@@ -2,7 +2,7 @@ Changelog for django-user-management
 
 This project uses Semantic Versioning (2.0).
 
-## Upcoming
+## 18.0.0
 
 * BREAKING: Add a app_name to each of the urls entry points. See the docs/views.md for updated default url namespaces.
 * Fix Pillow security issue
