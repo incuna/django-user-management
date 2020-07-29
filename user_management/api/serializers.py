@@ -183,7 +183,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {
                 'lookup_field': 'pk',
-                'view_name': 'user_management_api:user_detail',
+                'view_name': 'user_management_api_users:user_detail',
             }
         }
 

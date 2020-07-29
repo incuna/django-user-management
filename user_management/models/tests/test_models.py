@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import unittest
-
-import django
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db.models import TextField
@@ -10,7 +7,6 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 
-from incuna_test_utils.utils import get_all_field_names, get_field_by_name
 from mock import Mock, patch
 
 from user_management.models.tests import utils
@@ -24,11 +20,6 @@ PASSWORD_CONTEXT = 'user_management.utils.notifications.password_reset_email_con
 VALIDATION_CONTEXT = 'user_management.utils.notifications.validation_email_context'
 SEND_METHOD = 'user_management.utils.notifications.incuna_mail.send'
 
-skip_if_checks_unavailable = unittest.skipIf(
-    django.VERSION < (1, 7),
-    'Checks only available in django>=1.7',
-)
-
 
 class TestUser(utils.APIRequestTestCase):
     """Test the "User" model"""
@@ -36,7 +27,7 @@ class TestUser(utils.APIRequestTestCase):
 
     def test_fields(self):
         """Do we have the fields we expect?"""
-        fields = get_all_field_names(self.model)
+        fields = {field.name for field in self.model._meta.get_fields()}
         expected = {
             # On model
             'id',
@@ -233,12 +224,10 @@ class TestVerifyEmailMixin(TestCase):
 
         self.assertFalse(send.called)
 
-    @skip_if_checks_unavailable
     def test_manager_check_valid(self):
         errors = self.model.check()
         self.assertEqual(errors, [])
 
-    @skip_if_checks_unavailable
     def test_manager_check_invalid(self):
         class InvalidUser(self.model):
             objects = mixins.UserManager()
@@ -260,7 +249,7 @@ class TestCustomNameUser(utils.APIRequestTestCase):
 
     def test_fields(self):
         """Do we have the fields we expect?"""
-        fields = get_all_field_names(self.model)
+        fields = {field.name for field in self.model._meta.get_fields()}
         expected = {
             # On model
             'id',
@@ -283,10 +272,9 @@ class TestCustomNameUser(utils.APIRequestTestCase):
 
         self.assertEqual(model.get_full_name(), expected)
         self.assertEqual(str(model), expected)
-        field = get_field_by_name(self.model, 'name')[0]
+        field = self.model._meta.get_field('name')
         self.assertIsInstance(field, TextField)
 
-    @skip_if_checks_unavailable
     def test_manager_check_invalid(self):
         errors = self.model.check()
         self.assertEqual(errors, [])

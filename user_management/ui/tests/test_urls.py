@@ -8,6 +8,6 @@ class TestURLs(URLTestCase):
         self.assert_url_matches_view(
             view=views.VerifyUserEmailView,
             expected_url='/register/verify/x:-y/',
-            url_name='user_management_api:registration-verify',
+            url_name='user_management_ui:registration-verify',
             url_kwargs={'token': 'x:-y'},
         )

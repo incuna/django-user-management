@@ -1,8 +1,8 @@
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
 from django.test.client import Client
+from django.urls import reverse
 from mock import patch
 from PIL import Image
 from rest_framework import status
@@ -172,7 +172,7 @@ class TestProfileAvatar(APIRequestTestCase):
         token = AuthTokenFactory(user=user)
 
         data = {'avatar': SIMPLE_PNG, 'token': token.key}
-        url = reverse('user_management_api:profile_avatar')
+        url = reverse('user_management_api_avatar:profile_avatar')
         response = client.post(url, data=data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -336,7 +336,7 @@ class TestUserAvatar(APIRequestTestCase):
 
         data = {'avatar': SIMPLE_PNG, 'token': token.key}
         url_kwargs = {'pk': user.pk}
-        url = reverse('user_management_api:user_avatar', kwargs=url_kwargs)
+        url = reverse('user_management_api_avatar:user_avatar', kwargs=url_kwargs)
         response = client.post(url, data=data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

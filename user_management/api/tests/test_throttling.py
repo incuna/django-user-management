@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import patch
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
@@ -26,7 +26,7 @@ class GetAuthTokenTest(ClearCacheMixin, APIRequestTestCase):
     view_class = views.GetAuthToken
 
     def setUp(self):
-        self.auth_url = reverse('user_management_api:auth')
+        self.auth_url = reverse('user_management_api_core:auth')
 
     @patch(THROTTLE_RATE_PATH, new={'logins': '1/minute'})
     def test_user_auth_throttle(self):

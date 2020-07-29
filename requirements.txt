@@ -3,11 +3,11 @@
 colour-runner==0.0.4
 coverage==4.2.0
 dj-database-url==0.4.1
-dj-inmemorystorage==1.4.0
+dj-inmemorystorage==2.1.0
 factory-boy==2.8.1
 flake8==2.5.4
 flake8-import-order==0.7
-incuna-test-utils==6.5.1
+incuna-test-utils==8.0.0
 mkdocs==0.15.3
 mock==2.0.0
 pillow>3.3.2

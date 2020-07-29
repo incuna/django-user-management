@@ -1,5 +1,3 @@
-from incuna_test_utils.utils import get_all_field_names
-
 from user_management.models.tests import factories, utils
 from ..models import AuthToken
 
@@ -8,13 +6,12 @@ class TestAuthToken(utils.APIRequestTestCase):
     model = AuthToken
 
     def test_fields(self):
-        fields = get_all_field_names(self.model)
+        fields = {field.name for field in self.model._meta.get_fields()}
 
         expected = (
             # Inherited from subclassed model
             'key',
             'user',
-            'user_id',
             'created',
 
             'expires',

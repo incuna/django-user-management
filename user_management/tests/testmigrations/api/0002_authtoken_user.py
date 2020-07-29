@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='authtoken',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='authtoken'),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='authtoken', on_delete=models.CASCADE),
         ),
     ]

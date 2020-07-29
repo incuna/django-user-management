@@ -7,6 +7,12 @@ env:
     - TOX_ENV=py36-django111
     - TOX_ENV=py37-django111
     - TOX_ENV=py38-django111
+    - TOX_ENV=py36-django22
+    - TOX_ENV=py37-django22
+    - TOX_ENV=py38-django22
+    - TOX_ENV=py36-django30
+    - TOX_ENV=py37-django30
+    - TOX_ENV=py38-django30
     - TOX_ENV=py36-djangopre
     - TOX_ENV=py37-djangopre
     - TOX_ENV=py38-djangopre
